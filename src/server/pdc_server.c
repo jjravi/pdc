@@ -59,6 +59,11 @@
 #include <rdmacred.h>
 #endif
 
+#ifdef ENABLE_ROCKSDB
+#include "rocksdb/c.h"
+rocksdb_t *rocksdb_g;
+#endif
+
 #define PDC_CHECKPOINT_INTERVAL         200
 #define PDC_CHECKPOINT_MIN_INTERVAL_SEC 300
 
@@ -127,6 +132,7 @@ int               read_from_bb_size_g          = 0;
 int               gen_hist_g                   = 0;
 int               gen_fastbit_idx_g            = 0;
 int               use_fastbit_idx_g            = 0;
+int               use_rocksdb_g                = 0;
 char *            gBinningOption               = NULL;
 
 double server_write_time_g                  = 0.0;
@@ -367,6 +373,14 @@ PDC_Server_rm_config_file()
     FUNC_ENTER(NULL);
 
     snprintf(config_fname, ADDR_MAX, "%s%s", pdc_server_tmp_dir_g, pdc_server_cfg_name_g);
+
+    if (remove(config_fname) != 0) {
+        printf("==PDC_SERVER[%d]: Unable to delete the config file[%s]", pdc_server_rank_g, config_fname);
+        ret_value = FAIL;
+        goto done;
+    }
+
+    snprintf(config_fname, ADDR_MAX, "/tmp/PDC_rocksdb_%d", pdc_server_rank_g);
 
     if (remove(config_fname) != 0) {
         printf("==PDC_SERVER[%d]: Unable to delete the config file[%s]", pdc_server_rank_g, config_fname);
@@ -1914,6 +1928,10 @@ PDC_Server_get_env()
     if (tmp_env_char != NULL)
         use_fastbit_idx_g = 1;
 
+    tmp_env_char = getenv("PDC_USE_ROCKSDB");
+    if (tmp_env_char != NULL)
+        use_rocksdb_g = 1;
+
     if (pdc_server_rank_g == 0) {
         printf("\n==PDC_SERVER[%d]: using [%s] as tmp dir. %d OSTs per data file, %d%% to BB\n",
                pdc_server_rank_g, pdc_server_tmp_dir_g, pdc_nost_per_file_g, write_to_bb_percentage_g);
@@ -1991,6 +2009,30 @@ main(int argc, char *argv[])
         if (PDC_Server_write_addr_to_file(all_addr_strings_g, pdc_server_size_g) != SUCCEED)
             printf("==PDC_SERVER[%d]: Error with write config file\n", pdc_server_rank_g);
 
+#ifdef ENABLE_ROCKSDB
+    if (use_rocksdb_g) {
+        /* rocksdb_backup_engine_t *be; */
+        rocksdb_options_t *options = rocksdb_options_create();
+        /* rocksdb_options_increase_parallelism(options, 1); */
+        rocksdb_options_optimize_level_style_compaction(options, 0);
+        rocksdb_options_set_create_if_missing(options, 1);
+
+        char *err = NULL;
+        char rocksdb_path[ADDR_MAX];
+        snprintf(rocksdb_path, ADDR_MAX, "/tmp/PDC_rocksdb_%d", pdc_server_rank_g);
+
+        // Remove the in-memory db
+        remove(rocksdb_path);
+
+        // Create db
+        rocksdb_g = rocksdb_open(options, rocksdb_path, &err);
+        assert(!err);
+        if (pdc_server_rank_g == 0)
+            printf("==PDC_SERVER[%d]: RocksDB initialized\n", pdc_server_rank_g);
+    }
+
+#endif
+
 #ifdef ENABLE_TIMING
     // Timing
     gettimeofday(&end, 0);
@@ -2028,10 +2070,18 @@ main(int argc, char *argv[])
 #endif
 
 done:
+
+#ifdef ENABLE_ROCKSDB
+    if (use_rocksdb_g)
+        rocksdb_close(rocksdb_g);
+#endif
+
 #if PDC_TIMING == 1
     PDC_server_timing_report();
 #endif
+
     PDC_Server_finalize();
+
 #ifdef ENABLE_MPI
     MPI_Finalize();
 #endif

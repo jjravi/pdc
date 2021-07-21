@@ -336,6 +336,14 @@ if(PDC_ENABLE_FASTBIT)
     set(ENABLE_FASTBIT 1)
 endif()
 
+#-----------------------------------------------------------------------------
+# Metadata with RocksDB
+#-----------------------------------------------------------------------------
+option(PDC_ENABLE_ROCKSDB "Enable RocksDB." OFF)
+if(PDC_ENABLE_ROCKSDB)
+    set(ENABLE_ROCKSDB 1)
+endif()
+
 #------------------------------------------------------------------------------
 # Data type
 #------------------------------------------------------------------------------
@@ -425,6 +433,14 @@ install(
     ${PDC_BINARY_DIR}/bin
   DESTINATION
     ${PDC_INSTALL_DATA_DIR}/test
+)
+
+install(
+  FILES
+    ${PDC_BINARY_DIR}/bin/pdc_server.exe
+    ${PDC_BINARY_DIR}/bin/close_server
+  DESTINATION
+    ${CMAKE_INSTALL_PREFIX}/bin
 )
 
 #-----------------------------------------------------------------------------

@@ -2549,49 +2549,71 @@ PDC_Server_add_kvtag(metadata_add_kvtag_in_t *in, metadata_add_tag_out_t *out)
     gettimeofday(&pdc_timer_start, 0);
 #endif
 
-    hash_key = in->hash_value;
     obj_id   = in->obj_id;
 
-#ifdef ENABLE_MULTITHREAD
-    // Obtain lock for hash table
-    unlocked = 0;
-    hg_thread_mutex_lock(&pdc_metadata_hash_table_mutex_g);
+    if (use_rocksdb_g == 1) {
+#ifdef ENABLE_ROCKSDB
+        rocksdb_writeoptions_t *writeoptions = rocksdb_writeoptions_create();
+        char rocksdb_key[512];
+        sprintf(rocksdb_key, "%lu_%s", obj_id, in->kvtag.name);
+        char *err;
+        rocksdb_put(rocksdb_g, writeoptions, rocksdb_key, strlen(rocksdb_key), in->kvtag.value, in->kvtag.size, &err);
+        if (err != NULL && err != "") {
+            printf("==PDC_SERVER[%d]: error with rocksdb_put %s!\n", pdc_server_rank_g, in->kvtag.name);
+            ret_value = FAIL;
+            goto done;
+        }
+        out->ret = 1;
+#else
+        printf("==PDC_SERVER[%d]: enabled rocksdb but PDC is not compiled with it!\n", pdc_server_rank_g);
+        goto done;
 #endif
-
-    lookup_value = hash_table_lookup(metadata_hash_table_g, &hash_key);
-    if (lookup_value != NULL) {
-        pdc_metadata_t *target;
-        target = find_metadata_by_id_from_list(lookup_value->metadata, obj_id);
-        if (target != NULL) {
-            PDC_add_kvtag_to_list(&target->kvtag_list_head, &in->kvtag);
-            out->ret = 1;
-        } // if (lookup_value != NULL)
-        else {
-            // Object not found
-            ret_value = FAIL;
-            out->ret  = -1;
-        }
-
-    }      // if lookup_value != NULL
-    else { // look for containers
-        cont_lookup_value = hash_table_lookup(container_hash_table_g, &hash_key);
-        if (cont_lookup_value != NULL) {
-            PDC_add_kvtag_to_list(&cont_lookup_value->kvtag_list_head, &in->kvtag);
-            out->ret = 1;
-        }
-        else {
-            printf("==PDC_SERVER[%d]: add tag target %" PRIu64 " not found!\n", pdc_server_rank_g, obj_id);
-            ret_value = FAIL;
-            out->ret  = -1;
-        }
     }
+    else {
+        hash_key = in->hash_value;
 
 #ifdef ENABLE_MULTITHREAD
-    // ^ Release hash table lock
-    hg_thread_mutex_unlock(&pdc_metadata_hash_table_mutex_g);
-    unlocked = 1;
+        // Obtain lock for hash table
+        unlocked = 0;
+        hg_thread_mutex_lock(&pdc_metadata_hash_table_mutex_g);
 #endif
 
+        lookup_value = hash_table_lookup(metadata_hash_table_g, &hash_key);
+        if (lookup_value != NULL) {
+            pdc_metadata_t *target;
+            target = find_metadata_by_id_from_list(lookup_value->metadata, obj_id);
+            if (target != NULL) {
+                PDC_add_kvtag_to_list(&target->kvtag_list_head, &in->kvtag);
+                out->ret = 1;
+            } // if (lookup_value != NULL)
+            else {
+                // Object not found
+                ret_value = FAIL;
+                out->ret  = -1;
+            }
+
+        }      // if lookup_value != NULL
+        else { // look for containers
+            cont_lookup_value = hash_table_lookup(container_hash_table_g, &hash_key);
+            if (cont_lookup_value != NULL) {
+                PDC_add_kvtag_to_list(&cont_lookup_value->kvtag_list_head, &in->kvtag);
+                out->ret = 1;
+            }
+            else {
+                printf("==PDC_SERVER[%d]: add tag target %" PRIu64 " not found!\n", pdc_server_rank_g, obj_id);
+                ret_value = FAIL;
+                out->ret  = -1;
+            }
+        }
+
+#ifdef ENABLE_MULTITHREAD
+        // ^ Release hash table lock
+        hg_thread_mutex_unlock(&pdc_metadata_hash_table_mutex_g);
+        unlocked = 1;
+#endif
+    } // End else (no rocksdb)
+
+done:
 #ifdef ENABLE_TIMING
     // Timing
     gettimeofday(&pdc_timer_end, 0);
@@ -2614,7 +2636,6 @@ PDC_Server_add_kvtag(metadata_add_kvtag_in_t *in, metadata_add_tag_out_t *out)
     if (unlocked == 0)
         hg_thread_mutex_unlock(&pdc_metadata_hash_table_mutex_g);
 #endif
-    fflush(stdout);
 
     FUNC_LEAVE(ret_value);
 }
@@ -2667,48 +2688,73 @@ PDC_Server_get_kvtag(metadata_get_kvtag_in_t *in, metadata_get_kvtag_out_t *out)
     hash_key = in->hash_value;
     obj_id   = in->obj_id;
 
-#ifdef ENABLE_MULTITHREAD
-    // Obtain lock for hash table
-    unlocked = 0;
-    hg_thread_mutex_lock(&pdc_metadata_hash_table_mutex_g);
-#endif
-
-    lookup_value = hash_table_lookup(metadata_hash_table_g, &hash_key);
-    if (lookup_value != NULL) {
-        pdc_metadata_t *target;
-        target = find_metadata_by_id_from_list(lookup_value->metadata, obj_id);
-        if (target != NULL) {
-            PDC_get_kvtag_value_from_list(&target->kvtag_list_head, in->key, out);
-            out->ret = 1;
-        }
-        else {
+    if (use_rocksdb_g == 1) {
+#ifdef ENABLE_ROCKSDB
+        rocksdb_readoptions_t *readoptions = rocksdb_readoptions_create();
+        char rocksdb_key[512];
+        sprintf(rocksdb_key, "%lu_%s", obj_id, in->key);
+        char *err;
+        size_t len;
+        char *value = rocksdb_get(rocksdb_g, readoptions, rocksdb_key, strlen(rocksdb_key), &len, &err);
+        if (value == NULL) {
+            printf("==PDC_SERVER[%d]: error with rocksdb_get %s!\n", pdc_server_rank_g, in->key);
             ret_value = FAIL;
-            out->ret  = -1;
+            goto done;
         }
+        out->kvtag.name  = in->key;
+        out->kvtag.size  = len;
+        out->kvtag.value = value;
+        out->ret = 1;
+#else
+        printf("==PDC_SERVER[%d]: enabled rocksdb but PDC is not compiled with it!\n", pdc_server_rank_g);
+        goto done;
+#endif
     }
     else {
 
-        cont_lookup_value = hash_table_lookup(container_hash_table_g, &hash_key);
-        if (cont_lookup_value != NULL) {
-            PDC_get_kvtag_value_from_list(&cont_lookup_value->kvtag_list_head, in->key, out);
-            out->ret = 1;
+#ifdef ENABLE_MULTITHREAD
+        // Obtain lock for hash table
+        unlocked = 0;
+        hg_thread_mutex_lock(&pdc_metadata_hash_table_mutex_g);
+#endif
+
+        lookup_value = hash_table_lookup(metadata_hash_table_g, &hash_key);
+        if (lookup_value != NULL) {
+            pdc_metadata_t *target;
+            target = find_metadata_by_id_from_list(lookup_value->metadata, obj_id);
+            if (target != NULL) {
+                PDC_get_kvtag_value_from_list(&target->kvtag_list_head, in->key, out);
+                out->ret = 1;
+            }
+            else {
+                ret_value = FAIL;
+                out->ret  = -1;
+            }
         }
         else {
-            ret_value = FAIL;
-            out->ret  = -1;
-        }
-    }
 
-    if (ret_value != SUCCEED) {
-        printf("==PDC_SERVER[%d]: %s - error \n", pdc_server_rank_g, __func__);
-        goto done;
-    }
+            cont_lookup_value = hash_table_lookup(container_hash_table_g, &hash_key);
+            if (cont_lookup_value != NULL) {
+                PDC_get_kvtag_value_from_list(&cont_lookup_value->kvtag_list_head, in->key, out);
+                out->ret = 1;
+            }
+            else {
+                ret_value = FAIL;
+                out->ret  = -1;
+            }
+        }
+
+        if (ret_value != SUCCEED) {
+            printf("==PDC_SERVER[%d]: %s - error \n", pdc_server_rank_g, __func__);
+            goto done;
+        }
 
 #ifdef ENABLE_MULTITHREAD
-    // ^ Release hash table lock
-    hg_thread_mutex_unlock(&pdc_metadata_hash_table_mutex_g);
-    unlocked = 1;
+        // ^ Release hash table lock
+        hg_thread_mutex_unlock(&pdc_metadata_hash_table_mutex_g);
+        unlocked = 1;
 #endif
+    } // else use native metadata hash table
 
 #ifdef ENABLE_TIMING
     // Timing

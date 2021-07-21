@@ -5917,6 +5917,7 @@ PDC_get_kvtag(pdcid_t obj_id, char *tag_name, pdc_kvtag_t **kvtag, int is_cont)
     work_todo_g = 1;
     PDC_Client_check_response(&send_context_g);
 
+    (*kvtag)->name = tag_name;
     if (lookup_args.ret != 1)
         printf("PDC_CLIENT: get kvtag NOT successful ... ret_value = %d\n", lookup_args.ret);
 
