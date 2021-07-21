@@ -98,7 +98,7 @@ extern uint32_t n_metadata_g;
 #ifdef ENABLE_ROCKSDB
 #include "rocksdb/c.h"
 extern rocksdb_t *rocksdb_g;
-extern int use_rocksdb_g;
+extern int        use_rocksdb_g;
 #endif
 /***************************************/
 /* Library-private Function Prototypes */

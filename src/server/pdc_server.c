@@ -2018,7 +2018,7 @@ main(int argc, char *argv[])
         rocksdb_options_set_create_if_missing(options, 1);
 
         char *err = NULL;
-        char rocksdb_path[ADDR_MAX];
+        char  rocksdb_path[ADDR_MAX];
         snprintf(rocksdb_path, ADDR_MAX, "/tmp/PDC_rocksdb_%d", pdc_server_rank_g);
 
         // Remove the in-memory db
