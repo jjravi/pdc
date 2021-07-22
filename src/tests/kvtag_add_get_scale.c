@@ -70,10 +70,9 @@ main(int argc, char *argv[])
     pdcid_t       pdc, cont_prop, cont, obj_prop;
     pdcid_t *     obj_ids;
     int           n_obj, n_add_tag, n_query, my_obj, my_obj_s, my_add_tag, my_query, my_add_tag_s, my_query_s;
-    int           proc_num, my_rank, i, v;
+    int           proc_num, my_rank, i, j, v;
     char          obj_name[128];
     double        stime, total_time;
-    pdc_kvtag_t   kvtag;
     void          **values;
     size_t        value_size;
 #ifdef ENABLE_MPI
@@ -134,18 +133,20 @@ main(int argc, char *argv[])
         printf("Created %d objects\n", n_obj);
 
     // Add tags
-    kvtag.name  = "Group";
-    kvtag.value = (void *)&v;
-    kvtag.size  = sizeof(int);
+    char name[128];
+    size_t v_size  = sizeof(int);
 
 #ifdef ENABLE_MPI
     MPI_Barrier(MPI_COMM_WORLD);
     stime = MPI_Wtime();
 #endif
-    for (i = 0; i < my_add_tag; i++) {
-        v = i + my_add_tag_s;
-        if (PDCobj_put_tag(obj_ids[i], kvtag.name, kvtag.value, kvtag.size) < 0)
-            printf("fail to add a kvtag to o%d\n", i + my_obj_s);
+    for (j = 0; j < my_obj; j++) {
+        for (i = 0; i < my_add_tag; i++) {
+            sprintf(name, "Tag_from_%d_of_%d", my_rank, i);
+            v = i + my_add_tag_s;
+            if (PDCobj_put_tag(obj_ids[j], name, &v, v_size) < 0)
+                printf("fail to add a kvtag to o%d\n", j + my_obj_s);
+        }
     }
 
 #ifdef ENABLE_MPI
@@ -161,9 +162,12 @@ main(int argc, char *argv[])
     MPI_Barrier(MPI_COMM_WORLD);
     stime = MPI_Wtime();
 #endif
-    for (i = 0; i < my_query; i++) {
-        if (PDCobj_get_tag(obj_ids[i], kvtag.name, &values[i], (void *)&value_size) < 0)
-            printf("fail to get a kvtag from o%d\n", i + my_query_s);
+    for (j = 0; j < my_obj; j++) {
+        for (i = 0; i < my_query; i++) {
+            sprintf(name, "Tag_from_%d_of_%d", my_rank, i);
+            if (PDCobj_get_tag(obj_ids[j], name, &values[i], (void *)&value_size) < 0)
+                printf("fail to get a kvtag from o%d\n", j + my_obj_s);
+        }
     }
 
 #ifdef ENABLE_MPI

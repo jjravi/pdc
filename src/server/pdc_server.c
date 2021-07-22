@@ -34,6 +34,7 @@
 #include <fcntl.h>
 #include <inttypes.h>
 #include <math.h>
+#include <fts.h>
 
 #include <sys/shm.h>
 #include <sys/mman.h>
@@ -359,6 +360,85 @@ done:
     FUNC_LEAVE(ret_value);
 }
 
+/* int unlink_cb(const char *fpath, const struct stat *sb, int typeflag, struct FTW *ftwbuf) */
+/* { */
+/*     int rv = remove(fpath); */
+
+/*     if (rv) */
+/*         perror(fpath); */
+
+/*     return rv; */
+/* } */
+
+/* int rmrf(char *path) */
+/* { */
+/*     return nftw(path, unlink_cb, 64, FTW_DEPTH | FTW_PHYS); */
+/* } */
+static int 
+remove_directory(const char *dir) 
+{
+    int ret = 0;
+    FTS *ftsp = NULL;
+    FTSENT *curr;
+
+    // Cast needed (in C) because fts_open() takes a "char * const *", instead
+    // of a "const char * const *", which is only allowed in C++. fts_open()
+    // does not modify the argument.
+    char *files[] = { (char *) dir, NULL };
+
+    // FTS_NOCHDIR  - Avoid changing cwd, which could cause unexpected behavior
+    //                in multithreaded programs
+    // FTS_PHYSICAL - Don't follow symlinks. Prevents deletion of files outside
+    //                of the specified directory
+    // FTS_XDEV     - Don't cross filesystem boundaries
+    ftsp = fts_open(files, FTS_NOCHDIR | FTS_PHYSICAL | FTS_XDEV, NULL);
+    if (!ftsp) {
+        fprintf(stderr, "PDC_SERVER: %s: fts_open failed: %s\n", dir, strerror(curr->fts_errno));
+        ret = -1;
+        goto done;
+    }
+
+    while ((curr = fts_read(ftsp))) {
+        switch (curr->fts_info) {
+        case FTS_NS:
+        case FTS_DNR:
+        case FTS_ERR:
+            break;
+
+        case FTS_DC:
+        case FTS_DOT:
+        case FTS_NSOK:
+            // Not reached unless FTS_LOGICAL, FTS_SEEDOT, or FTS_NOSTAT were
+            // passed to fts_open()
+            break;
+
+        case FTS_D:
+            // Do nothing. Need depth-first search, so directories are deleted
+            // in FTS_DP
+            break;
+
+        case FTS_DP:
+        case FTS_F:
+        case FTS_SL:
+        case FTS_SLNONE:
+        case FTS_DEFAULT:
+            if (remove(curr->fts_accpath) < 0) {
+                fprintf(stderr, "PDC_SERVER: %s: Failed to remove: %s\n",
+                        curr->fts_path, strerror(curr->fts_errno));
+                ret = -1;
+            }
+            break;
+        }
+    }
+
+done:
+    if (ftsp) {
+        fts_close(ftsp);
+    }
+
+    return ret;
+}
+
 /*
  * Remove server config file
  *
@@ -381,12 +461,8 @@ PDC_Server_rm_config_file()
     }
 
     snprintf(config_fname, ADDR_MAX, "/tmp/PDC_rocksdb_%d", pdc_server_rank_g);
+    remove_directory(config_fname);
 
-    if (remove(config_fname) != 0) {
-        printf("==PDC_SERVER[%d]: Unable to delete the config file[%s]", pdc_server_rank_g, config_fname);
-        ret_value = FAIL;
-        goto done;
-    }
 
 done:
     FUNC_LEAVE(ret_value);
@@ -1929,7 +2005,7 @@ PDC_Server_get_env()
         use_fastbit_idx_g = 1;
 
     tmp_env_char = getenv("PDC_USE_ROCKSDB");
-    if (tmp_env_char != NULL)
+    if (tmp_env_char != NULL && strcmp(tmp_env_char, "1") == 0)
         use_rocksdb_g = 1;
 
     if (pdc_server_rank_g == 0) {
@@ -2022,7 +2098,7 @@ main(int argc, char *argv[])
         snprintf(rocksdb_path, ADDR_MAX, "/tmp/PDC_rocksdb_%d", pdc_server_rank_g);
 
         // Remove the in-memory db
-        remove(rocksdb_path);
+	remove_directory(rocksdb_path);
 
         // Create db
         rocksdb_g = rocksdb_open(options, rocksdb_path, &err);

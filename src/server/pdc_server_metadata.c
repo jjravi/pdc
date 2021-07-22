@@ -2549,17 +2549,20 @@ PDC_Server_add_kvtag(metadata_add_kvtag_in_t *in, metadata_add_tag_out_t *out)
     gettimeofday(&pdc_timer_start, 0);
 #endif
 
+    out->ret = -1;
     obj_id   = in->obj_id;
+    hash_key = in->hash_value;
 
     if (use_rocksdb_g == 1) {
 #ifdef ENABLE_ROCKSDB
         rocksdb_writeoptions_t *writeoptions = rocksdb_writeoptions_create();
-        char rocksdb_key[512];
+        char rocksdb_key[512] = {0};
         sprintf(rocksdb_key, "%lu_%s", obj_id, in->kvtag.name);
-        char *err;
+        char *err = NULL;
+        /* printf("Put %s, vsize %lu\n", rocksdb_key, in->kvtag.size); */
         rocksdb_put(rocksdb_g, writeoptions, rocksdb_key, strlen(rocksdb_key), in->kvtag.value, in->kvtag.size, &err);
-        if (err != NULL && err != "") {
-            printf("==PDC_SERVER[%d]: error with rocksdb_put %s!\n", pdc_server_rank_g, in->kvtag.name);
+        if (err != NULL) {
+            printf("==PDC_SERVER[%d]: error with rocksdb_put %s, [%s]!\n", pdc_server_rank_g, in->kvtag.name, err);
             ret_value = FAIL;
             goto done;
         }
@@ -2570,8 +2573,6 @@ PDC_Server_add_kvtag(metadata_add_kvtag_in_t *in, metadata_add_tag_out_t *out)
 #endif
     }
     else {
-        hash_key = in->hash_value;
-
 #ifdef ENABLE_MULTITHREAD
         // Obtain lock for hash table
         unlocked = 0;
@@ -2685,6 +2686,7 @@ PDC_Server_get_kvtag(metadata_get_kvtag_in_t *in, metadata_get_kvtag_out_t *out)
     gettimeofday(&pdc_timer_start, 0);
 #endif
 
+    out->ret = -1;
     hash_key = in->hash_value;
     obj_id   = in->obj_id;
 
@@ -2693,11 +2695,11 @@ PDC_Server_get_kvtag(metadata_get_kvtag_in_t *in, metadata_get_kvtag_out_t *out)
         rocksdb_readoptions_t *readoptions = rocksdb_readoptions_create();
         char rocksdb_key[512];
         sprintf(rocksdb_key, "%lu_%s", obj_id, in->key);
-        char *err;
+        char *err = NULL;
         size_t len;
         char *value = rocksdb_get(rocksdb_g, readoptions, rocksdb_key, strlen(rocksdb_key), &len, &err);
         if (value == NULL) {
-            printf("==PDC_SERVER[%d]: error with rocksdb_get %s!\n", pdc_server_rank_g, in->key);
+            printf("==PDC_SERVER[%d]: error with rocksdb_get %s, [%s]!\n", pdc_server_rank_g, in->key, err);
             ret_value = FAIL;
             goto done;
         }
