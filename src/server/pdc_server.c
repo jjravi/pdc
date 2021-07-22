@@ -374,17 +374,17 @@ done:
 /* { */
 /*     return nftw(path, unlink_cb, 64, FTW_DEPTH | FTW_PHYS); */
 /* } */
-static int 
-remove_directory(const char *dir) 
+static int
+remove_directory(const char *dir)
 {
-    int ret = 0;
-    FTS *ftsp = NULL;
+    int     ret  = 0;
+    FTS *   ftsp = NULL;
     FTSENT *curr;
 
     // Cast needed (in C) because fts_open() takes a "char * const *", instead
     // of a "const char * const *", which is only allowed in C++. fts_open()
     // does not modify the argument.
-    char *files[] = { (char *) dir, NULL };
+    char *files[] = {(char *)dir, NULL};
 
     // FTS_NOCHDIR  - Avoid changing cwd, which could cause unexpected behavior
     //                in multithreaded programs
@@ -400,34 +400,34 @@ remove_directory(const char *dir)
 
     while ((curr = fts_read(ftsp))) {
         switch (curr->fts_info) {
-        case FTS_NS:
-        case FTS_DNR:
-        case FTS_ERR:
-            break;
+            case FTS_NS:
+            case FTS_DNR:
+            case FTS_ERR:
+                break;
 
-        case FTS_DC:
-        case FTS_DOT:
-        case FTS_NSOK:
-            // Not reached unless FTS_LOGICAL, FTS_SEEDOT, or FTS_NOSTAT were
-            // passed to fts_open()
-            break;
+            case FTS_DC:
+            case FTS_DOT:
+            case FTS_NSOK:
+                // Not reached unless FTS_LOGICAL, FTS_SEEDOT, or FTS_NOSTAT were
+                // passed to fts_open()
+                break;
 
-        case FTS_D:
-            // Do nothing. Need depth-first search, so directories are deleted
-            // in FTS_DP
-            break;
+            case FTS_D:
+                // Do nothing. Need depth-first search, so directories are deleted
+                // in FTS_DP
+                break;
 
-        case FTS_DP:
-        case FTS_F:
-        case FTS_SL:
-        case FTS_SLNONE:
-        case FTS_DEFAULT:
-            if (remove(curr->fts_accpath) < 0) {
-                fprintf(stderr, "PDC_SERVER: %s: Failed to remove: %s\n",
-                        curr->fts_path, strerror(curr->fts_errno));
-                ret = -1;
-            }
-            break;
+            case FTS_DP:
+            case FTS_F:
+            case FTS_SL:
+            case FTS_SLNONE:
+            case FTS_DEFAULT:
+                if (remove(curr->fts_accpath) < 0) {
+                    fprintf(stderr, "PDC_SERVER: %s: Failed to remove: %s\n", curr->fts_path,
+                            strerror(curr->fts_errno));
+                    ret = -1;
+                }
+                break;
         }
     }
 
@@ -462,7 +462,6 @@ PDC_Server_rm_config_file()
 
     snprintf(config_fname, ADDR_MAX, "/tmp/PDC_rocksdb_%d", pdc_server_rank_g);
     remove_directory(config_fname);
-
 
 done:
     FUNC_LEAVE(ret_value);
@@ -2094,11 +2093,11 @@ main(int argc, char *argv[])
         rocksdb_options_set_create_if_missing(options, 1);
 
         char *err = NULL;
-        char rocksdb_path[ADDR_MAX];
+        char  rocksdb_path[ADDR_MAX];
         snprintf(rocksdb_path, ADDR_MAX, "/tmp/PDC_rocksdb_%d", pdc_server_rank_g);
 
         // Remove the in-memory db
-	remove_directory(rocksdb_path);
+        remove_directory(rocksdb_path);
 
         // Create db
         rocksdb_g = rocksdb_open(options, rocksdb_path, &err);
