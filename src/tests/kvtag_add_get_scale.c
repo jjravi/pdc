@@ -91,11 +91,11 @@ main(int argc, char *argv[])
     n_add_tag = atoi(argv[2]);
     n_query   = atoi(argv[3]);
 
-    if (n_add_tag > n_obj || n_query > n_obj) {
-        if (my_rank == 0)
-            printf("n_add_tag or n_query larger than n_obj! Exiting...\n");
-        goto done;
-    }
+    /* if (n_add_tag > n_obj || n_query > n_obj) { */
+    /*     if (my_rank == 0) */
+    /*         printf("n_add_tag or n_query larger than n_obj! Exiting...\n"); */
+    /*     goto done; */
+    /* } */
 
     assign_work_to_rank(my_rank, proc_num, n_add_tag, &my_add_tag, &my_add_tag_s);
     assign_work_to_rank(my_rank, proc_num, n_query, &my_query, &my_query_s);
