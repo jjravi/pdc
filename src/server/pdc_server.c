@@ -2092,6 +2092,14 @@ main(int argc, char *argv[])
         rocksdb_options_optimize_level_style_compaction(options, 0);
         rocksdb_options_set_create_if_missing(options, 1);
 
+        rocksdb_block_based_table_options_t *table_options = rocksdb_block_based_options_create();
+        rocksdb_filterpolicy_t* filter_policy = rocksdb_filterpolicy_create_bloom(10);
+        rocksdb_block_based_options_set_filter_policy(table_options, filter_policy);
+
+        rocksdb_options_set_block_based_table_factory(options, table_options);
+        rocksdb_slicetransform_t *slicetransform = rocksdb_slicetransform_create_fixed_prefix(3);
+        rocksdb_options_set_prefix_extractor(options, slicetransform);
+
         char *err = NULL;
         char  rocksdb_path[ADDR_MAX];
         snprintf(rocksdb_path, ADDR_MAX, "/tmp/PDC_rocksdb_%d", pdc_server_rank_g);
