@@ -2093,7 +2093,7 @@ main(int argc, char *argv[])
         rocksdb_options_set_create_if_missing(options, 1);
 
         rocksdb_block_based_table_options_t *table_options = rocksdb_block_based_options_create();
-        rocksdb_filterpolicy_t* filter_policy = rocksdb_filterpolicy_create_bloom(10);
+        rocksdb_filterpolicy_t *             filter_policy = rocksdb_filterpolicy_create_bloom(10);
         rocksdb_block_based_options_set_filter_policy(table_options, filter_policy);
 
         rocksdb_options_set_block_based_table_factory(options, table_options);
