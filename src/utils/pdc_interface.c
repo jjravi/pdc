@@ -61,7 +61,6 @@ PDC_find_id(pdcid_t idid)
     PDC_LIST_SEARCH(ret_value, &type_ptr->ids, entry, id, idid);
 
 done:
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 
@@ -99,7 +98,6 @@ PDC_register_type(PDC_type_t type_id, PDC_free_t free_func)
     type_ptr->init_count++;
 
 done:
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 
@@ -141,7 +139,6 @@ PDC_id_register(PDC_type_t type, void *object)
     ret_value = new_id;
 
 done:
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 
@@ -181,7 +178,6 @@ PDC_dec_ref(pdcid_t id)
     }
 
 done:
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 
@@ -205,7 +201,6 @@ PDC_find_byname(PDC_type_t type, const char *byname)
         ret_value = id_ptr->id;
 
 done:
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 
@@ -225,7 +220,6 @@ PDC_inc_ref(pdcid_t id)
     ret_value = hg_atomic_incr32(&(id_ptr->count));
 
 done:
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 
@@ -245,7 +239,6 @@ PDC_id_list_null(PDC_type_t type)
         ret_value = type_ptr->id_count;
 
 done:
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 
@@ -290,6 +283,6 @@ PDC_destroy_type(PDC_type_t type)
     type_ptr = PDC_FREE(struct PDC_id_type, type_ptr);
 
 done:
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
+

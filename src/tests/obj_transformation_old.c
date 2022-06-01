@@ -221,16 +221,16 @@ main(int argc, char **argv)
 #else
     ret = PDCbuf_map_transform_register("pdc_transform_increment", &id1[0], region_id1, obj_id11, region_id11,
                                         0, INCR_STATE, DATA_OUT);
-    ret = PDCbuf_map_transform_register("pdc_transform_compress", &id1[0], region_id1, obj_id11, region_id11,
-                                        0, INCR_STATE, DATA_OUT);
+    //ret = PDCbuf_map_transform_register("pdc_transform_compress", &id1[0], region_id1, obj_id11, region_id11,
+    //                                    0, INCR_STATE, DATA_OUT);
 #endif
-    if (ret < 0)
-        printf("PDCobj_transform_register(1) failed\n");
+    //if (ret < 0)
+    //    printf("PDCobj_transform_register(1) failed\n");
 
-    ret = PDCbuf_map_transform_register("pdc_transform_decompress", NULL, region_id1, obj_id11, region_id11,
-                                        1, DECR_STATE, DATA_IN);
-    if (ret < 0)
-        printf("PDCobj_transform_register(2) failed\n");
+    //ret = PDCbuf_map_transform_register("pdc_transform_decompress", NULL, region_id1, obj_id11, region_id11,
+    //                                    1, DECR_STATE, DATA_IN);
+    //if (ret < 0)
+    //    printf("PDCobj_transform_register(2) failed\n");
 
     ret = PDCbuf_obj_map(&x[0], PDC_FLOAT, region_x, obj_xx, region_xx);
     if (ret < 0)

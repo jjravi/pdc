@@ -24,7 +24,7 @@
 #ifndef PDC_ANALYSIS_COMMON_H
 #define PDC_ANALYSIS_COMMON_H
 
-#include "pdc_transforms_pkg.h"
+#include "pdc_transforms_pkg_old.h"
 #include "mercury.h"
 #include "mercury_proc_string.h"
 #include "mercury_atomic.h"
@@ -118,47 +118,9 @@ int PDC_add_analysis_ptr_to_registry_(struct _pdc_region_analysis_ftn_info *ftn_
 /**
  * *****
  *
- * \param ftn [IN]              *******
- * \param loadpath [IN]         *******
- * \param ftnPtr [IN]           *******
- *
- * \return *****
- */
-int PDC_get_ftnPtr_(const char *ftn, const char *loadpath, void **ftnPtr);
-
-/**
- * *****
- *
  * \return
  */
 _pdc_loci_t PDC_get_execution_locus();
-
-/**
- * ********
- *
- * \param workingDir [IN]       Path of working directory
- * \param application [IN]      Name of the application
- *
- * \return ****
- */
-char *PDC_find_in_path(char *workingDir, char *application);
-
-/**
- * ********
- *
- * \return ****
- */
-char *PDC_get_argv0_();
-
-/**
- * ********
- *
- * \param fname [IN]            Path of working directory
- * \param app_path [IN]         Name of the application
- *
- * \return ****
- */
-char *PDC_get_realpath(char *fname, char *app_path);
 
 /**
  * ********

@@ -29,6 +29,9 @@
 #include "pdc_public.h"
 #include <stdio.h>
 
+#undef NDEBUG
+#include <assert.h>
+
 /****************************/
 /* Library Private Typedefs */
 /****************************/
@@ -104,6 +107,38 @@ struct _pdc_class {
 #endif
 
 extern pbool_t err_occurred;
+
+/**
+ * ********
+ *
+ * \param workingDir [IN]       Path of working directory
+ * \param application [IN]      Name of the application
+ *
+ * \return ****
+ */
+char *PDC_find_in_path(char *workingDir, char *application);
+
+/**
+ *
+ * \param fname [IN]            Path of working directory
+ * \param app_path [IN]         Name of the application
+ *
+ * \return ****
+ */
+char *PDC_get_realpath(char *fname, char *app_path);
+
+char *PDC_get_argv0_();
+
+/**
+ * \brief Loads function pointer from dynamic library
+ *
+ * \param ftn [IN]              *******
+ * \param loadpath [IN]         *******
+ * \param ftnPtr [IN]           *******
+ *
+ * \return *****
+ */
+int PDC_get_ftnPtr_(const char *ftn, const char *loadpath, void **ftnPtr);
 
 /*
  * PGOTO_DONE macro. The argument is the return value which is
@@ -183,17 +218,22 @@ extern pbool_t err_occurred;
 /*         return (ret_value); \ */
 /*     } while (0) */
 
+#include <nvtx3/nvToolsExt.h>
+
 #define FUNC_ENTER(X)                                                                                        \
     do {                                                                                                     \
+      nvtxRangePush(__FUNCTION__);                 \
     } while (0)
 
 #define FUNC_LEAVE(ret_value)                                                                                \
     do {                                                                                                     \
+      nvtxRangePop();                              \
         return (ret_value);                                                                                  \
     } while (0)
 
 #define FUNC_LEAVE_VOID                                                                                      \
     do {                                                                                                     \
+      nvtxRangePop();                              \
         return;                                                                                              \
     } while (0)
 #endif

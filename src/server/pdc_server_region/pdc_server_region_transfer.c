@@ -76,7 +76,6 @@ PDC_commit_request(uint64_t transfer_request_id)
         transfer_request_status_list_end = ptr->next;
     }
 
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 
@@ -144,7 +143,6 @@ PDC_finish_request(uint64_t transfer_request_id)
         ptr = ptr->next;
     }
 
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 
@@ -196,7 +194,6 @@ PDC_check_request(uint64_t transfer_request_id)
         ptr = ptr->next;
     }
 
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 
@@ -224,7 +221,6 @@ PDC_try_finish_request(uint64_t transfer_request_id, hg_handle_t handle, int *ha
         ptr = ptr->next;
     }
 
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 
@@ -246,7 +242,6 @@ PDC_transfer_request_id_register()
     ret_value = transfer_request_id_g;
     transfer_request_id_g++;
 
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 
@@ -268,134 +263,133 @@ PDC_transfer_request_id_register()
 
 perr_t
 PDC_Server_transfer_request_io(uint64_t obj_id, int obj_ndim, const uint64_t *obj_dims,
-                               struct pdc_region_info *region_info, void *buf, size_t unit, int is_write)
+  struct pdc_region_info *region_info, int is_write)
 {
-    perr_t   ret_value = SUCCEED;
-    int      fd;
-    char *   data_path                = NULL;
-    char *   user_specified_data_path = NULL;
-    char     storage_location[ADDR_MAX];
-    ssize_t  io_size;
-    uint64_t i, j;
+  perr_t   ret_value = SUCCEED;
+  int      fd;
+  char *   data_path                = NULL;
+  char *   user_specified_data_path = NULL;
+  char     storage_location[ADDR_MAX];
+  ssize_t  io_size;
+  uint64_t i, j;
 
-    int server_rank = get_server_rank();
+  int server_rank = get_server_rank();
 
-    FUNC_ENTER(NULL);
+  FUNC_ENTER(NULL);
 
-    if (io_by_region_g || obj_ndim == 0) {
-        // PDC_Server_register_obj_region(obj_id);
-        if (is_write) {
-            PDC_Server_data_write_out(obj_id, region_info, buf, unit);
-        }
-        else {
-            PDC_Server_data_read_from(obj_id, region_info, buf, unit);
-        }
-        // PDC_Server_unregister_obj_region(obj_id);
-        goto done;
-    }
-    if (obj_ndim != (int)region_info->ndim) {
-        printf("Server I/O error: Obj dim does not match obj dim\n");
-        goto done;
-    }
-
-    user_specified_data_path = getenv("PDC_DATA_LOC");
-    if (user_specified_data_path != NULL) {
-        data_path = user_specified_data_path;
+  if (io_by_region_g) {
+    // PDC_Server_register_obj_region(obj_id);
+    if (is_write) {
+      PDC_Server_data_write_out(obj_id, region_info);
     }
     else {
-        data_path = getenv("SCRATCH");
-        if (data_path == NULL)
-            data_path = ".";
+      PDC_Server_data_read_from(obj_id, region_info);
     }
-    // Data path prefix will be $SCRATCH/pdc_data/$obj_id/
-    snprintf(storage_location, ADDR_MAX, "%.200s/pdc_data/%" PRIu64 "/server%d/s%04d.bin", data_path, obj_id,
-             server_rank, server_rank);
-    PDC_mkdir(storage_location);
+    // PDC_Server_unregister_obj_region(obj_id);
+    goto done;
+  }
+  if (obj_ndim != (int)region_info->ndim) {
+    printf("Server I/O error: Obj dim does not match obj dim\n");
+    goto done;
+  }
 
-    fd = open(storage_location, O_RDWR | O_CREAT, 0666);
-    if (region_info->ndim == 1) {
-        // printf("server I/O checkpoint 1D\n");
-        lseek(fd, region_info->offset[0] * unit, SEEK_SET);
-        io_size = region_info->size[0] * unit;
-        PDC_POSIX_IO(fd, buf, io_size, is_write);
+  user_specified_data_path = getenv("PDC_DATA_LOC");
+  if (user_specified_data_path != NULL) {
+    data_path = user_specified_data_path;
+  }
+  else {
+    data_path = getenv("SCRATCH");
+    if (data_path == NULL)
+      data_path = ".";
+  }
+  // Data path prefix will be $SCRATCH/pdc_data/$obj_id/
+  snprintf(storage_location, ADDR_MAX, "%.200s/pdc_data/%" PRIu64 "/server%d/s%04d.bin", data_path, obj_id,
+    server_rank, server_rank);
+  PDC_mkdir(storage_location);
+
+  fd = open(storage_location, O_RDWR | O_CREAT, 0666);
+  if (region_info->ndim == 1) {
+    // printf("server I/O checkpoint 1D\n");
+    lseek(fd, region_info->offset[0] * region_info->unit, SEEK_SET);
+    io_size = region_info->dims_size[0] * region_info->unit;
+    PDC_POSIX_IO(fd, region_info->data_buf, io_size, is_write);
+  }
+  else if (region_info->ndim == 2) {
+    // Check we can directly write the contiguous chunk to the file
+    if (region_info->offset[1] == 0 && region_info->dims_size[1] == obj_dims[1]) {
+      // printf("server I/O checkpoint 2D 1\n");
+      lseek(fd, region_info->offset[0] * obj_dims[1] * region_info->unit, SEEK_SET);
+      io_size = region_info->dims_size[0] * obj_dims[1] * region_info->unit;
+      PDC_POSIX_IO(fd, region_info->data_buf, io_size, is_write);
     }
-    else if (region_info->ndim == 2) {
-        // Check we can directly write the contiguous chunk to the file
-        if (region_info->offset[1] == 0 && region_info->size[1] == obj_dims[1]) {
-            // printf("server I/O checkpoint 2D 1\n");
-            lseek(fd, region_info->offset[0] * obj_dims[1] * unit, SEEK_SET);
-            io_size = region_info->size[0] * obj_dims[1] * unit;
-            PDC_POSIX_IO(fd, buf, io_size, is_write);
-        }
-        else {
-            // printf("server I/O checkpoint 2D 2\n");
-            // We have to write line by line
-            for (i = 0; i < region_info->size[0]; ++i) {
-                /*
-                                printf("lseek to %lld\n",
-                                       (long long int)((i + region_info->offset[0]) * obj_dims[1] +
-                   region_info->offset[1]));
-                */
-                lseek(fd, ((i + region_info->offset[0]) * obj_dims[1] + region_info->offset[1]) * unit,
-                      SEEK_SET);
-                io_size = region_info->size[1] * unit;
-                PDC_POSIX_IO(fd, buf, io_size, is_write);
-                buf += io_size;
-            }
-        }
+    else {
+      // printf("server I/O checkpoint 2D 2\n");
+      // We have to write line by line
+      for (i = 0; i < region_info->dims_size[0]; ++i) {
+        /*
+           printf("lseek to %lld\n",
+           (long long int)((i + region_info->offset[0]) * obj_dims[1] +
+           region_info->offset[1]));
+         */
+        lseek(fd, ((i + region_info->offset[0]) * obj_dims[1] + region_info->offset[1]) * region_info->unit,
+          SEEK_SET);
+        io_size = region_info->dims_size[1] * region_info->unit;
+        PDC_POSIX_IO(fd, region_info->data_buf, io_size, is_write);
+        region_info->data_buf += io_size;
+      }
     }
-    else if (region_info->ndim == 3) {
-        // Check we can directly write the contiguous chunk to the file
-        if (region_info->offset[1] == 0 && region_info->size[1] == obj_dims[1] &&
-            region_info->offset[2] == 0 && region_info->size[2] == obj_dims[2]) {
-            lseek(fd, region_info->offset[0] * region_info->size[1] * region_info->size[2] * unit, SEEK_SET);
-            io_size = region_info->size[0] * region_info->size[1] * region_info->size[2] * unit;
-            // printf("server I/O checkpoint 3D 1\n");
-            PDC_POSIX_IO(fd, buf, io_size, is_write);
-        }
-        else if (region_info->offset[2] == 0 && region_info->size[2] == obj_dims[2]) {
-            // printf("server I/O checkpoint 3D 2\n");
-            // We have to write plane by plane
-            for (i = 0; i < region_info->size[0]; ++i) {
-                lseek(fd,
-                      ((i + region_info->offset[0]) * obj_dims[1] * obj_dims[2] +
-                       region_info->offset[1] * obj_dims[2]) *
-                          unit,
-                      SEEK_SET);
-                io_size = region_info->size[1] * obj_dims[2] * unit;
-                PDC_POSIX_IO(fd, buf, io_size, is_write);
-                buf += io_size;
-            }
-        }
-        else {
-            /*
-                        printf("server I/O checkpoint 3D 3, obj dims [%" PRIu64 ", %" PRIu64 ", %" PRIu64
-                               "], region [%" PRIu64 ", %" PRIu64 ", %" PRIu64 "] size [%" PRIu64 ", %" PRIu64
-                               ", %" PRIu64 "]\n",
-                               obj_dims[0], obj_dims[1], obj_dims[2], region_info->offset[0],
-               region_info->offset[1], region_info->offset[2], region_info->size[0], region_info->size[1],
-               region_info->size[2]);
-            */
-            // We have to write line by line
-            for (i = 0; i < region_info->size[0]; ++i) {
-                for (j = 0; j < region_info->size[1]; ++j) {
-                    lseek(fd,
-                          ((region_info->offset[0] + i) * obj_dims[1] * obj_dims[2] +
-                           (region_info->offset[1] + j) * obj_dims[2] + region_info->offset[2]) *
-                              unit,
-                          SEEK_SET);
-                    io_size = region_info->size[2] * unit;
-                    PDC_POSIX_IO(fd, buf, io_size, is_write);
-                    buf += io_size;
-                }
-            }
-        }
+  }
+  else if (region_info->ndim == 3) {
+    // Check we can directly write the contiguous chunk to the file
+    if (region_info->offset[1] == 0 && region_info->dims_size[1] == obj_dims[1] &&
+      region_info->offset[2] == 0 && region_info->dims_size[2] == obj_dims[2]) {
+      lseek(fd, region_info->offset[0] * region_info->dims_size[1] * region_info->dims_size[2] * region_info->unit, SEEK_SET);
+      io_size = region_info->dims_size[0] * region_info->dims_size[1] * region_info->dims_size[2] * region_info->unit;
+      // printf("server I/O checkpoint 3D 1\n");
+      PDC_POSIX_IO(fd, region_info->data_buf, io_size, is_write);
     }
-    close(fd);
+    else if (region_info->offset[2] == 0 && region_info->dims_size[2] == obj_dims[2]) {
+      // printf("server I/O checkpoint 3D 2\n");
+      // We have to write plane by plane
+      for (i = 0; i < region_info->dims_size[0]; ++i) {
+        lseek(fd,
+          ((i + region_info->offset[0]) * obj_dims[1] * obj_dims[2] +
+           region_info->offset[1] * obj_dims[2]) *
+          region_info->unit,
+          SEEK_SET);
+        io_size = region_info->dims_size[1] * obj_dims[2] * region_info->unit;
+        PDC_POSIX_IO(fd, region_info->data_buf, io_size, is_write);
+        region_info->data_buf += io_size;
+      }
+    }
+    else {
+      /*
+         printf("server I/O checkpoint 3D 3, obj dims [%" PRIu64 ", %" PRIu64 ", %" PRIu64
+         "], region [%" PRIu64 ", %" PRIu64 ", %" PRIu64 "] dims_size [%" PRIu64 ", %" PRIu64
+         ", %" PRIu64 "]\n",
+         obj_dims[0], obj_dims[1], obj_dims[2], region_info->offset[0],
+         region_info->offset[1], region_info->offset[2], region_info->dims_size[0], region_info->dims_size[1],
+         region_info->dims_size[2]);
+       */
+      // We have to write line by line
+      for (i = 0; i < region_info->dims_size[0]; ++i) {
+        for (j = 0; j < region_info->dims_size[1]; ++j) {
+          lseek(fd,
+            ((region_info->offset[0] + i) * obj_dims[1] * obj_dims[2] +
+             (region_info->offset[1] + j) * obj_dims[2] + region_info->offset[2]) *
+            region_info->unit,
+            SEEK_SET);
+          io_size = region_info->dims_size[2] * region_info->unit;
+          PDC_POSIX_IO(fd, region_info->data_buf, io_size, is_write);
+          region_info->data_buf += io_size;
+        }
+      }
+    }
+  }
+  close(fd);
 
 done:
-    fflush(stdout);
-    FUNC_LEAVE(ret_value);
+  FUNC_LEAVE(ret_value);
 }
 
 int

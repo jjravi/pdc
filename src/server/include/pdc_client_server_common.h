@@ -591,18 +591,18 @@ typedef struct {
     uint64_t               obj_id;
     uint8_t                access_type;
     pdcid_t                local_reg_id;
-    region_info_transfer_t region;
+    region_info_transfer_t region; // TODO: jjravi, unify with transform size
     uint8_t                mapping;
     uint8_t                data_type;
+    size_t                 data_unit;
     uint8_t                lock_mode;
     /* The following are unique to the transform portion of the lock */
     uint8_t   dest_type;
     int32_t   transform_id;
     int32_t   transform_state;
     hg_bulk_t local_bulk_handle;
-    int64_t   transform_data_size;
+    int64_t   transform_data_size; // TODO: jjravi, unify with region transfer info 
     uint64_t  client_data_ptr;
-
 } region_transform_and_lock_in_t;
 
 /* FIXME:  The region_analysis structure (shown below) is defined as a
@@ -3785,17 +3785,17 @@ struct bulk_args_t {
 };
 
 struct buf_map_release_bulk_args {
-#ifdef PDC_TIMING
-    double start_time;
-#endif
     hg_handle_t             handle;
     void *                  data_buf;
     pdcid_t                 remote_obj_id; /* target of object id */
     pdcid_t                 remote_reg_id; /* target of region id */
     int32_t                 remote_client_id;
     struct pdc_region_info *remote_reg_info; //
+
+    // TODO: jjravi why the heck are there two of these:
     region_info_transfer_t  remote_region_unit;
     region_info_transfer_t  remote_region_nounit;
+
     hg_bulk_t               remote_bulk_handle;
     hg_bulk_t               local_bulk_handle;
     hg_addr_t               local_addr;
@@ -3822,7 +3822,12 @@ struct buf_map_transform_and_release_bulk_args {
     pdcid_t                        remote_reg_id; /* target of region id */
     int32_t                        remote_client_id;
     struct pdc_region_info *       remote_reg_info;
+
+    // TODO: jjravi needed to refect region_lock_in_t struct.. 
+    //remove later
+    region_info_transfer_t         remote_region_ignore;
     region_info_transfer_t         remote_region;
+
     hg_bulk_t                      remote_bulk_handle;
     hg_bulk_t                      local_bulk_handle;
     hg_addr_t                      local_addr;
@@ -4586,15 +4591,6 @@ perr_t PDC_kvtag_dup(pdc_kvtag_t *from, pdc_kvtag_t **to);
 perr_t PDC_free_kvtag(pdc_kvtag_t **kvtag);
 
 /**
- * Get the size of a data type
- *
- * \param dtype[IN]             Data type
- *
- * \return Size of the data type
- */
-int PDC_get_var_type_size(pdc_var_type_t dtype);
-
-/**
  * *********
  *
  * \param query[IN]             ***********
@@ -4627,9 +4623,5 @@ void PDC_query_xfer_free(pdc_query_xfer_t *query_xfer);
  * \return HG_SUCCESS or corresponding HG error code
  */
 hg_return_t PDC_Client_recv_nhits(const struct hg_cb_info *callback_info);
-
-perr_t PDC_Server_transfer_request_io(uint64_t obj_id, int obj_ndim, const uint64_t *obj_dims,
-                                      struct pdc_region_info *region_info, void *buf, size_t unit,
-                                      int is_write);
 
 #endif /* PDC_CLIENT_SERVER_COMMON_H */

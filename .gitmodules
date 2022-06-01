@@ -1,3 +1,9 @@
 [submodule "api/src/server/dablooms"]
 	path = api/src/server/dablooms
 	url = git@github.com:bitly/dablooms.git
+[submodule "external/SZ3"]
+	path = external/SZ3
+	url = git@github.com:szcompressor/SZ3.git
+[submodule "external/cuSZ"]
+	path = external/cuSZ
+	url = git@github.com:szcompressor/cuSZ.git

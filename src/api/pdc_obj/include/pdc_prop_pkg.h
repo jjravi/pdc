@@ -62,7 +62,6 @@ struct _pdc_obj_prop {
     pdc_kvtag_t *        kvtag;
 
     /* The following have been added to support of PDC analysis and transforms */
-    size_t                      type_extent;
     uint64_t                    locus;
     uint32_t                    data_state;
     struct _pdc_transform_state transform_prop;

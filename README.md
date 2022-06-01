@@ -16,9 +16,9 @@ PDC also depends on libfabric and Mercury. We provide detailed instructions for 
 Make sure to record the environmental variables (lines that contains the "export" commands). They are needed for running PDC and to use the libraries again.
 # Install libfabric
 ```
-0. wget https://github.com/ofiwg/libfabric/archive/v1.11.2.tar.gz
-1. tar xvzf v1.11.2.tar.gz
-2. cd libfabric-1.11.2
+0. wget https://github.com/ofiwg/libfabric/archive/v1.14.1.tar.gz
+1. tar xvzf v1.14.1.tar.gz
+2. cd libfabric-1.14.1
 3. mkdir install
 4. export LIBFABRIC_DIR=$(pwd)/install
 5. ./autogen.sh
@@ -31,16 +31,16 @@ Make sure to record the environmental variables (lines that contains the "export
 # Install Mercury
 Make sure the ctest passes. PDC may not work without passing all the tests of Mercury.
 
-Step 2 in the following is not required. It is a stable commit that has been used to test when these these instructions were written (mercury-2.0.1 release commit). One may skip it to use the current master branch of Mercury.
+Step 2 in the following is not required. It is a commit that has been used to test when these these instructions were written. One may skip it to use the current master branch of Mercury.
 ```
 0. git clone https://github.com/mercury-hpc/mercury.git
 1. cd mercury
-2. git checkout cabb83758f9e07842dc34b0443d0873301fbdf91
+2. git checkout 72c14746073ba59a780a2a48b02695fe32a4ea8d
 3. git submodule update --init
 4. export MERCURY_DIR=$(pwd)/install
 5. mkdir install
 6. cd install
-7. cmake ../ -DCMAKE_INSTALL_PREFIX=$MERCURY_DIR -DCMAKE_C_COMPILER=gcc -DBUILD_SHARED_LIBS=ON -DBUILD_TESTING=ON -DNA_USE_OFI=ON -DNA_USE_SM=OFF
+7. cmake ../ -DCMAKE_INSTALL_PREFIX=$MERCURY_DIR -DCMAKE_C_COMPILER=gcc -DBUILD_SHARED_LIBS=ON -DBUILD_TESTING=ON -DNA_USE_OFI=ON -DNA_USE_SM=OFF -DMERCURY_USE_BOOST_PP=ON
 8. make
 9. make install
 10. ctest

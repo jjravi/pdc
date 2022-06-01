@@ -39,7 +39,7 @@
 #include "pdc_region_pkg.h"
 #include "pdc_obj_pkg.h"
 #include "pdc_interface.h"
-#include "pdc_transforms_pkg.h"
+#include "pdc_transforms_pkg_old.h"
 #include "pdc_client_connect.h"
 #include "pdc_analysis_pkg.h"
 #include <mpi.h>
@@ -233,13 +233,12 @@ PDCregion_transfer_create(void *buf, pdc_access_t access_type, pdcid_t obj_id, p
        obj2->obj_info_pub->name, (long long unsigned)obj2->obj_info_pub->meta_id, access_type);
     */
     p->local_region_ndim   = reg1->ndim;
-    p->local_region_offset = (uint64_t *)malloc(
-        sizeof(uint64_t) * (reg1->ndim * 2 + reg2->ndim * 2 + obj2->obj_pt->obj_prop_pub->ndim));
+    p->local_region_offset = (uint64_t *)malloc(sizeof(uint64_t) * (reg1->ndim * 2 + reg2->ndim * 2 + obj2->obj_pt->obj_prop_pub->ndim));
     ptr = p->local_region_offset;
     memcpy(p->local_region_offset, reg1->offset, sizeof(uint64_t) * reg1->ndim);
     ptr += reg1->ndim;
     p->local_region_size = ptr;
-    memcpy(p->local_region_size, reg1->size, sizeof(uint64_t) * reg1->ndim);
+    memcpy(p->local_region_size, reg1->dims_size, sizeof(uint64_t) * reg1->ndim);
     ptr += reg1->ndim;
 
     p->remote_region_ndim   = reg2->ndim;
@@ -248,7 +247,7 @@ PDCregion_transfer_create(void *buf, pdc_access_t access_type, pdcid_t obj_id, p
     ptr += reg2->ndim;
 
     p->remote_region_size = ptr;
-    memcpy(p->remote_region_size, reg2->size, sizeof(uint64_t) * reg2->ndim);
+    memcpy(p->remote_region_size, reg2->dims_size, sizeof(uint64_t) * reg2->ndim);
     ptr += reg2->ndim;
 
     p->obj_ndim = obj2->obj_pt->obj_prop_pub->ndim;
@@ -257,7 +256,7 @@ PDCregion_transfer_create(void *buf, pdc_access_t access_type, pdcid_t obj_id, p
 
     p->total_data_size = unit;
     for (j = 0; j < (int)reg2->ndim; ++j) {
-        p->total_data_size *= reg2->size[j];
+        p->total_data_size *= reg2->dims_size[j];
     }
     /*
     int rank;

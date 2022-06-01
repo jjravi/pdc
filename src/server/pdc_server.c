@@ -22,6 +22,8 @@
  * perform publicly and display publicly, and to permit other to do so.
  */
 
+#include <string.h>
+#include <libgen.h> // dirname
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -38,6 +40,8 @@
 #include <sys/shm.h>
 #include <sys/mman.h>
 
+#include <dirent.h>
+
 #include "mercury.h"
 #include "mercury_macros.h"
 #include "mercury_thread_pool.h"
@@ -49,13 +53,15 @@
 #include "pdc_interface.h"
 #include "pdc_analysis_pkg.h"
 #include "pdc_client_server_common.h"
-#include "pdc_transforms_common.h"
+#include "pdc_transforms_common_old.h"
 #include "pdc_server.h"
 #include "pdc_server_metadata.h"
 #include "pdc_server_data.h"
 #include "pdc_timing.h"
 #include "pdc_server_region_cache.h"
 #include "pdc_server_region_transfer_metadata_query.h"
+
+#include "rpc_engine.h"
 
 #ifdef PDC_HAS_CRAY_DRC
 #include <rdmacred.h>
@@ -154,7 +160,7 @@ update_storage_meta_list_t * pdc_update_storage_meta_list_head_g = NULL;
 extern data_server_region_t *dataserver_region_g;
 
 /*
- * Init the remote server info structure
+ * \brief Init the remote server info structure
  *
  * \param  info [IN]        PDC remote server info
  *
@@ -182,7 +188,7 @@ done:
 }
 
 /*
- * Destroy the client info structures, free the allocated space
+ * \brief Destroy the client info structures, free the allocated space
  *
  * \param  info[IN]        Pointer to the client info structures
  *
@@ -217,7 +223,7 @@ done:
 }
 
 /*
- * Init the client info structure
+ * \brief Init the client info structure
  *
  * \param  a[IN]        PDC client info structure pointer
  *
@@ -242,7 +248,7 @@ done:
 }
 
 /*
- * Callback function, allocates the client info structure with the first connectiong from all clients,
+ * \brief Callback function, allocates the client info structure with the first connectiong from all clients,
  * copies the client's address, and when received all clients' test connection message, start the lookup
  * process to test connection to all clients.
  *
@@ -265,8 +271,6 @@ PDC_Server_get_client_addr(const struct hg_cb_info *callback_info)
 
     if (is_all_client_connected_g == 1) {
         printf("==PDC_SERVER[%d]: new application run detected, create new client info\n", pdc_server_rank_g);
-        fflush(stdout);
-
         PDC_Server_destroy_client_info(pdc_client_info_g);
         pdc_client_info_g         = NULL;
         is_all_client_connected_g = 0;
@@ -304,9 +308,8 @@ done:
 }
 
 /*
- * Print the Mercury version
+ * \brief Print the Mercury version
  *
- * \return void
  */
 void
 PDC_Server_print_version()
@@ -321,7 +324,7 @@ PDC_Server_print_version()
 }
 
 /*
- * Write the servers' addresses to file, so that client can read the file and
+ * \brief Write the servers' addresses to file, so that client can read the file and
  * get all the servers' addresses.
  *
  * \param  addr_strings[IN]     2D char array of all servers' network address
@@ -357,7 +360,7 @@ done:
 }
 
 /*
- * Remove server config file
+ * \brief Remove server config file
  *
  * \return Non-negative on success/Negative on failure
  */
@@ -382,7 +385,7 @@ done:
 }
 
 /*
- * Callback function of the server to lookup other servers via Mercury RPC
+ * \brief Callback function of the server to lookup other servers via Mercury RPC
  *
  * \param  callback_info[IN]        Mercury callback info pointer
  *
@@ -423,7 +426,7 @@ done:
 }
 
 /*
- * Test connection to another server, and stores the remote server's addr into
+ * \brief Test connection to another server, and stores the remote server's addr into
  * pdc_remote_server_info_g
  *
  * \return Non-negative on success/Negative on failure
@@ -455,12 +458,11 @@ PDC_Server_lookup_server_id(int remote_server_id)
     hg_ret = HG_Trigger(hg_context_g, 0 /* timeout */, 1 /* max count */, &actual_count);
 
 done:
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 
 /*
- * Test connection to all other servers
+ * \brief Test connection to all other servers
  *
  * \return Non-negative on success/Negative on failure
  */
@@ -497,7 +499,6 @@ PDC_Server_lookup_all_servers()
     if (pdc_server_rank_g == 0) {
         printf("==PDC_SERVER[%d]: Successfully established connection to %d other PDC servers\n",
                pdc_server_rank_g, pdc_server_size_g - 1);
-        fflush(stdout);
     }
 
 done:
@@ -505,8 +506,7 @@ done:
 }
 
 /*
- * Callback function for HG_Addr_lookup(), creates a Mercury handle then forward the RPC message
- * to the client
+ * \brief Callback function for HG_Addr_lookup(), creates a Mercury handle then forward the RPC message to the client
  *
  * \param  callback_info[IN]        Mercury callback info pointer
  *
@@ -532,12 +532,11 @@ PDC_Server_lookup_client_cb(const struct hg_cb_info *callback_info)
     pdc_client_info_g[client_id].addr_valid = 1;
 
 done:
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 
 /*
- * Lookup the available clients to obtain proper address of them for future communication
+ * \brief Lookup the available clients to obtain proper address of them for future communication
  * via Mercury.
  *
  * \param  client_id[IN]        Client's MPI rank
@@ -582,7 +581,6 @@ PDC_Server_lookup_client(uint32_t client_id)
     hg_ret = HG_Trigger(hg_context_g, 0 /* timeout */, 1 /* max count */, &actual_count);
 
 done:
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 
@@ -610,9 +608,6 @@ PDC_Server_set_close(void)
 {
     perr_t             ret_value = SUCCEED;
     close_server_out_t close_out;
-#ifdef PDC_TIMING
-    double start;
-#endif
 
     while (hg_atomic_get32(&close_server_g) == 0) {
         // Exit from the loop, start finalize process
@@ -621,9 +616,6 @@ PDC_Server_set_close(void)
 #endif
 
 #ifdef PDC_ENABLE_CHECKPOINT
-#ifdef PDC_TIMING
-        start = MPI_Wtime();
-#endif
         char *tmp_env_char = getenv("PDC_DISABLE_CHECKPOINT");
         if (tmp_env_char != NULL && strcmp(tmp_env_char, "TRUE") == 0) {
             if (pdc_server_rank_g == 0) {
@@ -633,9 +625,6 @@ PDC_Server_set_close(void)
         else {
             PDC_Server_checkpoint();
         }
-#ifdef PDC_TIMING
-        pdc_server_timings->PDCserver_checkpoint += MPI_Wtime() - start;
-#endif
 #endif
         /* Barrier is needed here to make sure all servers have checkpointed data. */
         close_out.ret = 88;
@@ -676,7 +665,7 @@ drc_strerror(int errnum)
 #endif
 
 /*
- * Callback function of the server to lookup other servers via Mercury RPC
+ * \brief Callback function of the server to lookup other servers via Mercury RPC
  *
  * \param  port[IN]        Port number for Mercury to use
  * \param  hg_class[IN]    Pointer to Mercury class
@@ -757,7 +746,6 @@ drc_access_again:
     if (pdc_server_rank_g == 0) {
         printf("# Credential is %u\n", credential);
         printf("# Cookie is %u\n", cookie);
-        fflush(stdout);
     }
     sprintf(pdc_auth_key, "%u", cookie);
     init_info.na_init_info.auth_key = strdup(pdc_auth_key);
@@ -773,7 +761,7 @@ drc_access_again:
 #ifdef PDC_HAS_SHARED_SERVER
     init_info.auto_sm = HG_TRUE;
 #endif
-    *hg_class = HG_Init_opt(na_info_string, NA_TRUE, &init_info);
+    *hg_class = HG_Init_opt(hg_transport, HG_TRUE, &init_info);
     if (*hg_class == NULL) {
         printf("Error with HG_Init()\n");
         return FAIL;
@@ -908,12 +896,16 @@ drc_access_again:
     PDC_region_server_cache_init();
 #endif
 
+    // NOTE: jjravi additonal engine
+    hg_engine_init(HG_TRUE, hg_transport);
+    hg_engine_save_self_addr();
+
 done:
     FUNC_LEAVE(ret_value);
 }
 
 /*
- * Destroy the remote server info structures, free the allocated space
+ * \brief Destroy the remote server info structures, free the allocated space
  *
  * \param  info[IN]        Pointer to the remote server info structures
  *
@@ -946,7 +938,7 @@ done:
 }
 
 /*
- * Finalize the server, free allocated spaces
+ * \brief Finalize the server, free allocated spaces
  *
  * \return Non-negative on success/Negative on failure
  */
@@ -960,12 +952,14 @@ PDC_Server_finalize()
 
     FUNC_ENTER(NULL);
 
+    // NOTE: jjravi additonal engine
+    hg_engine_finalize();
+
     transfer_request_metadata_query_finalize();
 
     // Debug: check duplicates
     if (is_debug_g == 1) {
         PDC_Server_metadata_duplicate_check();
-        fflush(stdout);
     }
 
     // Remove the opened shm
@@ -998,42 +992,6 @@ PDC_Server_finalize()
     }
 
     PDC_Close_cache_file();
-
-#ifdef ENABLE_TIMING
-
-    double all_bloom_check_time_max, all_bloom_check_time_min, all_insert_time_max, all_insert_time_min;
-    double all_server_bloom_init_time_min, all_server_bloom_init_time_max;
-    double all_server_hash_insert_time_min, all_server_hash_insert_time_max;
-
-#ifdef ENABLE_MPI
-    MPI_Reduce(&server_bloom_check_time_g, &all_bloom_check_time_max, 1, MPI_DOUBLE, MPI_MAX, 0,
-               MPI_COMM_WORLD);
-    MPI_Reduce(&server_bloom_check_time_g, &all_bloom_check_time_min, 1, MPI_DOUBLE, MPI_MIN, 0,
-               MPI_COMM_WORLD);
-    MPI_Reduce(&server_insert_time_g, &all_insert_time_max, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
-    MPI_Reduce(&server_insert_time_g, &all_insert_time_min, 1, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
-
-    MPI_Reduce(&server_bloom_init_time_g, &all_server_bloom_init_time_max, 1, MPI_DOUBLE, MPI_MIN, 0,
-               MPI_COMM_WORLD);
-    MPI_Reduce(&server_bloom_init_time_g, &all_server_bloom_init_time_min, 1, MPI_DOUBLE, MPI_MIN, 0,
-               MPI_COMM_WORLD);
-    MPI_Reduce(&server_hash_insert_time_g, &all_server_hash_insert_time_max, 1, MPI_DOUBLE, MPI_MAX, 0,
-               MPI_COMM_WORLD);
-    MPI_Reduce(&server_hash_insert_time_g, &all_server_hash_insert_time_min, 1, MPI_DOUBLE, MPI_MIN, 0,
-               MPI_COMM_WORLD);
-
-#else
-    all_bloom_check_time_min        = server_bloom_check_time_g;
-    all_bloom_check_time_max        = server_bloom_check_time_g;
-    all_insert_time_max             = server_insert_time_g;
-    all_insert_time_min             = server_insert_time_g;
-    all_server_bloom_init_time_min  = server_bloom_init_time_g;
-    all_server_bloom_init_time_max  = server_bloom_init_time_g;
-    all_server_hash_insert_time_max = server_hash_insert_time_g;
-    all_server_hash_insert_time_min = server_hash_insert_time_g;
-#endif
-
-#endif
 
 #ifdef ENABLE_MULTITHREAD
     // Destory pool
@@ -1111,7 +1069,7 @@ PDC_Server_checkpoint_cb()
 }
 
 /*
- * Checkpoint in-memory metadata to persistant storage, each server writes to one file
+ * \brief Checkpoint in-memory metadata to persistant storage, each server writes to one file
  *
  * \param  filename[IN]     Checkpoint file name
  *
@@ -1136,20 +1094,11 @@ PDC_Server_checkpoint()
 
     FUNC_ENTER(NULL);
 
-#ifdef ENABLE_TIMING
-    // Timing
-    struct timeval pdc_timer_start;
-    struct timeval pdc_timer_end;
-    double         checkpoint_time;
-    gettimeofday(&pdc_timer_start, 0);
-#endif
-
     // TODO: instead of checkpoint at app finalize time, try checkpoint with a time countdown or # of objects
     snprintf(checkpoint_file, ADDR_MAX, "%s%s%d", pdc_server_tmp_dir_g, "metadata_checkpoint.",
              pdc_server_rank_g);
     if (pdc_server_rank_g == 0) {
         printf("\n\n==PDC_SERVER[%d]: Checkpoint file [%s]\n", pdc_server_rank_g, checkpoint_file);
-        fflush(stdout);
     }
 
     FILE *file = fopen(checkpoint_file, "w+");
@@ -1289,15 +1238,6 @@ PDC_Server_checkpoint()
                all_region_count);
     }
 
-#ifdef ENABLE_TIMING
-    // Timing
-    gettimeofday(&pdc_timer_end, 0);
-    checkpoint_time = PDC_get_elapsed_time_double(&pdc_timer_start, &pdc_timer_end);
-    if (pdc_server_rank_g == 0) {
-        printf("==PDC_SERVER: total checkpoint time = %.6f\n", checkpoint_time);
-    }
-#endif
-
 done:
     FUNC_LEAVE(ret_value);
 }
@@ -1310,7 +1250,7 @@ region_cmp(region_list_t *a, region_list_t *b)
 }
 
 /*
- * Load metadata from checkpoint file in persistant storage
+ * \brief Load metadata from checkpoint file in persistant storage
  *
  * \param  filename[IN]     Checkpoint file name
  *
@@ -1331,9 +1271,6 @@ PDC_Server_restart(char *filename)
     unsigned                     idx;
     uint64_t                     checkpoint_size;
     char *                       checkpoint_buf;
-#ifdef PDC_TIMING
-    double start = MPI_Wtime();
-#endif
 
     FUNC_ENTER(NULL);
 
@@ -1625,18 +1562,12 @@ PDC_Server_restart(char *filename)
     }
 
 done:
-#ifdef PDC_TIMING
-    pdc_server_timings->PDCserver_restart += MPI_Wtime() - start;
-#endif
-
-    fflush(stdout);
-
     FUNC_LEAVE(ret_value);
 }
 
 #ifdef ENABLE_MULTITHREAD
 /*
- * Multi-thread Mercury progess
+ * \brief Multi-thread Mercury progess
  *
  * \return Non-negative on success/Negative on failure
  */
@@ -1649,7 +1580,16 @@ hg_progress_thread(void *arg)
 
     FUNC_ENTER(NULL);
 
+    nvtxNameOsThread(hg_thread_self(),"hg_progress_thread");
+
+    uint8_t iter_count = 0;
+    char iter_str[8];
+
     do {
+      sprintf(iter_str, "iter%3d", iter_count);
+      nvtxRangePush(iter_str);
+      iter_count++;
+
         if (hg_atomic_cas32(&close_server_g, 1, 1))
             break;
 
@@ -1657,6 +1597,7 @@ hg_progress_thread(void *arg)
 #ifndef ENABLE_WAIT_DATA
         PDC_Data_Server_check_unmap();
 #endif
+      nvtxRangePop();
     } while (ret == HG_SUCCESS || ret == HG_TIMEOUT);
 
     hg_thread_exit(tret);
@@ -1665,7 +1606,7 @@ hg_progress_thread(void *arg)
 }
 
 /*
- * Multithread Mercury server to trigger and progress
+ * \brief Multithread Mercury server to trigger and progress
  *
  * \return Non-negative on success/Negative on failure
  */
@@ -1681,10 +1622,10 @@ PDC_Server_multithread_loop(hg_context_t *context)
     hg_thread_create(&progress_thread, hg_progress_thread, context);
 
     do {
-        if (hg_atomic_get32(&close_server_g))
-            break;
+      if (hg_atomic_get32(&close_server_g))
+        break;
 
-        ret = HG_Trigger(context, 0, 1, NULL);
+      ret = HG_Trigger(context, 0, 1, NULL);
     } while (ret == HG_SUCCESS || ret == HG_TIMEOUT);
 
     hg_thread_join(progress_thread);
@@ -1697,7 +1638,7 @@ PDC_Server_multithread_loop(hg_context_t *context)
 #endif
 
 /*
- * Single-thread Mercury server to trigger and progress
+ * \brief Single-thread Mercury server to trigger and progress
  *
  * \return Non-negative on success/Negative on failure
  */
@@ -1715,8 +1656,15 @@ PDC_Server_loop(hg_context_t *hg_context)
 #endif
     FUNC_ENTER(NULL);
 
+    uint8_t iter_count = 0;
+    char iter_str[8];
+
     /* Poke progress engine and check for events */
     do {
+      sprintf(iter_str, "iter%3d", iter_count);
+      nvtxRangePush(iter_str);
+      iter_count++;
+
 #ifdef PDC_ENABLE_CHECKPOINT
         checkpoint_interval++;
         if (checkpoint_interval % PDC_CHECKPOINT_INTERVAL == 0) {
@@ -1741,6 +1689,7 @@ PDC_Server_loop(hg_context_t *hg_context)
             break;
         hg_ret = HG_Progress(hg_context, 30000);
 
+      nvtxRangePop();
     } while (hg_ret == HG_SUCCESS || hg_ret == HG_TIMEOUT);
 
     if (hg_ret == HG_SUCCESS)
@@ -1752,103 +1701,12 @@ PDC_Server_loop(hg_context_t *hg_context)
 }
 #endif
 
-#ifdef ENABLE_TIMING
-static void
-PDC_print_IO_stats()
-{
-    // Debug print
-    double write_time_max, write_time_min, write_time_avg;
-    double read_time_max, read_time_min, read_time_avg;
-    double open_time_max, open_time_min, open_time_avg;
-    double fsync_time_max, fsync_time_min, fsync_time_avg;
-    double total_io_max, total_io_min, total_io_avg;
-    double update_time_max, update_time_min, update_time_avg;
-    double get_info_time_max, get_info_time_min, get_info_time_avg;
-    double io_elapsed_time_max, io_elapsed_time_min, io_elapsed_time_avg;
-
-#ifdef ENABLE_MPI
-    MPI_Reduce(&server_write_time_g, &write_time_max, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
-    MPI_Reduce(&server_write_time_g, &write_time_min, 1, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
-    MPI_Reduce(&server_write_time_g, &write_time_avg, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-    write_time_avg /= pdc_server_size_g;
-
-    MPI_Reduce(&server_read_time_g, &read_time_max, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
-    MPI_Reduce(&server_read_time_g, &read_time_min, 1, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
-    MPI_Reduce(&server_read_time_g, &read_time_avg, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-    read_time_avg /= pdc_server_size_g;
-
-    MPI_Reduce(&server_fopen_time_g, &open_time_max, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
-    MPI_Reduce(&server_fopen_time_g, &open_time_min, 1, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
-    MPI_Reduce(&server_fopen_time_g, &open_time_avg, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-    open_time_avg /= pdc_server_size_g;
-
-    MPI_Reduce(&server_fsync_time_g, &fsync_time_max, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
-    MPI_Reduce(&server_fsync_time_g, &fsync_time_min, 1, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
-    MPI_Reduce(&server_fsync_time_g, &fsync_time_avg, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-    fsync_time_avg /= pdc_server_size_g;
-
-    MPI_Reduce(&server_total_io_time_g, &total_io_max, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
-    MPI_Reduce(&server_total_io_time_g, &total_io_min, 1, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
-    MPI_Reduce(&server_total_io_time_g, &total_io_avg, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-    total_io_avg /= pdc_server_size_g;
-
-    MPI_Reduce(&server_io_elapsed_time_g, &io_elapsed_time_max, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
-    MPI_Reduce(&server_io_elapsed_time_g, &io_elapsed_time_min, 1, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
-    MPI_Reduce(&server_io_elapsed_time_g, &io_elapsed_time_avg, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-    io_elapsed_time_avg /= pdc_server_size_g;
-
-    MPI_Reduce(&server_update_region_location_time_g, &update_time_max, 1, MPI_DOUBLE, MPI_MAX, 0,
-               MPI_COMM_WORLD);
-    MPI_Reduce(&server_update_region_location_time_g, &update_time_min, 1, MPI_DOUBLE, MPI_MIN, 0,
-               MPI_COMM_WORLD);
-    MPI_Reduce(&server_update_region_location_time_g, &update_time_avg, 1, MPI_DOUBLE, MPI_SUM, 0,
-               MPI_COMM_WORLD);
-    update_time_avg /= pdc_server_size_g;
-
-    MPI_Reduce(&server_get_storage_info_time_g, &get_info_time_max, 1, MPI_DOUBLE, MPI_MAX, 0,
-               MPI_COMM_WORLD);
-    MPI_Reduce(&server_get_storage_info_time_g, &get_info_time_min, 1, MPI_DOUBLE, MPI_MIN, 0,
-               MPI_COMM_WORLD);
-    MPI_Reduce(&server_get_storage_info_time_g, &get_info_time_avg, 1, MPI_DOUBLE, MPI_SUM, 0,
-               MPI_COMM_WORLD);
-    get_info_time_avg /= pdc_server_size_g;
-
-#else
-    write_time_avg = write_time_max = write_time_min = server_write_time_g;
-    read_time_avg = read_time_max = read_time_min = server_read_time_g;
-    open_time_avg = open_time_max = open_time_min = server_fopen_time_g;
-    fsync_time_avg = fsync_time_max = fsync_time_min = server_fsync_time_g;
-    total_io_avg = total_io_max = total_io_min = server_total_io_time_g;
-    update_time_avg = update_time_max = update_time_min = server_update_region_location_time_g;
-    get_info_time_avg = get_info_time_max = get_info_time_min = server_get_storage_info_time_g;
-    io_elapsed_time_avg = io_elapsed_time_max = io_elapsed_time_min = server_io_elapsed_time_g;
-
-#endif
-
-    if (pdc_server_rank_g == 0) {
-        printf("==PDC_SERVER[0]: IO STATS (MIN, AVG, MAX)\n"
-               "              #fwrite %4d, Tfwrite (%6.2f, %6.2f, %6.2f), %.0f MB\n"
-               "              #fread  %4d, Tfread  (%6.2f, %6.2f, %6.2f), %.0f MB\n"
-               "              #fopen  %4d, Tfopen  (%6.2f, %6.2f, %6.2f)\n"
-               "              Tfsync                (%6.2f, %6.2f, %6.2f)\n"
-               "              Ttotal_IO             (%6.2f, %6.2f, %6.2f)\n"
-               "              Ttotal_IO_elapsed     (%6.2f, %6.2f, %6.2f)\n"
-               "              Tregion_update        (%6.2f, %6.2f, %6.2f)\n"
-               "              Tget_region           (%6.2f, %6.2f, %6.2f)\n"
-               "              #read_bb %4d, size %d MB\n",
-               n_fwrite_g, write_time_min, write_time_avg, write_time_max, fwrite_total_MB, n_fread_g,
-               read_time_min, read_time_avg, read_time_max, fread_total_MB, n_fopen_g, open_time_min,
-               open_time_avg, open_time_max, fsync_time_min, fsync_time_avg, fsync_time_max, total_io_min,
-               total_io_avg, total_io_max, io_elapsed_time_min, io_elapsed_time_avg, io_elapsed_time_max,
-               update_time_min, update_time_avg, update_time_max, get_info_time_min, get_info_time_avg,
-               get_info_time_max, n_read_from_bb_g, read_from_bb_size_g);
-    }
-}
-#endif
-
 static void
 PDC_Server_mercury_register()
 {
+    // NOTE: jjravi Register RPC on server
+    my_rpc_register();
+
     // Register RPC, metadata related
     PDC_client_test_connect_register(hg_class_g);
     PDC_gen_obj_id_register(hg_class_g);
@@ -2026,8 +1884,126 @@ PDC_Server_get_env()
     }
 }
 
+void PDC_plugin_init(const char *path)
+{
+  if(!path) return;
+
+  FUNC_ENTER(NULL);
+  printf("loading from: %s\n", path);
+  // read_directory(path);
+
+  /// print all the files and directories within directory
+  // void read_directory(const char *path)
+  {
+    DIR *dir = opendir(path);
+    if(!dir) perror ("could not open directory");
+
+    struct dirent *ent;
+    while ( (ent = readdir(dir)) != NULL )
+    {
+      if(ent->d_type != DT_REG) 
+      { 
+        // only deal with regular file
+        continue;
+      }
+
+      if (strstr(ent->d_name, ".so"))
+      {
+        printf("found dynamic lib: %s\n", ent->d_name );
+      }
+    }
+    closedir (dir);
+  }
+
+//PDCobj_transform_register(char *func, pdcid_t obj_id, int current_state, int next_state,
+//                          pdc_obj_transform_t op_type, pdc_data_movement_t when)
+//{
+//  perr_t ret_value                               = SUCCEED;
+//  struct _pdc_region_transform_ftn_info *thisFtn = NULL;
+//  struct _pdc_obj_info *                 obj1, *obj2;
+//  struct _pdc_id_info *                  objinfo1;
+//  struct _pdc_obj_prop *                 prop;
+//  struct pdc_region_info *               reg1 = NULL, *reg2 = NULL;
+//  pdcid_t                                src_region_id = 0, dest_region_id = 0;
+//  pdcid_t                                dest_object_id    = 0;
+//  char *                                 thisApp           = NULL;
+//  char *                                 colonsep          = NULL;
+//  int                                    local_regIndex;
+//  struct _pdc_id_info *                  id_info;
+//
+//  const char *loadpath = PDC_get_realpath(transformslibrary, applicationDir);
+//
+//  void *ftnHandle;
+//  if (PDC_get_ftnPtr_(func, loadpath, &ftnHandle) < 0)
+//    fprintf(stderr, "PDC_get_ftnPtr_ returned an error!\n");
+//
+//  size_t (*ftnPtr)() = NULL;
+//  if ((ftnPtr = ftnHandle) == NULL)
+//    fprintf(stderr, "Transforms function lookup failed");
+//
+//  if ((thisFtn = PDC_MALLOC(struct _pdc_region_transform_ftn_info)) == NULL)
+//    fprintf(stderr, "PDC register_obj_transforms memory allocation failed");
+//
+//  memset(thisFtn, 0, sizeof(struct _pdc_region_transform_ftn_info));
+//  thisFtn->ftnPtr    = (size_t(*)())ftnPtr;
+//  thisFtn->object_id = obj_id;
+//  thisFtn->op_type   = op_type;
+//  thisFtn->when      = when;
+//  thisFtn->lang      = C_lang;
+//  thisFtn->nextState = next_state;
+//  thisFtn->dest_type = PDC_UNKNOWN;
+//
+//  // Add to our own list of transform functions
+//  if ((local_regIndex = PDC_add_transform_ptr_to_registry_(thisFtn)) < 0)
+//    fprintf(stderr, "PDC unable to register transform function!");
+//
+//  // Flag the transform as being active on mapping operations
+//  if (op_type == PDC_DATA_MAP) {
+//    objinfo1 = PDC_find_id(obj_id);
+//    if (objinfo1 == NULL)
+//      fprintf(stderr, "cannot locate local object ID");
+//    obj1 = (struct _pdc_obj_info *)(objinfo1->obj_ptr);
+//    /* See if any mapping operations are defined */
+//    if (obj1 && (obj1->region_list_head != NULL)) {
+//      id_info        = PDC_find_id(obj1->region_list_head->orig_reg_id);
+//      src_region_id  = obj1->region_list_head->orig_reg_id;
+//      dest_region_id = obj1->region_list_head->des_reg_id;
+//      // mapping is already defined...
+//      if (id_info && ((reg1 = (struct pdc_region_info *)id_info->obj_ptr) != NULL)) {
+//        thisFtn->src_region = reg1;
+//        obj1                = reg1->obj;
+//
+//        // Requires that the PDCprop_set_obj_buf function be used...
+//        if (obj1 && ((prop = obj1->obj_pt) != NULL)) {
+//          thisFtn->data        = prop->buf;
+//          thisFtn->type        = prop->obj_prop_pub->type;
+//          thisFtn->type_extent = prop->type_extent;
+//        }
+//      }
+//      id_info = PDC_find_id(dest_region_id);
+//      if (id_info && ((reg2 = (struct pdc_region_info *)id_info->obj_ptr) != NULL)) {
+//        thisFtn->dest_region = reg2;
+//        obj2                 = reg2->obj;
+//        dest_object_id       = obj2->obj_info_pub->local_id;
+//        if (obj2 && ((prop = obj2->obj_pt) != NULL)) {
+//          thisFtn->result      = prop->buf;
+//          thisFtn->dest_type   = prop->obj_prop_pub->type;
+//          thisFtn->dest_extent = prop->type_extent;
+//        }
+//      }
+//      // Flag the destination region with the transform
+//      reg2->registered_op |= PDC_TRANSFORM;
+//    }
+//    PDC_Client_register_region_transform(userdefinedftn, loadpath, src_region_id, dest_region_id, dest_object_id, current_state, thisFtn->nextState, (int)PDC_DATA_MAP, (int)when, local_regIndex);
+//  }
+//
+//}
+
+  FUNC_LEAVE(NULL);
+}
+
 /*
- * Main function of PDC server
+ * \brief Main function of PDC server
  *
  * \param  argc[IN]     Number of command line arguments
  * \param  argv[IN]     Command line arguments
@@ -2049,21 +2025,11 @@ main(int argc, char *argv[])
     pdc_server_size_g = 1;
 #endif
 
-#ifdef ENABLE_TIMING
-    struct timeval start;
-    struct timeval end;
-    double         server_init_time;
-    gettimeofday(&start, 0);
-#endif
-
-#ifdef PDC_TIMING
-    double start = MPI_Wtime();
-    PDC_server_timing_init();
-#endif
     if (argc > 1)
         if (strcmp(argv[1], "restart") == 0)
             is_restart_g = 1;
 
+    // TODO: jjravi why?...  remove
     // Init rand seed
     srand(time(NULL));
 
@@ -2097,22 +2063,21 @@ main(int argc, char *argv[])
     if (pdc_server_rank_g == 0)
         if (PDC_Server_write_addr_to_file(all_addr_strings_g, pdc_server_size_g) != SUCCEED)
             printf("==PDC_SERVER[%d]: Error with write config file\n", pdc_server_rank_g);
-#ifdef PDC_TIMING
-    pdc_server_timings->PDCserver_start_total += MPI_Wtime() - start;
-#endif
-#ifdef ENABLE_TIMING
-    // Timing
-    gettimeofday(&end, 0);
-    server_init_time = PDC_get_elapsed_time_double(&start, &end);
-#endif
 
     if (pdc_server_rank_g == 0) {
-#ifdef ENABLE_TIMING
-        printf("==PDC_SERVER[%d]: total startup time = %.6f\n", pdc_server_rank_g, server_init_time);
-#endif
         printf("==PDC_SERVER[%d]: Server ready!\n\n\n", pdc_server_rank_g);
     }
-    fflush(stdout);
+
+    const char *plugin_path = getenv("PDC_PLUGIN_PATH");
+
+    // default path is pdc server executable directory
+    if (!plugin_path)
+    {
+      char *app_name = PDC_get_argv0_();
+      char *app_dir = dirname(strdup(app_name));
+      plugin_path = app_dir;
+    }
+    // PDC_plugin_init(plugin_path);
 
     // Main loop to handle Mercury RPC/Bulk requests
 #ifdef ENABLE_MULTITHREAD
@@ -2121,14 +2086,7 @@ main(int argc, char *argv[])
     PDC_Server_loop(hg_context_g);
 #endif
 
-#ifdef ENABLE_TIMING
-    PDC_print_IO_stats();
-#endif
-
 done:
-#ifdef PDC_TIMING
-    PDC_server_timing_report();
-#endif
     PDC_Server_finalize();
 #ifdef ENABLE_MPI
     MPI_Finalize();

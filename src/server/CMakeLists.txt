@@ -16,17 +16,21 @@ include_directories(
   ${PDC_SOURCE_DIR}/src/server/pdc_server_region
   ${PDC_SOURCE_DIR}/src/server/pdc_server_region/include
   ${PDC_SOURCE_DIR}/src/server/pdc_server_analysis/include
+  ${PDC_SOURCE_DIR}/src/server/pdc_server_transform/include
   ${PDC_SOURCE_DIR}/src/server/dablooms
   ${PDC_SOURCE_DIR}/src/api/include
   ${PDC_SOURCE_DIR}/src/api/pdc_obj/include
   ${PDC_SOURCE_DIR}/src/api/pdc_region/include
   ${PDC_SOURCE_DIR}/src/api/pdc_query/include
+  ${PDC_SOURCE_DIR}/src/api/pdc_transform_old/include
   ${PDC_SOURCE_DIR}/src/api/pdc_transform/include
   ${PDC_SOURCE_DIR}/src/api/pdc_analysis/include
   ${PDC_SOURCE_DIR}/src/api/profiling/include
   ${PDC_SOURCE_DIR}/src/utils/include
   ${MERCURY_INCLUDE_DIR}
   ${FASTBIT_INCLUDE_DIR}
+
+  ${PDC_SOURCE_DIR}/src/api/pdc_persist/include
 )
 
 add_definitions( -DIS_PDC_SERVER=1 )
@@ -47,11 +51,15 @@ add_executable(pdc_server.exe
                ${PDC_SOURCE_DIR}/src/server/pdc_server_region/pdc_server_region_cache.c
                ${PDC_SOURCE_DIR}/src/server/pdc_server_region/pdc_server_region_transfer.c
                ${PDC_SOURCE_DIR}/src/server/pdc_server_region/pdc_server_region_transfer_metadata_query.c
+               ${PDC_SOURCE_DIR}/src/server/pdc_server_transform/pdc_server_transform.c
                ${PDC_SOURCE_DIR}/src/utils/pdc_region_utils.c
                ${PDC_SOURCE_DIR}/src/utils/pdc_timing.c
+               ${PDC_SOURCE_DIR}/src/utils/pdc_utils.c
                ${PDC_SOURCE_DIR}/src/api/pdc_analysis/pdc_analysis_common.c
-               ${PDC_SOURCE_DIR}/src/api/pdc_transform/pdc_transforms_common.c
+               ${PDC_SOURCE_DIR}/src/api/pdc_transform_old/pdc_transforms_common_old.c
                ${PDC_SOURCE_DIR}/src/api/pdc_analysis/pdc_hist_pkg.c
+               ${PDC_SOURCE_DIR}/src/api/pdc_persist/pdc_persist.c
+               ${PDC_SOURCE_DIR}/src/utils/rpc_engine.c
 )
 
 install(
@@ -59,14 +67,6 @@ install(
     pdc_server.exe
   DESTINATION ${PDC_INSTALL_BIN_DIR}
 )
-
-if(NOT ${PDC_INSTALL_BIN_DIR} MATCHES ${PROJECT_BINARY_DIR}/bin)
-install(
-  TARGETS
-    pdc_server.exe
-  DESTINATION ${PDC_INSTALL_BIN_DIR}
-)
-endif()
 
 if(PDC_ENABLE_FASTBIT)
     message(STATUS "Enabled fastbit")
@@ -75,4 +75,8 @@ else()
     target_link_libraries(pdc_server.exe mercury pdcprof -lm -ldl ${PDC_EXT_LIB_DEPENDENCIES})
 endif()
 
+
+# TODO: jjravi move
+# target_link_libraries(pdc_server.exe cusz)
+target_include_directories(pdc_server.exe PUBLIC ${CUDA_INCLUDE_DIRS})
 

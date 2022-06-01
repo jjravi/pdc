@@ -38,7 +38,8 @@
 #include "pdc_region.h"
 #include "pdc_query.h"
 #include "pdc_analysis.h"
-#include "pdc_transform.h"
+#include "pdc_transform_old.h"
+#include "pdc_persist.h"
 
 int PDC_timing_report(const char *prefix);
 
@@ -46,7 +47,7 @@ int PDC_timing_report(const char *prefix);
 /* Public Prototypes */
 /*********************/
 /**
- * Initialize the PDC layer
+ * \brief Initialize the PDC layer
  *
  * \param pdc_name [IN]         Name of the PDC
  *
