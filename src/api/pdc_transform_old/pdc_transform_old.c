@@ -48,119 +48,213 @@ extern int pdc_client_mpi_size_g;
 static char *default_pdc_transforms_lib = "libpdctransforms.so";
 
 perr_t
-PDCobj_transform_register(char *func, pdcid_t obj_id, int current_state, int next_state,
-  pdc_obj_transform_t op_type, pdc_data_movement_t when)
+PDCobj_transform_register(char *func, pdcid_t iterIn, pdcid_t iterOut)
 {
-  perr_t ret_value                               = SUCCEED;
-  void * ftnHandle                               = NULL;
-  size_t (*ftnPtr)()                             = NULL;
-  struct _pdc_region_transform_ftn_info *thisFtn = NULL;
-  struct _pdc_obj_info *                 obj1, *obj2;
-  struct _pdc_id_info *                  objinfo1;
-  struct _pdc_obj_prop *                 prop;
-  struct pdc_region_info *               reg1 = NULL, *reg2 = NULL;
-  pdcid_t                                src_region_id = 0, dest_region_id = 0;
-  pdcid_t                                dest_object_id    = 0;
-  char *                                 thisApp           = NULL;
-  char *                                 colonsep          = NULL;
-  char *                                 transformslibrary = NULL;
-  char *                                 applicationDir    = NULL;
-  char *                                 userdefinedftn    = NULL;
-  char *                                 loadpath          = NULL;
-  int                                    local_regIndex;
-  struct _pdc_id_info *                  id_info;
+  perr_t ret_value                              = SUCCEED; /* Return value */
+  void * ftnHandle                              = NULL;
+  int (*ftnPtr)(pdcid_t, pdcid_t)               = NULL;
+  struct _pdc_region_analysis_ftn_info *thisFtn = NULL;
+  struct _pdc_iterator_info *           i_in = NULL, *i_out = NULL;
+  pdcid_t                               meta_id_in = 0, meta_id_out = 0;
+  pdcid_t                               local_id_in = 0, local_id_out = 0;
+  char *                                thisApp        = NULL;
+  char *                                colonsep       = NULL;
+  char *                                analyislibrary = NULL;
+  char *                                applicationDir = NULL;
+  char *                                userdefinedftn = NULL;
+  char *                                loadpath       = NULL;
 
   FUNC_ENTER(NULL);
 
   thisApp = PDC_get_argv0_();
-  if (thisApp)
-  {
+  if (thisApp) {
     applicationDir = dirname(strdup(thisApp));
   }
   userdefinedftn = strdup(func);
 
   if ((colonsep = strrchr(userdefinedftn, ':')) != NULL) {
-    *colonsep++       = 0;
-    transformslibrary = colonsep;
+    *colonsep++    = 0;
+    analyislibrary = colonsep;
   }
   else
-    transformslibrary = default_pdc_transforms_lib;
+    analyislibrary = default_pdc_transforms_lib;
 
-  loadpath = PDC_get_realpath(transformslibrary, applicationDir);
-
-  if (PDC_get_ftnPtr_(userdefinedftn, loadpath, &ftnHandle) < 0)
-    PGOTO_ERROR(FAIL, "PDC_get_ftnPtr_ returned an error!\n");
+  // TODO: Should probably validate the location of the "analysislibrary"
+  loadpath = PDC_get_realpath(analyislibrary, applicationDir);
+  if (PDC_get_ftnPtr_((const char *)userdefinedftn, (const char *)loadpath, &ftnHandle) < 0)
+    PGOTO_ERROR(FAIL, "PDC_get_ftnPtr_ returned an error!");
 
   if ((ftnPtr = ftnHandle) == NULL)
-    PGOTO_ERROR(FAIL, "Transforms function lookup failed");
+    PGOTO_ERROR(FAIL, "Analysis function lookup failed");
 
-  if ((thisFtn = PDC_MALLOC(struct _pdc_region_transform_ftn_info)) == NULL)
-    PGOTO_ERROR(FAIL, "PDC register_obj_transforms memory allocation failed");
+  if ((thisFtn = PDC_MALLOC(struct _pdc_region_analysis_ftn_info)) == NULL)
+    PGOTO_ERROR(FAIL, "PDC register_obj_analysis memory allocation failed");
 
-  memset(thisFtn, 0, sizeof(struct _pdc_region_transform_ftn_info));
-  thisFtn->ftnPtr    = (size_t(*)())ftnPtr;
-  thisFtn->object_id = obj_id;
-  thisFtn->op_type   = op_type;
-  thisFtn->when      = when;
-  thisFtn->lang      = C_lang;
-  thisFtn->nextState = next_state;
-  thisFtn->dest_type = PDC_UNKNOWN;
-
-  // Add to our own list of transform functions
-  if ((local_regIndex = PDC_add_transform_ptr_to_registry_(thisFtn)) < 0)
-    PGOTO_ERROR(FAIL, "PDC unable to register transform function!");
-
-  // Flag the transform as being active on mapping operations
-  if (op_type == PDC_DATA_MAP) {
-    objinfo1 = PDC_find_id(obj_id);
-    if (objinfo1 == NULL)
-      PGOTO_ERROR(FAIL, "cannot locate local object ID");
-    obj1 = (struct _pdc_obj_info *)(objinfo1->obj_ptr);
-    /* See if any mapping operations are defined */
-    if (obj1 && (obj1->region_list_head != NULL)) {
-      id_info        = PDC_find_id(obj1->region_list_head->orig_reg_id);
-      src_region_id  = obj1->region_list_head->orig_reg_id;
-      dest_region_id = obj1->region_list_head->des_reg_id;
-      // mapping is already defined...
-      if (id_info && ((reg1 = (struct pdc_region_info *)id_info->obj_ptr) != NULL)) {
-        thisFtn->src_region = reg1;
-        obj1                = reg1->obj;
-
-        // Requires that the PDCprop_set_obj_buf function be used...
-        if (obj1 && ((prop = obj1->obj_pt) != NULL)) {
-          thisFtn->data        = prop->buf;
-          thisFtn->type        = prop->obj_prop_pub->type;
-          thisFtn->type_extent = PDC_get_var_type_size(prop->obj_prop_pub->type);
-        }
-      }
-      id_info = PDC_find_id(dest_region_id);
-      if (id_info && ((reg2 = (struct pdc_region_info *)id_info->obj_ptr) != NULL)) {
-        thisFtn->dest_region = reg2;
-        obj2                 = reg2->obj;
-        dest_object_id       = obj2->obj_info_pub->local_id;
-        if (obj2 && ((prop = obj2->obj_pt) != NULL)) {
-          thisFtn->result      = prop->buf;
-          thisFtn->dest_type   = prop->obj_prop_pub->type;
-          thisFtn->dest_extent = PDC_get_var_type_size(prop->obj_prop_pub->type);
-
-        }
-      }
-      // Flag the destination region with the transform
-      reg2->registered_op |= PDC_TRANSFORM;
-    }
-    PDC_Client_register_region_transform(userdefinedftn, loadpath, src_region_id, dest_region_id,
-      dest_object_id, current_state, thisFtn->nextState,
-      (int)PDC_DATA_MAP, (int)when, local_regIndex);
+  thisFtn->ftnPtr = (int (*)())ftnPtr;
+  thisFtn->n_args = 2;
+  /* Allocate for iterator ids and region ids */
+  if ((thisFtn->object_id = (pdcid_t *)calloc(4, sizeof(pdcid_t))) != NULL) {
+    thisFtn->object_id[0] = iterIn;
+    thisFtn->object_id[1] = iterOut;
   }
+  else
+    PGOTO_ERROR(FAIL, "PDC register_obj_analysis memory allocation failed - object_ids");
+
+  thisFtn->region_id = (pdcid_t *)&thisFtn->object_id[2];
+
+  thisFtn->lang = C_lang;
+
+  if (PDC_Block_iterator_cache) {
+    if (iterIn != 0) {
+      i_in        = &PDC_Block_iterator_cache[iterIn];
+      meta_id_in  = i_in->meta_id;
+      local_id_in = i_in->local_id;
+    }
+    if (iterOut != 0) {
+      i_out        = &PDC_Block_iterator_cache[iterOut];
+      meta_id_out  = i_out->meta_id;
+      local_id_out = i_out->local_id;
+    }
+  }
+
+  PDC_Client_register_obj_analysis(thisFtn, userdefinedftn, loadpath, local_id_in, local_id_out, meta_id_in,
+    meta_id_out);
+
+  // Add region IDs
+  thisFtn->region_id[0] = i_in->reg_id;
+  thisFtn->region_id[1] = i_out->reg_id;
+
+  // Add to our own list of analysis functions
+  if (PDC_add_analysis_ptr_to_registry_(thisFtn) < 0)
+    PGOTO_ERROR(FAIL, "PDC unable to register analysis function!");
 
 done:
   if (applicationDir)
     free(applicationDir);
   if (userdefinedftn)
     free(userdefinedftn);
+  if (loadpath)
+    free(loadpath);
 
   FUNC_LEAVE(ret_value);
 }
+
+
+
+// perr_t
+// PDCobj_transform_register(char *func, pdcid_t obj_id, int current_state, int next_state,
+//   pdc_obj_transform_t op_type, pdc_data_movement_t when)
+// {
+//   perr_t ret_value                               = SUCCEED;
+//   void * ftnHandle                               = NULL;
+//   size_t (*ftnPtr)()                             = NULL;
+//   struct _pdc_region_transform_ftn_info *thisFtn = NULL;
+//   struct _pdc_obj_info *                 obj1, *obj2;
+//   struct _pdc_id_info *                  objinfo1;
+//   struct _pdc_obj_prop *                 prop;
+//   struct pdc_region_info *               reg1 = NULL, *reg2 = NULL;
+//   pdcid_t                                src_region_id = 0, dest_region_id = 0;
+//   pdcid_t                                dest_object_id    = 0;
+//   char *                                 thisApp           = NULL;
+//   char *                                 colonsep          = NULL;
+//   char *                                 transformslibrary = NULL;
+//   char *                                 applicationDir    = NULL;
+//   char *                                 userdefinedftn    = NULL;
+//   char *                                 loadpath          = NULL;
+//   int                                    local_regIndex;
+//   struct _pdc_id_info *                  id_info;
+// 
+//   FUNC_ENTER(NULL);
+// 
+//   thisApp = PDC_get_argv0_();
+//   if (thisApp)
+//   {
+//     applicationDir = dirname(strdup(thisApp));
+//   }
+//   userdefinedftn = strdup(func);
+// 
+//   if ((colonsep = strrchr(userdefinedftn, ':')) != NULL) {
+//     *colonsep++       = 0;
+//     transformslibrary = colonsep;
+//   }
+//   else
+//     transformslibrary = default_pdc_transforms_lib;
+// 
+//   loadpath = PDC_get_realpath(transformslibrary, applicationDir);
+// 
+//   if (PDC_get_ftnPtr_(userdefinedftn, loadpath, &ftnHandle) < 0)
+//     PGOTO_ERROR(FAIL, "PDC_get_ftnPtr_ returned an error!\n");
+// 
+//   if ((ftnPtr = ftnHandle) == NULL)
+//     PGOTO_ERROR(FAIL, "Transforms function lookup failed");
+// 
+//   if ((thisFtn = PDC_MALLOC(struct _pdc_region_transform_ftn_info)) == NULL)
+//     PGOTO_ERROR(FAIL, "PDC register_obj_transforms memory allocation failed");
+// 
+//   memset(thisFtn, 0, sizeof(struct _pdc_region_transform_ftn_info));
+//   thisFtn->ftnPtr    = (size_t(*)())ftnPtr;
+//   thisFtn->object_id = obj_id;
+//   thisFtn->op_type   = op_type;
+//   thisFtn->when      = when;
+//   thisFtn->lang      = C_lang;
+//   thisFtn->nextState = next_state;
+//   thisFtn->dest_type = PDC_UNKNOWN;
+// 
+//   // Add to our own list of transform functions
+//   if ((local_regIndex = PDC_add_transform_ptr_to_registry_(thisFtn)) < 0)
+//     PGOTO_ERROR(FAIL, "PDC unable to register transform function!");
+// 
+//   // Flag the transform as being active on mapping operations
+//   if (op_type == PDC_DATA_MAP) {
+//     objinfo1 = PDC_find_id(obj_id);
+//     if (objinfo1 == NULL)
+//       PGOTO_ERROR(FAIL, "cannot locate local object ID");
+//     obj1 = (struct _pdc_obj_info *)(objinfo1->obj_ptr);
+//     /* See if any mapping operations are defined */
+//     if (obj1 && (obj1->region_list_head != NULL)) {
+//       id_info        = PDC_find_id(obj1->region_list_head->orig_reg_id);
+//       src_region_id  = obj1->region_list_head->orig_reg_id;
+//       dest_region_id = obj1->region_list_head->des_reg_id;
+//       // mapping is already defined...
+//       if (id_info && ((reg1 = (struct pdc_region_info *)id_info->obj_ptr) != NULL)) {
+//         thisFtn->src_region = reg1;
+//         obj1                = reg1->obj;
+// 
+//         // Requires that the PDCprop_set_obj_buf function be used...
+//         if (obj1 && ((prop = obj1->obj_pt) != NULL)) {
+//           thisFtn->data        = prop->buf;
+//           thisFtn->type        = prop->obj_prop_pub->type;
+//           thisFtn->type_extent = PDC_get_var_type_size(prop->obj_prop_pub->type);
+//         }
+//       }
+//       id_info = PDC_find_id(dest_region_id);
+//       if (id_info && ((reg2 = (struct pdc_region_info *)id_info->obj_ptr) != NULL)) {
+//         thisFtn->dest_region = reg2;
+//         obj2                 = reg2->obj;
+//         dest_object_id       = obj2->obj_info_pub->local_id;
+//         if (obj2 && ((prop = obj2->obj_pt) != NULL)) {
+//           thisFtn->result      = prop->buf;
+//           thisFtn->dest_type   = prop->obj_prop_pub->type;
+//           thisFtn->dest_extent = PDC_get_var_type_size(prop->obj_prop_pub->type);
+// 
+//         }
+//       }
+//       // Flag the destination region with the transform
+//       reg2->registered_op |= PDC_TRANSFORM;
+//     }
+//     PDC_Client_register_region_transform(userdefinedftn, loadpath, src_region_id, dest_region_id,
+//       dest_object_id, current_state, thisFtn->nextState,
+//       (int)PDC_DATA_MAP, (int)when, local_regIndex);
+//   }
+// 
+// done:
+//   if (applicationDir)
+//     free(applicationDir);
+//   if (userdefinedftn)
+//     free(userdefinedftn);
+// 
+//   FUNC_LEAVE(ret_value);
+// }
 
 perr_t
 PDCbuf_map_transform_register(char *func, void *buf, pdcid_t src_region_id, pdcid_t dest_object_id,

@@ -112,7 +112,7 @@ int main(int argc, char **argv)
    * structures to indicate that an analysis operation has been
    * added to the lock release...
    */
-  PDCobj_analysis_register("pdc_server_passthrough:libpdc_server_transform_test.so", input1_iter, result1_iter);
+  PDCobj_transform_register("pdc_server_passthrough:libpdc_server_transform_test.so", input1_iter, result1_iter);
   PDC_API_CALL( PDCbuf_obj_map(&myArray1[0], PDC_INT, r1, obj2, r2) );
   PDC_API_CALL( PDCreg_obtain_lock(obj1, r1, PDC_WRITE, PDC_NOBLOCK) );
   PDC_API_CALL( PDCreg_release_lock(obj1, r1, PDC_WRITE) );

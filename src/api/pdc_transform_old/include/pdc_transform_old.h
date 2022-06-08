@@ -51,17 +51,14 @@ typedef enum { DATA_IN = 1, DATA_OUT = 2, DATA_RELOCATION = 4 } pdc_data_movemen
  *
  * \param func [IN]             String containing the [libraryname:]function to be registered.
  *                              (default library name = "libpdctransforms")
- * \param obj_id [IN]           PDC object id containing the input data.
- * \param current_state [IN]    State/Sequence ID to identify when the transform can take place.
- * \param next_state [IN]       State/Sequence ID after the transform is complete (should be +1 or -1).
- * \param op_type [IN]          An enumerated ID specifying an operation type that invokes the transform.
- * \param when [IN]             An enumerated ID specifying when/where a transform is invoked.
- *                              (examples for data movement: DATA_OUT, DATA_IN)
+ * \param iterIn [IN]           PDC iterator id containing the input data
+ *                              (may be a NULL iterator == 0).
+ * \param dims [IN]             PDC iterator id containing the output data
+ *                              (may be a NULL iterator == 0).
  *
  * \return Non-negative on success/Negative on failure
  */
-perr_t PDCobj_transform_register(char *func, pdcid_t obj_id, int current_state, int next_state,
-                                 pdc_obj_transform_t op_type, pdc_data_movement_t when);
+perr_t PDCobj_transform_register(char *func, pdcid_t iterIn, pdcid_t iterOut);
 
 /**
  * Register a function to be invoked as a result of having mapped two regions.

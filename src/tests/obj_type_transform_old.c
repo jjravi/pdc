@@ -173,9 +173,10 @@ main(int argc, char **argv)
         printf("PDCbuf_obj_map failed\n");
 
     // register a transform for when the mapping of 'obj_dx' takes place
-    ret = PDCobj_transform_register("pdc_convert_datatype", obj_dx, 0, INCR_STATE, PDC_DATA_MAP, DATA_OUT);
+    // ret = PDCobj_transform_register("pdc_convert_datatype", obj_dx, 0, INCR_STATE, PDC_DATA_MAP, DATA_OUT);
+    ret = PDCbuf_map_transform_register("pdc_convert_datatype", &dx[0], region_dx, obj_ix, 0, INCR_STATE, PDC_DATA_MAP, DATA_OUT);
     if (ret < 0)
-        printf("PDCobj_transform_register failed\n");
+        printf("PDCbuf_map_transform_register failed\n");
 
 #ifdef ENABLE_MPI
     MPI_Barrier(MPI_COMM_WORLD);
