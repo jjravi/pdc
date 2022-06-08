@@ -44,6 +44,7 @@
 // Mercury hash table and list
 #include "mercury_hash_table.h"
 #include "mercury_list.h"
+#include "mercury_atomic.h"
 
 #include "pdc_config.h"
 
@@ -69,6 +70,9 @@
 #define BLOOM_ADD    counting_bloom_add
 #define BLOOM_REMOVE counting_bloom_remove
 #define BLOOM_FREE   free_counting_bloom
+
+hg_atomic_int32_t registered_analysis_ftn_count_g;
+
 
 #ifdef ENABLE_MULTITHREAD
 hg_thread_mutex_t insert_iterator_mutex_g = HG_THREAD_MUTEX_INITIALIZER;

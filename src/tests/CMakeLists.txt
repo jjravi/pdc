@@ -81,12 +81,11 @@ set(PROGRAMS
   openmsi-read3d
   nyx-read3d
   iter_create
-  obj_analysis
   obj_analysis_old
   obj_analysis_old2
   obj_transformation
   obj_transformation_old
-  obj_type_transform
+  obj_type_transform_old
   query_data
   region_transfer
   region_transfer_status
@@ -132,11 +131,20 @@ enable_language(CXX)
 find_package(MPI REQUIRED)
 include_directories(SYSTEM ${MPI_INCLUDE_PATH})
 #
+add_executable(obj_analysis obj_analysis.cc)
+target_link_libraries(obj_analysis pdc MPI::MPI_C MPI::MPI_CXX)
+#
+add_executable(obj_type_transform obj_type_transform.cc)
+target_link_libraries(obj_type_transform pdc MPI::MPI_C MPI::MPI_CXX)
+#
 add_executable(vpicio_compress vpicio_compress.cc)
 target_link_libraries(vpicio_compress pdc MPI::MPI_C MPI::MPI_CXX)
 #
 add_executable(vpicio_compress_obj vpicio_compress_obj.cc)
 target_link_libraries(vpicio_compress_obj pdc MPI::MPI_C MPI::MPI_CXX)
+#
+add_executable(vpicio_compress_obj_server vpicio_compress_obj_server.cc)
+target_link_libraries(vpicio_compress_obj_server pdc MPI::MPI_C MPI::MPI_CXX)
 #
 add_executable(vpicio_compress_obj_gpu vpicio_compress_obj_gpu.cu)
 target_link_libraries(vpicio_compress_obj_gpu pdc MPI::MPI_C MPI::MPI_CXX)

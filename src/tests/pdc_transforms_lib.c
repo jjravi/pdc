@@ -8,378 +8,462 @@
 static int
 _int_to_float(int *dataIn, float *dataOut, size_t elements)
 {
+  FUNC_ENTER(NULL);
   size_t k;
   for (k = 0; k < elements; k++)
     dataOut[k] = (float)dataIn[k];
+  FUNC_LEAVE(0);
   return 0;
 }
 
 static int
 _int_to_double(int *dataIn, double *dataOut, size_t elements)
 {
+  FUNC_ENTER(NULL);
   size_t k;
   for (k = 0; k < elements; k++)
     dataOut[k] = (double)dataIn[k];
+  FUNC_LEAVE(0);
   return 0;
 }
 
 static int
 _int_to_int64(int *dataIn, int64_t *dataOut, size_t elements)
 {
+  FUNC_ENTER(NULL);
   size_t k;
   for (k = 0; k < elements; k++)
     dataOut[k] = (int64_t)dataIn[k];
+  FUNC_LEAVE(0);
   return 0;
 }
 
 static int
 _int_to_int16(int *dataIn, short *dataOut, size_t elements)
 {
+  FUNC_ENTER(NULL);
   size_t k;
   for (k = 0; k < elements; k++)
     dataOut[k] = (short)(dataIn[k] & 0x0FFFF);
+  FUNC_LEAVE(0);
   return 0;
 }
 
 static int
 _int_to_int8(int *dataIn, int8_t *dataOut, size_t elements)
 {
+  FUNC_ENTER(NULL);
   size_t k;
   for (k = 0; k < elements; k++)
     dataOut[k] = (int8_t)(dataIn[k] & 0x0FF);
+  FUNC_LEAVE(0);
   return 0;
 }
 
 static int
 _uint_to_float(uint32_t *dataIn, float *dataOut, size_t elements)
 {
+  FUNC_ENTER(NULL);
   size_t k;
   for (k = 0; k < elements; k++)
     dataOut[k] = (float)dataIn[k];
+  FUNC_LEAVE(0);
   return 0;
 }
 
 static int
 _uint_to_double(uint32_t *dataIn, double *dataOut, size_t elements)
 {
+  FUNC_ENTER(NULL);
   size_t k;
   for (k = 0; k < elements; k++)
     dataOut[k] = (double)dataIn[k];
+  FUNC_LEAVE(0);
   return 0;
 }
 
 static int
 _uint_to_int64(uint32_t *dataIn, int64_t *dataOut, size_t elements)
 {
+  FUNC_ENTER(NULL);
   size_t k;
   for (k = 0; k < elements; k++)
     dataOut[k] = (int64_t)dataIn[k];
+  FUNC_LEAVE(0);
   return 0;
 }
 
 static int
 _uint_to_int16(uint32_t *dataIn, short *dataOut, size_t elements)
 {
+  FUNC_ENTER(NULL);
   size_t k;
   for (k = 0; k < elements; k++)
     dataOut[k] = (short)(dataIn[k] & 0x0FFFF);
+  FUNC_LEAVE(0);
   return 0;
 }
 
 static int
 _uint_to_int8(uint32_t *dataIn, int8_t *dataOut, size_t elements)
 {
+  FUNC_ENTER(NULL);
   size_t k;
   for (k = 0; k < elements; k++)
     dataOut[k] = (int8_t)(dataIn[k] & 0x0FF);
+  FUNC_LEAVE(0);
   return 0;
 }
 
 static int
 _int64_to_float(int64_t *dataIn, float *dataOut, size_t elements)
 {
+  FUNC_ENTER(NULL);
   size_t k;
   for (k = 0; k < elements; k++)
     dataOut[k] = (float)dataIn[k];
+  FUNC_LEAVE(0);
   return 0;
 }
 
 static int
 _int64_to_double(int64_t *dataIn, double *dataOut, size_t elements)
 {
+  FUNC_ENTER(NULL);
   size_t k;
   for (k = 0; k < elements; k++)
     dataOut[k] = (double)dataIn[k];
+  FUNC_LEAVE(0);
   return 0;
 }
 
 static int
 _int64_to_int(int64_t *dataIn, int *dataOut, size_t elements)
 {
+  FUNC_ENTER(NULL);
   size_t k;
   for (k = 0; k < elements; k++)
     dataOut[k] = (int)dataIn[k];
+  FUNC_LEAVE(0);
   return 0;
 }
 
 static int
 _int64_to_int16(int64_t *dataIn, short *dataOut, size_t elements)
 {
+  FUNC_ENTER(NULL);
   size_t k;
   for (k = 0; k < elements; k++)
     dataOut[k] = (short)(dataIn[k] & 0x0FFFF);
+  FUNC_LEAVE(0);
   return 0;
 }
 
 static int
 _int64_to_int8(int64_t *dataIn, int8_t *dataOut, size_t elements)
 {
+  FUNC_ENTER(NULL);
   size_t k;
   for (k = 0; k < elements; k++)
     dataOut[k] = (int8_t)(dataIn[k] & 0x0FF);
+  FUNC_LEAVE(0);
   return 0;
 }
 
 static int
 _uint64_to_float(uint64_t *dataIn, float *dataOut, size_t elements)
 {
+  FUNC_ENTER(NULL);
   size_t k;
   for (k = 0; k < elements; k++)
     dataOut[k] = (float)dataIn[k];
+  FUNC_LEAVE(0);
   return 0;
 }
 
 static int
 _uint64_to_double(uint64_t *dataIn, double *dataOut, size_t elements)
 {
+  FUNC_ENTER(NULL);
   size_t k;
   for (k = 0; k < elements; k++)
     dataOut[k] = (double)dataIn[k];
+  FUNC_LEAVE(0);
   return 0;
 }
 
 static int
 _uint64_to_int(uint64_t *dataIn, int *dataOut, size_t elements)
 {
+  FUNC_ENTER(NULL);
   size_t k;
   for (k = 0; k < elements; k++)
     dataOut[k] = (int)dataIn[k];
+  FUNC_LEAVE(0);
   return 0;
 }
 
 static int
 _uint64_to_int16(uint64_t *dataIn, short *dataOut, size_t elements)
 {
+  FUNC_ENTER(NULL);
   size_t k;
   for (k = 0; k < elements; k++)
     dataOut[k] = (short)(dataIn[k] & 0x0FFFF);
+  FUNC_LEAVE(0);
   return 0;
 }
 
 static int
 _uint64_to_int8(uint64_t *dataIn, int8_t *dataOut, size_t elements)
 {
+  FUNC_ENTER(NULL);
   size_t k;
   for (k = 0; k < elements; k++)
     dataOut[k] = (int8_t)(dataIn[k] & 0x0FF);
+  FUNC_LEAVE(0);
   return 0;
 }
 
 static int
 _int16_to_float(int16_t *dataIn, float *dataOut, size_t elements)
 {
+  FUNC_ENTER(NULL);
   size_t k;
   for (k = 0; k < elements; k++)
     dataOut[k] = (float)dataIn[k];
+  FUNC_LEAVE(0);
   return 0;
 }
 
 static int
 _int16_to_double(int16_t *dataIn, double *dataOut, size_t elements)
 {
+  FUNC_ENTER(NULL);
   size_t k;
   for (k = 0; k < elements; k++)
     dataOut[k] = (double)dataIn[k];
+  FUNC_LEAVE(0);
   return 0;
 }
 
 static int
 _int16_to_int64(int16_t *dataIn, int64_t *dataOut, size_t elements)
 {
+  FUNC_ENTER(NULL);
   size_t k;
   for (k = 0; k < elements; k++)
     dataOut[k] = (int64_t)dataIn[k];
+  FUNC_LEAVE(0);
   return 0;
 }
 
 static int
 _int16_to_uint64(int16_t *dataIn, uint64_t *dataOut, size_t elements)
 {
+  FUNC_ENTER(NULL);
   size_t k;
   for (k = 0; k < elements; k++)
     dataOut[k] = (uint64_t)dataIn[k];
+  FUNC_LEAVE(0);
   return 0;
 }
 
 static int
 _int16_to_int(int16_t *dataIn, short *dataOut, size_t elements)
 {
+  FUNC_ENTER(NULL);
   size_t k;
   for (k = 0; k < elements; k++)
     dataOut[k] = (short)(dataIn[k] & 0x0FFFF);
+  FUNC_LEAVE(0);
   return 0;
 }
 
 static int
 _int16_to_int8(int16_t *dataIn, int8_t *dataOut, size_t elements)
 {
+  FUNC_ENTER(NULL);
   size_t k;
   for (k = 0; k < elements; k++)
     dataOut[k] = (int8_t)(dataIn[k] & 0x0FF);
+  FUNC_LEAVE(0);
   return 0;
 }
 
 static int
 _int8_to_float(int8_t *dataIn, float *dataOut, size_t elements)
 {
+  FUNC_ENTER(NULL);
   size_t k;
   for (k = 0; k < elements; k++)
     dataOut[k] = (float)dataIn[k];
+  FUNC_LEAVE(0);
   return 0;
 }
 
 static int
 _int8_to_double(int8_t *dataIn, double *dataOut, size_t elements)
 {
+  FUNC_ENTER(NULL);
   size_t k;
   for (k = 0; k < elements; k++)
     dataOut[k] = (double)dataIn[k];
+  FUNC_LEAVE(0);
   return 0;
 }
 
 static int
 _int8_to_int64(int8_t *dataIn, int64_t *dataOut, size_t elements)
 {
+  FUNC_ENTER(NULL);
   size_t k;
   for (k = 0; k < elements; k++)
     dataOut[k] = (int64_t)dataIn[k];
+  FUNC_LEAVE(0);
   return 0;
 }
 
 static int
 _int8_to_uint64(int8_t *dataIn, uint64_t *dataOut, size_t elements)
 {
+  FUNC_ENTER(NULL);
   size_t k;
   for (k = 0; k < elements; k++)
     dataOut[k] = (uint64_t)dataIn[k];
+  FUNC_LEAVE(0);
   return 0;
 }
 
 static int
 _int8_to_int(int8_t *dataIn, int *dataOut, size_t elements)
 {
+  FUNC_ENTER(NULL);
   size_t k;
   for (k = 0; k < elements; k++)
     dataOut[k] = (short)(dataIn[k] & 0x0FFFF);
+  FUNC_LEAVE(0);
   return 0;
 }
 
 static int
 _int8_to_int16(int8_t *dataIn, short *dataOut, size_t elements)
 {
+  FUNC_ENTER(NULL);
   size_t k;
   for (k = 0; k < elements; k++)
     dataOut[k] = (short)(dataIn[k] & 0x0FFFF);
+  FUNC_LEAVE(0);
   return 0;
 }
 
 static int
 _float_to_int(float *dataIn, int *dataOut, size_t elements)
 {
+  FUNC_ENTER(NULL);
   size_t k;
   for (k = 0; k < elements; k++)
     dataOut[k] = (int)dataIn[k];
+  FUNC_LEAVE(0);
   return 0;
 }
 
 static int
 _float_to_double(float *dataIn, double *dataOut, size_t elements)
 {
+  FUNC_ENTER(NULL);
   size_t k;
   for (k = 0; k < elements; k++)
     dataOut[k] = (double)dataIn[k];
+  FUNC_LEAVE(0);
   return 0;
 }
 
 static int
 _float_to_int64(float *dataIn, int64_t *dataOut, size_t elements)
 {
+  FUNC_ENTER(NULL);
   size_t k;
   for (k = 0; k < elements; k++)
     dataOut[k] = (int64_t)dataIn[k];
+  FUNC_LEAVE(0);
   return 0;
 }
 
 static int
 _float_to_int16(float *dataIn, int16_t *dataOut, size_t elements)
 {
+  FUNC_ENTER(NULL);
   size_t k;
   for (k = 0; k < elements; k++)
     dataOut[k] = (int16_t)dataIn[k];
+  FUNC_LEAVE(0);
   return 0;
 }
 
 static int
 _float_to_int8(float *dataIn, int16_t *dataOut, size_t elements)
 {
+  FUNC_ENTER(NULL);
   size_t k;
   for (k = 0; k < elements; k++)
     dataOut[k] = (int8_t)dataIn[k];
+  FUNC_LEAVE(0);
   return 0;
 }
 
 static int
 _double_to_int(double *dataIn, int *dataOut, size_t elements)
 {
+  FUNC_ENTER(NULL);
   size_t k;
   for (k = 0; k < elements; k++)
     dataOut[k] = (int)dataIn[k];
+  FUNC_LEAVE(0);
   return 0;
 }
 
 static int
 _double_to_float(double *dataIn, float *dataOut, size_t elements)
 {
+  FUNC_ENTER(NULL);
   size_t k;
   for (k = 0; k < elements; k++)
     dataOut[k] = (float)dataIn[k];
+  FUNC_LEAVE(0);
   return 0;
 }
 
 static int
 _double_to_int64(double *dataIn, int64_t *dataOut, size_t elements)
 {
+  FUNC_ENTER(NULL);
   size_t k;
   for (k = 0; k < elements; k++)
     dataOut[k] = (int64_t)dataIn[k];
+  FUNC_LEAVE(0);
   return 0;
 }
 
 static int
 _double_to_int16(double *dataIn, int16_t *dataOut, size_t elements)
 {
+  FUNC_ENTER(NULL);
   size_t k;
   for (k = 0; k < elements; k++)
     dataOut[k] = (int16_t)dataIn[k];
+  FUNC_LEAVE(0);
   return 0;
 }
 
 static int
 _double_to_int8(double *dataIn, int16_t *dataOut, size_t elements)
 {
+  FUNC_ENTER(NULL);
   size_t k;
   for (k = 0; k < elements; k++)
     dataOut[k] = (int8_t)dataIn[k];
+  FUNC_LEAVE(0);
   return 0;
 }
 
@@ -395,6 +479,9 @@ size_t
 pdc_convert_datatype(void *dataIn, pdc_var_type_t srcType, int ndim, uint64_t *dims, void **dataOut,
   pdc_var_type_t destType)
 {
+  FUNC_ENTER(NULL);
+  printf("[TRANSFORM] pdc_convert_datatype\n");
+
   int    d;
   size_t elements = dims[0];
   size_t storage_in_bytes;
@@ -416,125 +503,159 @@ pdc_convert_datatype(void *dataIn, pdc_var_type_t srcType, int ndim, uint64_t *d
   printf("pdc_convert_datatype: elements = %ld\n", elements);
 
   switch (srcType) {
-    case PDC_INT: {
-                    if (destType == PDC_FLOAT)
-                      _int_to_float(dataIn, *dataOut, elements);
-                    else if (destType == PDC_DOUBLE)
-                      _int_to_double(dataIn, *dataOut, elements);
-                    else if (destType == PDC_INT64)
-                      _int_to_int64(dataIn, *dataOut, elements);
-                    else if (destType == PDC_INT16)
-                      _int_to_int16(dataIn, *dataOut, elements);
-                    else if (destType == PDC_INT8)
-                      _int_to_int8(dataIn, *dataOut, elements);
-                    else
-                      return -1;
-                  } break;
-    case PDC_FLOAT: {
-                      if (destType == PDC_INT)
-                        _float_to_int(dataIn, *dataOut, elements);
-                      else if (destType == PDC_DOUBLE)
-                        _float_to_double(dataIn, *dataOut, elements);
-                      else if (destType == PDC_INT64)
-                        _float_to_int64(dataIn, *dataOut, elements);
-                      else if (destType == PDC_INT16)
-                        _float_to_int16(dataIn, *dataOut, elements);
-                      else if (destType == PDC_INT8)
-                        _float_to_int8(dataIn, *dataOut, elements);
-                      else
-                        return -1;
-                    } break;
-    case PDC_DOUBLE: {
-                       if (destType == PDC_INT)
-                         _double_to_int(dataIn, *dataOut, elements);
-                       else if (destType == PDC_FLOAT)
-                         _double_to_float(dataIn, *dataOut, elements);
-                       else if (destType == PDC_INT64)
-                         _double_to_int64(dataIn, *dataOut, elements);
-                       else if (destType == PDC_INT16)
-                         _double_to_int16(dataIn, *dataOut, elements);
-                       else if (destType == PDC_INT8)
-                         _double_to_int8(dataIn, *dataOut, elements);
-                       else
-                         return -1;
-                     } break;
-    case PDC_UINT: {
-                     if (destType == PDC_FLOAT)
-                       _uint_to_float(dataIn, *dataOut, elements);
-                     else if (destType == PDC_DOUBLE)
-                       _uint_to_double(dataIn, *dataOut, elements);
-                     else if (destType == PDC_INT64)
-                       _uint_to_int64(dataIn, *dataOut, elements);
-                     else if (destType == PDC_INT16)
-                       _uint_to_int16(dataIn, *dataOut, elements);
-                     else if (destType == PDC_INT8)
-                       _uint_to_int8(dataIn, *dataOut, elements);
-                     else
-                       return -1;
-                   } break;
-    case PDC_INT64: {
-                      if (destType == PDC_INT)
-                        _int64_to_int(dataIn, *dataOut, elements);
-                      else if (destType == PDC_FLOAT)
-                        _int64_to_float(dataIn, *dataOut, elements);
-                      else if (destType == PDC_DOUBLE)
-                        _int64_to_double(dataIn, *dataOut, elements);
-                      else if (destType == PDC_INT16)
-                        _int64_to_int16(dataIn, *dataOut, elements);
-                      else if (destType == PDC_INT8)
-                        _int64_to_int8(dataIn, *dataOut, elements);
-                      else
-                        return -1;
-                    } break;
-    case PDC_UINT64: {
-                       if (destType == PDC_INT)
-                         _uint64_to_int(dataIn, *dataOut, elements);
-                       else if (destType == PDC_FLOAT)
-                         _uint64_to_float(dataIn, *dataOut, elements);
-                       else if (destType == PDC_DOUBLE)
-                         _uint64_to_double(dataIn, *dataOut, elements);
-                       else if (destType == PDC_INT16)
-                         _uint64_to_int16(dataIn, *dataOut, elements);
-                       else if (destType == PDC_INT8)
-                         _uint64_to_int8(dataIn, *dataOut, elements);
-                       else
-                         return -1;
-                     } break;
-    case PDC_INT16: {
-                      if (destType == PDC_INT)
-                        _int16_to_int(dataIn, *dataOut, elements);
-                      else if (destType == PDC_FLOAT)
-                        _int16_to_float(dataIn, *dataOut, elements);
-                      else if (destType == PDC_DOUBLE)
-                        _int16_to_double(dataIn, *dataOut, elements);
-                      else if (destType == PDC_INT64)
-                        _int16_to_int64(dataIn, *dataOut, elements);
-                      else if (destType == PDC_UINT64)
-                        _int16_to_uint64(dataIn, *dataOut, elements);
-                      else if (destType == PDC_INT8)
-                        _int16_to_int8(dataIn, *dataOut, elements);
-                      else
-                        return -1;
-                    } break;
-    case PDC_INT8: {
-                     if (destType == PDC_INT)
-                       _int8_to_int(dataIn, *dataOut, elements);
-                     else if (destType == PDC_FLOAT)
-                       _int8_to_float(dataIn, *dataOut, elements);
-                     else if (destType == PDC_DOUBLE)
-                       _int8_to_double(dataIn, *dataOut, elements);
-                     else if (destType == PDC_INT16)
-                       _int8_to_int16(dataIn, *dataOut, elements);
-                     else if (destType == PDC_INT64)
-                       _int8_to_int64(dataIn, *dataOut, elements);
-                     else if (destType == PDC_UINT64)
-                       _int8_to_uint64(dataIn, *dataOut, elements);
-                     else
-                       return -1;
-                   } break;
+    case PDC_INT: 
+      {
+        if (destType == PDC_FLOAT)
+          _int_to_float(dataIn, *dataOut, elements);
+        else if (destType == PDC_DOUBLE)
+          _int_to_double(dataIn, *dataOut, elements);
+        else if (destType == PDC_INT64)
+          _int_to_int64(dataIn, *dataOut, elements);
+        else if (destType == PDC_INT16)
+          _int_to_int16(dataIn, *dataOut, elements);
+        else if (destType == PDC_INT8)
+          _int_to_int8(dataIn, *dataOut, elements);
+        else
+        {
+          FUNC_LEAVE(-1);
+          return -1;
+        }
+      } break;
+    case PDC_FLOAT: 
+      {
+        if (destType == PDC_INT)
+          _float_to_int(dataIn, *dataOut, elements);
+        else if (destType == PDC_DOUBLE)
+          _float_to_double(dataIn, *dataOut, elements);
+        else if (destType == PDC_INT64)
+          _float_to_int64(dataIn, *dataOut, elements);
+        else if (destType == PDC_INT16)
+          _float_to_int16(dataIn, *dataOut, elements);
+        else if (destType == PDC_INT8)
+          _float_to_int8(dataIn, *dataOut, elements);
+        else
+        {
+          FUNC_LEAVE(-1);
+          return -1;
+        }
+      } break;
+    case PDC_DOUBLE: 
+      {
+        if (destType == PDC_INT)
+          _double_to_int(dataIn, *dataOut, elements);
+        else if (destType == PDC_FLOAT)
+          _double_to_float(dataIn, *dataOut, elements);
+        else if (destType == PDC_INT64)
+          _double_to_int64(dataIn, *dataOut, elements);
+        else if (destType == PDC_INT16)
+          _double_to_int16(dataIn, *dataOut, elements);
+        else if (destType == PDC_INT8)
+          _double_to_int8(dataIn, *dataOut, elements);
+        else
+        {
+          FUNC_LEAVE(-1);
+          return -1;
+        }
+      } break;
+    case PDC_UINT: 
+      {
+        if (destType == PDC_FLOAT)
+          _uint_to_float(dataIn, *dataOut, elements);
+        else if (destType == PDC_DOUBLE)
+          _uint_to_double(dataIn, *dataOut, elements);
+        else if (destType == PDC_INT64)
+          _uint_to_int64(dataIn, *dataOut, elements);
+        else if (destType == PDC_INT16)
+          _uint_to_int16(dataIn, *dataOut, elements);
+        else if (destType == PDC_INT8)
+          _uint_to_int8(dataIn, *dataOut, elements);
+        else
+        {
+          FUNC_LEAVE(-1);
+          return -1;
+        }
+      } break;
+    case PDC_INT64: 
+      {
+        if (destType == PDC_INT)
+          _int64_to_int(dataIn, *dataOut, elements);
+        else if (destType == PDC_FLOAT)
+          _int64_to_float(dataIn, *dataOut, elements);
+        else if (destType == PDC_DOUBLE)
+          _int64_to_double(dataIn, *dataOut, elements);
+        else if (destType == PDC_INT16)
+          _int64_to_int16(dataIn, *dataOut, elements);
+        else if (destType == PDC_INT8)
+          _int64_to_int8(dataIn, *dataOut, elements);
+        else
+        {
+          FUNC_LEAVE(-1);
+          return -1;
+        }
+      } break;
+    case PDC_UINT64: 
+      {
+        if (destType == PDC_INT)
+          _uint64_to_int(dataIn, *dataOut, elements);
+        else if (destType == PDC_FLOAT)
+          _uint64_to_float(dataIn, *dataOut, elements);
+        else if (destType == PDC_DOUBLE)
+          _uint64_to_double(dataIn, *dataOut, elements);
+        else if (destType == PDC_INT16)
+          _uint64_to_int16(dataIn, *dataOut, elements);
+        else if (destType == PDC_INT8)
+          _uint64_to_int8(dataIn, *dataOut, elements);
+        else
+        {
+          FUNC_LEAVE(-1);
+          return -1;
+        }
+      } break;
+    case PDC_INT16: 
+      {
+        if (destType == PDC_INT)
+          _int16_to_int(dataIn, *dataOut, elements);
+        else if (destType == PDC_FLOAT)
+          _int16_to_float(dataIn, *dataOut, elements);
+        else if (destType == PDC_DOUBLE)
+          _int16_to_double(dataIn, *dataOut, elements);
+        else if (destType == PDC_INT64)
+          _int16_to_int64(dataIn, *dataOut, elements);
+        else if (destType == PDC_UINT64)
+          _int16_to_uint64(dataIn, *dataOut, elements);
+        else if (destType == PDC_INT8)
+          _int16_to_int8(dataIn, *dataOut, elements);
+        else
+        {
+          FUNC_LEAVE(-1);
+          return -1;
+        }
+      } break;
+    case PDC_INT8: 
+      {
+        if (destType == PDC_INT)
+          _int8_to_int(dataIn, *dataOut, elements);
+        else if (destType == PDC_FLOAT)
+          _int8_to_float(dataIn, *dataOut, elements);
+        else if (destType == PDC_DOUBLE)
+          _int8_to_double(dataIn, *dataOut, elements);
+        else if (destType == PDC_INT16)
+          _int8_to_int16(dataIn, *dataOut, elements);
+        else if (destType == PDC_INT64)
+          _int8_to_int64(dataIn, *dataOut, elements);
+        else if (destType == PDC_UINT64)
+          _int8_to_uint64(dataIn, *dataOut, elements);
+        else
+        {
+          FUNC_LEAVE(-1);
+          return -1;
+        }
+      } break;
     default:
-                   return -1;
+      FUNC_LEAVE(-1);
+      return -1;
   }
+  FUNC_LEAVE(storage_in_bytes);
   return storage_in_bytes;
 }
 

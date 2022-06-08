@@ -27,7 +27,7 @@
 #include "pdc_transforms_pkg_old.h"
 #include "mercury.h"
 #include "mercury_proc_string.h"
-#include "mercury_atomic.h"
+//#include "mercury_atomic.h"
 
 /*****************************/
 /* Library-private Variables */
@@ -35,7 +35,7 @@
 hg_id_t           analysis_ftn_register_id_g;
 hg_id_t           transform_ftn_register_id_g;
 hg_id_t           object_data_iterator_register_id_g;
-hg_atomic_int32_t registered_analysis_ftn_count_g;
+// hg_atomic_int32_t registered_analysis_ftn_count_g;
 
 extern struct _pdc_region_analysis_ftn_info **pdc_region_analysis_registry;
 

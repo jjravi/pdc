@@ -52,6 +52,11 @@ include_directories(SYSTEM ${MPI_INCLUDE_PATH})
 # libpdc_transform_<name>.so
 ############################################################################
 
+add_library(pdc_server_transform_test SHARED server_plugin_test.cc)
+target_include_directories(pdc_server_transform_test PUBLIC ${PDC_SOURCE_DIR}/src/api/)
+target_link_libraries(pdc_server_transform_test pdc MPI::MPI_C MPI::MPI_CXX)
+target_link_libraries(pdc_server_transform_test "-Wl,--no-undefined")
+
 add_library(pdc_transform_test SHARED plugin_test.cc)
 target_include_directories(pdc_transform_test PUBLIC ${PDC_SOURCE_DIR}/src/api/)
 target_link_libraries(pdc_transform_test pdc)

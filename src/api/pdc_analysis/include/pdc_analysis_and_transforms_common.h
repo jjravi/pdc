@@ -26,7 +26,6 @@
 
 #include "pdc_private.h"
 #include "mercury_proc_string.h"
-#include "mercury_atomic.h"
 #include <dlfcn.h>
 
 #define PDC_REGION_ALL (pdcid_t)(-1)
