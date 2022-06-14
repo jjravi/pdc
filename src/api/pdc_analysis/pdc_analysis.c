@@ -271,9 +271,6 @@ done:
   FUNC_LEAVE(ret_value);
 }
 
-/*
- * A wrapper to the more general "block_iterator_create" (see above)
- */
 pdcid_t
 PDCobj_data_iter_create(pdcid_t obj_id, pdcid_t reg_id)
 {

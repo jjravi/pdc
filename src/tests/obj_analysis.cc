@@ -44,15 +44,7 @@ int main(int argc, char **argv)
   MPI_Comm comm;
 #endif
   int rank = 0, size = 1;
-  perr_t ret = SUCCEED;
-  pdcid_t result1_prop, result2_prop;
-  pdcid_t result1;
 
-  int myresult1[2];     /*  sum{6,7}, sum{10,11} */
-
-  uint64_t offset0[2] = {0, 0};
-  uint64_t offset[2] = {1, 1};
-  uint64_t rdims[2] = {2, 2};
   uint64_t array1_dims[2] = {4,4};
   int myArray1[4][4] = {
     {1,  2, 3, 4},
@@ -60,8 +52,6 @@ int main(int argc, char **argv)
     {9, 10,11,12},
     {13,14,15,16}
   };
-
-  uint64_t result1_dims[1] = {2};
 
 #ifdef ENABLE_MPI
   MPI_Init(&argc, &argv);
@@ -79,39 +69,32 @@ int main(int argc, char **argv)
   PDCprop_set_obj_type     (obj1_prop, PDC_INT );
   PDCprop_set_obj_time_step(obj1_prop, 0       );
   PDCprop_set_obj_user_id  (obj1_prop, getuid());
-  PDCprop_set_obj_app_name (obj1_prop, "object_analysis" );
+  PDCprop_set_obj_app_name (obj1_prop, "obj_analysis" );
   PDCprop_set_obj_tags(     obj1_prop, "tag0=1");
 
   pdcid_t obj2_prop = PDCprop_obj_dup(obj1_prop);
-  PDCprop_set_obj_type(obj2_prop, PDC_INT); /* Dup doesn't replicate the datatype */
+  PDCprop_set_obj_type(obj2_prop, PDC_INT);
 
   pdcid_t obj1 = PDCobj_create_mpi(container_id, "obj-var-array1", obj1_prop, 0, comm);
   if (obj1 == 0) {
     printf("Error getting an object id of %s from server, exit...\n", "obj-var-array1");
-    exit(-1);
+    exit(EXIT_FAILURE);
   }
 
   pdcid_t obj2 = PDCobj_create_mpi(container_id, "obj-var-result1", obj2_prop, 0, comm);
   if (obj2 == 0) {
     printf("Error getting an object id of %s from server, exit...\n", "obj-var-result1");
-    exit(-1);
+    exit(EXIT_FAILURE);
   }
 
   // create regions
+  uint64_t offset0[2] = {0, 0};
   pdcid_t r1 = PDCregion_create(2, offset0, array1_dims);
   pdcid_t r2 = PDCregion_create(2, offset0, array1_dims);
 
   pdcid_t input1_iter = PDCobj_data_iter_create(obj1, r1);
   pdcid_t result1_iter = PDCobj_data_iter_create(obj2, r2);
 
-  struct _pdc_iterator_info * i_iter = &PDC_Block_iterator_cache[input1_iter];
-  struct _pdc_iterator_info * o_iter = &PDC_Block_iterator_cache[result1_iter];
-
-  /* Need to register the analysis function PRIOR TO establishing
-   * the region mapping.  The obj_mapping will update the region
-   * structures to indicate that an analysis operation has been
-   * added to the lock release...
-   */
   PDCobj_transform_register("pdc_server_passthrough:libpdc_server_transform_test.so", input1_iter, result1_iter);
   PDC_API_CALL( PDCbuf_obj_map(&myArray1[0], PDC_INT, r1, obj2, r2) );
   PDC_API_CALL( PDCreg_obtain_lock(obj1, r1, PDC_WRITE, PDC_NOBLOCK) );
@@ -129,5 +112,5 @@ int main(int argc, char **argv)
   MPI_Finalize();
 #endif
 
-  return 0;
+  return EXIT_SUCCESS;
 }
