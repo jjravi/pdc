@@ -75,6 +75,11 @@ int main(int argc, char **argv)
   pdcid_t obj2_prop = PDCprop_obj_dup(obj1_prop);
   PDCprop_set_obj_type(obj2_prop, PDC_INT);
 
+
+  int *buf = (int *)calloc(4 * 4, sizeof(int));
+  PDCprop_set_obj_buf(obj2_prop, &buf[0]);
+  memcpy(buf, myArray1, 4*4*sizeof(int));
+
   pdcid_t obj1 = PDCobj_create_mpi(container_id, "obj-var-array1", obj1_prop, 0, comm);
   if (obj1 == 0) {
     printf("Error getting an object id of %s from server, exit...\n", "obj-var-array1");
@@ -96,9 +101,17 @@ int main(int argc, char **argv)
   pdcid_t result1_iter = PDCobj_data_iter_create(obj2, r2);
 
   PDCobj_transform_register("pdc_server_passthrough:libpdc_server_transform_test.so", input1_iter, result1_iter);
-  PDC_API_CALL( PDCbuf_obj_map(&myArray1[0], PDC_INT, r1, obj2, r2) );
+
+  PDC_API_CALL( PDCbuf_obj_map(&myArray1[0], PDC_INT, r1, obj1, r1) );
+  PDC_API_CALL( PDCbuf_obj_map(&buf[0], PDC_INT, r2, obj2, r2) );
+
   PDC_API_CALL( PDCreg_obtain_lock(obj1, r1, PDC_WRITE, PDC_NOBLOCK) );
   PDC_API_CALL( PDCreg_release_lock(obj1, r1, PDC_WRITE) );
+
+  PDC_API_CALL( PDCreg_obtain_lock(obj2, r2, PDC_WRITE, PDC_NOBLOCK) );
+  PDC_API_CALL( PDCreg_release_lock(obj2, r2, PDC_WRITE) );
+
+
 
 #ifdef ENABLE_MPI
   MPI_Barrier(MPI_COMM_WORLD);

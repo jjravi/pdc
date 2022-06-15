@@ -812,6 +812,7 @@ pdc_ls(FileNameNode *file_name_node, int argc, char *argv[])
                 }
                 count_arr_json = cJSON_CreateIntArray(dims, cur_region->ndim);
                 cJSON_AddItemToObject(region_info_json, "count", count_arr_json);
+                cJSON_AddNumberToObject(region_info_json, "data_size", cur_region->data_size);
                 cJSON_AddNumberToObject(region_info_json, "unit_size", cur_region->unit_size);
                 data_type = get_data_loc_type(cur_region->data_loc_type);
                 cJSON_AddStringToObject(region_info_json, "data_loc_type", data_type);

@@ -3258,6 +3258,7 @@ analysis_and_region_release_bulk_transfer_cb(const struct hg_cb_info *hg_cb_info
     int registered_count = PDC_get_analysis_registry(&registry);
     if ((registered_count >= analysis_meta_index) && (registry != NULL)) {
       int (*analysis_ftn)(pdcid_t iterIn, pdcid_t iterOut, struct _pdc_iterator_cbs_t * _cbs) = registry[analysis_meta_index]->ftnPtr;
+      // TODO: jjravi transform can change data buffer size here..
       int result = analysis_ftn(bulk_args->in.input_iter, bulk_args->in.output_iter, &iter_cbs);
       printf("==PDC_SERVER: Analysis returned %d\n", result);
       puts("----------------\n");
@@ -3285,6 +3286,7 @@ analysis_and_region_release_bulk_transfer_cb(const struct hg_cb_info *hg_cb_info
   remote_reg_info->offset      = (uint64_t *)calloc(remote_reg_info->ndim, sizeof(uint64_t));
   remote_reg_info->dims_size        = (uint64_t *)calloc(remote_reg_info->ndim, sizeof(uint64_t));
   remote_reg_info->offset[0] = (bulk_args->remote_region).start_0;
+
   remote_reg_info->dims_size[0]   = (bulk_args->remote_region).count_0;
   if (remote_reg_info->ndim > 1) {
     remote_reg_info->offset[1] = bulk_args->remote_region.start_1;
@@ -3299,6 +3301,13 @@ analysis_and_region_release_bulk_transfer_cb(const struct hg_cb_info *hg_cb_info
     remote_reg_info->dims_size[3]   = dims[3];
   }
   remote_reg_info->unit = type_extent;
+
+  remote_reg_info->data_size = remote_reg_info->dims_size[0];
+  for(int i = 1; i < remote_reg_info->ndim; i++)
+  {
+    remote_reg_info->data_size *= remote_reg_info->dims_size[i];
+  }
+  remote_reg_info->data_size *= remote_reg_info->unit;
 
   /* Write the analysis results... */
   PDC_Server_data_write_out(bulk_args->remote_obj_id, remote_reg_info);
@@ -4478,13 +4487,11 @@ HG_TEST_RPC_CB(region_analysis_release, handle)
   hg_size_t                                      size;
   hg_return_t                                    hg_ret;
   void *                                         data_buf;
-  struct pdc_region_info *                       server_region;
   region_list_t *                                elt, *request_region, *tmp;
   struct region_lock_update_bulk_args *          lock_update_bulk_args = NULL;
   struct buf_map_analysis_and_release_bulk_args *buf_map_bulk_args = NULL, *obj_map_bulk_args = NULL;
   hg_bulk_t                                      lock_local_bulk_handle = HG_BULK_NULL;
   hg_bulk_t                                      remote_bulk_handle     = HG_BULK_NULL;
-  struct pdc_region_info *                       remote_reg_info;
   region_buf_map_t *                             eltt, *eltt2;
 
   hg_uint32_t k, remote_count = 0;
@@ -4516,7 +4523,7 @@ HG_TEST_RPC_CB(region_analysis_release, handle)
         size      = HG_Bulk_get_size(elt->bulk_handle);
         data_buf  = (void *)calloc(1, size);
         // data transfer
-        server_region              = (struct pdc_region_info *)malloc(sizeof(struct pdc_region_info));
+        struct pdc_region_info *server_region = (struct pdc_region_info *)malloc(sizeof(struct pdc_region_info));
         server_region->ndim        = 1;
         server_region->dims_size        = (uint64_t *)malloc(sizeof(uint64_t));
         server_region->offset      = (uint64_t *)malloc(sizeof(uint64_t));
@@ -4580,7 +4587,7 @@ HG_TEST_RPC_CB(region_analysis_release, handle)
             free(data_ptrs_to);
             free(data_size_to);
 
-            remote_reg_info = (struct pdc_region_info *)malloc(sizeof(struct pdc_region_info));
+            struct pdc_region_info *remote_reg_info = (struct pdc_region_info *)malloc(sizeof(struct pdc_region_info));
             if (remote_reg_info == NULL) {
               error = 1;
               PGOTO_ERROR(HG_OTHER_ERROR, "==PDC SERVER:HG_TEST_RPC_CB(region_release, handle) "
@@ -4786,8 +4793,6 @@ HG_TEST_RPC_CB(region_analysis_release, handle)
               PGOTO_ERROR(HG_OTHER_ERROR, "===PDC SERVER: HG_TEST_RPC_CB(region_release, "
                 "handle) local and remote bulk size does not match");
             }
-
-            printf("JOHN!! THIS HAPPENS?\n");
 
             hg_ret = HG_Bulk_transfer(
               hg_info->context, analysis_and_region_release_bulk_transfer_cb, buf_map_bulk_args,

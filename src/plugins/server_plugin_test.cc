@@ -13,13 +13,13 @@ int pdc_server_passthrough_cpp(pdcid_t iterIn, pdcid_t iterOut)
   int *dataIn  = NULL;
   int *dataOut = NULL;
   int blockLengthOut = PDCobj_data_getNextBlock(iterOut, (void **)&dataOut, NULL);
-  printf("blockLengthOut: %d\n", blockLengthOut);
+  printf("blockLengthOut: %d (%p)\n", blockLengthOut, dataOut);
 
   if (blockLengthOut > 0) {
     int blockLengthIn = PDCobj_data_getNextBlock(iterIn, (void **)&dataIn, NULL);
     do
     {
-      printf("blockLengthIn: %d\n", blockLengthIn);
+      printf("blockLengthIn: %d (%p)\n", blockLengthIn, dataIn);
       for (i = 0, k = 0; i < blockLengthIn; i++) {
         printf("%d, ", dataIn[i]);
         total += dataIn[i];

@@ -48,6 +48,7 @@
 #include "mpi.h"
 #endif
 
+
 #include "pdc_utlist.h"
 #include "pdc_public.h"
 #include "pdc_interface.h"
@@ -4522,7 +4523,7 @@ PDC_Server_posix_write(int fd, void *buf, uint64_t write_size)
     ssize_t  ret;
 
     FUNC_ENTER(NULL);
-    printf("writing: %ld\n", write_size);
+    printf("writing: %ld bytes (%p)\n", write_size, buf);
 
     while (write_size > max_write_size) {
         ret = write(fd, buf, max_write_size);
@@ -4578,6 +4579,8 @@ PDC_Server_data_write_out(uint64_t obj_id, struct pdc_region_info *region_info)
   char *                tmp_buf;
 
   FUNC_ENTER(NULL);
+
+  assert(region_info->data_size > 0);
 
   uint64_t write_size = region_info->data_size;
 
