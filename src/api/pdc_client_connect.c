@@ -42,6 +42,7 @@
 #include "pdc_transforms_common_old.h"
 #include "pdc_client_connect.h"
 #include "pdc_server_transform.h"
+#include "my_server_rpc.h"
 
 #include "mercury.h"
 #include "mercury_macros.h"
@@ -3645,9 +3646,9 @@ pdc_region_release_with_server_analysis(struct _pdc_obj_info *  object_info,
   // struct _pdc_iterator_info * o_iter = &PDC_Block_iterator_cache[registry->n_args - 1];
   struct _pdc_obj_info *obj2_obj_info = PDC_obj_get_info(outputIter->objectId);
   struct pdc_obj_info *obj2_info_pub = obj2_obj_info->obj_info_pub;
-  struct pdc_obj_prop *obj2_pt = obj2_info_pub->obj_pt;
 
   // FIXME: jjravi invalid?
+  // struct pdc_obj_prop *obj2_pt = obj2_info_pub->obj_pt;
   // in.output_obj_id = obj_prop->obj_prop_pub->obj_prop_id;
   // in.output_obj_id = obj2_pt->obj_prop_id;
 
@@ -4016,6 +4017,8 @@ PDC_Client_region_release(pdcid_t remote_obj_id, struct _pdc_obj_info *object_in
   struct _pdc_region_analysis_ftn_info ** analysis_registry;
 
   FUNC_ENTER(NULL);
+
+  printf("%s\n", __FUNCTION__);
 
   if (region_info->registered_op & PDC_TRANSFORM) {
     transform_index = -1;

@@ -69,7 +69,7 @@ int main(int argc, char **argv)
   PDCprop_set_obj_type     (obj1_prop, PDC_INT );
   PDCprop_set_obj_time_step(obj1_prop, 0       );
   PDCprop_set_obj_user_id  (obj1_prop, getuid());
-  PDCprop_set_obj_app_name (obj1_prop, "obj_analysis" );
+  PDCprop_set_obj_app_name (obj1_prop, "obj_transform" );
   PDCprop_set_obj_tags(     obj1_prop, "tag0=1");
 
   pdcid_t obj2_prop = PDCprop_obj_dup(obj1_prop);
@@ -77,7 +77,6 @@ int main(int argc, char **argv)
 
 
   int *buf = (int *)calloc(4 * 4, sizeof(int));
-  PDCprop_set_obj_buf(obj2_prop, &buf[0]);
   memcpy(buf, myArray1, 4*4*sizeof(int));
 
   pdcid_t obj1 = PDCobj_create_mpi(container_id, "obj-var-array1", obj1_prop, 0, comm);
@@ -110,8 +109,6 @@ int main(int argc, char **argv)
 
   PDC_API_CALL( PDCreg_obtain_lock(obj2, r2, PDC_WRITE, PDC_NOBLOCK) );
   PDC_API_CALL( PDCreg_release_lock(obj2, r2, PDC_WRITE) );
-
-
 
 #ifdef ENABLE_MPI
   MPI_Barrier(MPI_COMM_WORLD);

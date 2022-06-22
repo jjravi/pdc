@@ -131,8 +131,8 @@ enable_language(CXX)
 find_package(MPI REQUIRED)
 include_directories(SYSTEM ${MPI_INCLUDE_PATH})
 #
-add_executable(obj_analysis obj_analysis.cc)
-target_link_libraries(obj_analysis pdc MPI::MPI_C MPI::MPI_CXX)
+add_executable(obj_transform obj_transform.cc)
+target_link_libraries(obj_transform pdc MPI::MPI_C MPI::MPI_CXX)
 #
 add_executable(obj_type_transform obj_type_transform.cc)
 target_link_libraries(obj_type_transform pdc MPI::MPI_C MPI::MPI_CXX)
