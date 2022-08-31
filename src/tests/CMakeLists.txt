@@ -143,6 +143,9 @@ target_link_libraries(vpicio_compress pdc MPI::MPI_C MPI::MPI_CXX)
 add_executable(vpicio_compress_obj vpicio_compress_obj.cc)
 target_link_libraries(vpicio_compress_obj pdc MPI::MPI_C MPI::MPI_CXX)
 #
+add_executable(sdrbench_hurricane_isabel sdrbench_hurricane_isabel.cc)
+target_link_libraries(sdrbench_hurricane_isabel pdc MPI::MPI_C MPI::MPI_CXX)
+#
 add_executable(vpicio_compress_obj_server vpicio_compress_obj_server.cc)
 target_link_libraries(vpicio_compress_obj_server pdc MPI::MPI_C MPI::MPI_CXX)
 #
