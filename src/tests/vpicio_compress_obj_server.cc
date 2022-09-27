@@ -30,6 +30,8 @@ extern "C"
 #endif
 }
 
+#include <string>
+
 
 #undef NDEBUG // enable asserts on release build
 #include <assert.h>

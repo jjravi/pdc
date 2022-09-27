@@ -29,6 +29,8 @@ extern "C"
 #undef NDEBUG // enable asserts on release build
 #include <assert.h>
 
+#include <string>
+
 #define PDC_API_CALL(apiFuncCall)                                        \
 {                                                                        \
   perr_t _status = apiFuncCall;                                          \

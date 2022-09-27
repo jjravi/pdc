@@ -39,6 +39,9 @@ include_directories(/opt/nvidia/nsight-systems/2022.2.1/target-linux-x64/nvtx/in
 set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Choose the type of build." FORCE)
 add_definitions(-DENABLE_MULTITHREAD=1)
 find_package(CUDA REQUIRED)
+
+set(CMAKE_PREFIX_PATH "/global/homes/j/jjravi/cfs_m2621/sept2022/mercury/build/install/share/cmake/mercury" ${CMAKE_PREFIX_PATH})
+set(CMAKE_PREFIX_PATH "/global/homes/j/jjravi/cfs_m2621/sept2022/hdf5/build/install/cmake" ${CMAKE_PREFIX_PATH})
 # add_subdirectory(external/cuSZ EXCLUDE_FROM_ALL)
 # include_directories(external/)
 ###################
@@ -266,7 +269,8 @@ endif()
 #-----------------------------------------------------------------------------
 option(PDC_ENABLE_MPI "Enable MPI." ON)
 if(PDC_ENABLE_MPI)
-  find_package(MPI)
+  find_package(MPI REQUIRED)
+  include_directories(${MPI_INCLUDE_PATH})
   if(MPI_FOUND)
     set(ENABLE_MPI 1)
   endif()

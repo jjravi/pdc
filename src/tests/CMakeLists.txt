@@ -20,6 +20,8 @@ include_directories(
   ${HDF5_INCLUDE_DIR}
 )
 
+include_directories(/global/homes/j/jjravi/cfs_m2621/sept2022/c-blosc/build/install/include)
+
 set(PROGRAMS
   pdc_init
 #  create_prop
@@ -125,6 +127,7 @@ set(PROGRAMS
 foreach(program ${PROGRAMS})
   add_executable(${program} ${program}.c)
   target_link_libraries(${program} pdc)
+  target_link_libraries(${program} MPI::MPI_C)
 endforeach(program)
 
 enable_language(CXX)

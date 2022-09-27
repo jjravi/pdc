@@ -82,3 +82,9 @@ endif()
 # target_link_libraries(pdc_server.exe cusz)
 target_include_directories(pdc_server.exe PUBLIC ${CUDA_INCLUDE_DIRS})
 
+target_link_libraries(pdc_server.exe MPI::MPI_C)
+
+find_package(Threads REQUIRED)
+
+target_link_libraries(pdc_server.exe Threads::Threads)
+

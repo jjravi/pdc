@@ -30,6 +30,7 @@ extern "C"
 
 #include <cuda.h>
 #include <cusparse.h>
+#include <string>
 
 #undef NDEBUG // enable asserts on release build
 #include <assert.h>
