@@ -154,10 +154,10 @@ target_link_libraries(vpicio_compress_obj_server pdc MPI::MPI_C MPI::MPI_CXX)
 #
 add_executable(vpicio_compress_obj_gpu vpicio_compress_obj_gpu.cu)
 target_link_libraries(vpicio_compress_obj_gpu pdc MPI::MPI_C MPI::MPI_CXX)
-target_link_libraries(vpicio_compress_obj_gpu -lcuda -lcusparse)
+target_link_libraries(vpicio_compress_obj_gpu -lcuda -lcusparse -lstdc++)
 #
 add_executable(init_pdc_gpu init_pdc_gpu.cu)
-target_link_libraries(init_pdc_gpu pdc MPI::MPI_C MPI::MPI_CXX)
+target_link_libraries(init_pdc_gpu pdc MPI::MPI_C MPI::MPI_CXX -lstdc++)
 # add_executable(nyx_sdrbench nyx_sdrbench.cc)
 # target_link_libraries(nyx_sdrbench pdc MPI::MPI_C MPI::MPI_CXX)
 

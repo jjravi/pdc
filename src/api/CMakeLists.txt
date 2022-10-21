@@ -126,6 +126,7 @@ target_link_libraries(pdc
   ${PDC_EXPORTED_LIBS}
   ${PDC_EXT_LIB_DEPENDENCIES}
   -ldl
+  MPI::MPI_C
 )
 
 # TODO: jjravi move
