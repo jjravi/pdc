@@ -1,11 +1,12 @@
 #ifndef PDC_PERSIST_H
 #define PDC_PERSIST_H
 
-typedef struct PDCtransfer_st *pdcTransfer_t;
+#include "pdc_private.h"
+#include "pdc_public.h"
+#include "pdc_obj.h"
 
-void pdcTransferCreate(pdcTransfer_t* pTransfer);
-void pdcTransferStart(pdcTransfer_t pTransfer);
-void pdcTransferWait(pdcTransfer_t pTransfer);
+perr_t pdcTransferStart(pdcid_t transfer_request_id);
+perr_t pdcTransferWait(pdcid_t transfer_request_id);
 
 void wait_my_rpc();
 

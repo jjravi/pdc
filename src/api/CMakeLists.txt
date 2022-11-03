@@ -24,6 +24,7 @@ set( LOCAL_INCLUDE_DIR
   ${PDC_SOURCE_DIR}/src/api/profiling/include
   ${PDC_SOURCE_DIR}/src/utils/include
 
+  ${PDC_SOURCE_DIR}/src/api/my_rpc/include
   ${PDC_SOURCE_DIR}/src/api/pdc_persist/include
 )
 
@@ -108,6 +109,7 @@ set(PDC_SRCS
   ${PDC_SOURCE_DIR}/src/utils/hash-string.c
   ${PDC_SOURCE_DIR}/src/utils/hash-table.c
 
+  ${PDC_SOURCE_DIR}/src/api/my_rpc/my_rpc.c
   ${PDC_SOURCE_DIR}/src/api/pdc_persist/pdc_persist.c
 )
 
@@ -148,6 +150,7 @@ add_executable(close_server
 )
 target_link_libraries(close_server pdc)
 target_link_libraries(close_server MPI::MPI_C)
+target_link_libraries(close_server m) # -lm
 
 install(
   TARGETS
