@@ -102,6 +102,12 @@ set(PDC_SRCS
   ${PDC_SOURCE_DIR}/src/utils/pdc_utils.c
   ${PDC_SOURCE_DIR}/src/utils/rpc_engine.c
 
+  ${PDC_SOURCE_DIR}/src/utils/compare-int.c
+  ${PDC_SOURCE_DIR}/src/utils/compare-string.c
+  ${PDC_SOURCE_DIR}/src/utils/hash-int.c
+  ${PDC_SOURCE_DIR}/src/utils/hash-string.c
+  ${PDC_SOURCE_DIR}/src/utils/hash-table.c
+
   ${PDC_SOURCE_DIR}/src/api/pdc_persist/pdc_persist.c
 )
 
