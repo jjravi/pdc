@@ -30,7 +30,7 @@
 #include "mercury.h"
 #include "pdc_id_pkg.h"
 #include "pdc_obj_pkg.h"
-#include "pdc_transforms_pkg.h"
+#include "pdc_transforms_pkg_old.h"
 #include "pdc_analysis_and_transforms_common.h"
 #include "pdc_client_server_common.h"
 #include "pdc_analysis_pkg.h"
@@ -115,7 +115,6 @@ pdc_analysis_registry_init_(size_t newSize)
     }
 
 done:
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 
@@ -150,7 +149,6 @@ pdc_transform_registry_init_(size_t newSize)
     }
 
 done:
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 
@@ -180,24 +178,24 @@ pdc_analysis_registry_finalize_()
 int
 PDC_check_analysis(pdc_obj_transform_t op_type ATTRIBUTE(unused), struct pdc_region_info *dest_region)
 {
-    int ret_value = 0;
-    int i, count;
+  int ret_value = 0;
+  int i, count;
 
-    FUNC_ENTER(NULL);
+  FUNC_ENTER(NULL);
 
-    if (analysis_registry_size > 0) {
-        count = hg_atomic_get32(&registered_analysis_ftn_count_g);
-        for (i = 0; i < count; i++) {
-            if (pdc_region_analysis_registry[i]->region_id[0] == dest_region->local_id) {
-                dest_region->registered_op |= PDC_ANALYSIS;
-                PGOTO_DONE(1);
-            }
-        }
+  if (analysis_registry_size > 0) {
+    count = hg_atomic_get32(&registered_analysis_ftn_count_g);
+
+    for (i = 0; i < count; i++) {
+      if (pdc_region_analysis_registry[i]->region_id[0] == dest_region->local_id) {
+        dest_region->registered_op |= PDC_ANALYSIS;
+        PGOTO_DONE(1);
+      }
     }
+  }
 
 done:
-    fflush(stdout);
-    FUNC_LEAVE(ret_value);
+  FUNC_LEAVE(ret_value);
 }
 
 int
@@ -238,7 +236,6 @@ PDC_add_analysis_ptr_to_registry_(struct _pdc_region_analysis_ftn_info *ftn_info
     ret_value = registry_index;
 
 done:
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 
@@ -292,7 +289,6 @@ PDCiter_get_nextId(void)
     ret_value = nextId;
 
 done:
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 
@@ -302,25 +298,24 @@ done:
 int
 PDC_check_transform(pdc_obj_transform_t op_type, struct pdc_region_info *dest_region)
 {
-    int ret_value = 0;
-    int i, count;
+  int ret_value = 0;
+  int i, count;
 
-    FUNC_ENTER(NULL);
+  FUNC_ENTER(NULL);
 
-    if (transform_registry_size > 0) {
-        count = hg_atomic_get32(&registered_transform_ftn_count_g);
-        for (i = 0; i < count; i++) {
-            if ((pdc_region_transform_registry[i]->op_type == op_type) &&
-                (pdc_region_transform_registry[i]->dest_region == dest_region)) {
-                dest_region->registered_op |= PDC_TRANSFORM; // FIXME: jjravi, merge transform and analysis
-                PGOTO_DONE(1);
-            }
-        }
+  if (transform_registry_size > 0) {
+    count = hg_atomic_get32(&registered_transform_ftn_count_g);
+    for (i = 0; i < count; i++) {
+      if ((pdc_region_transform_registry[i]->op_type == op_type) &&
+        (pdc_region_transform_registry[i]->dest_region == dest_region)) {
+        dest_region->registered_op |= PDC_TRANSFORM; // FIXME: jjravi, merge transform and analysis
+        PGOTO_DONE(1);
+      }
     }
+  }
 
 done:
-    fflush(stdout);
-    FUNC_LEAVE(ret_value);
+  FUNC_LEAVE(ret_value);
 }
 
 int
@@ -336,7 +331,6 @@ PDC_get_transforms(struct _pdc_region_transform_ftn_info ***registry)
     }
 
 done:
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 
@@ -376,7 +370,6 @@ PDC_add_transform_ptr_to_registry_(struct _pdc_region_transform_ftn_info *ftn_in
     ret_value = registry_index;
 
 done:
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 
@@ -396,7 +389,6 @@ PDC_update_transform_server_meta_index(int client_index, int meta_index)
         PGOTO_ERROR(-1, "Bad client index(%d)", client_index);
 
 done:
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 
@@ -422,126 +414,96 @@ PDC_get_execution_locus()
     FUNC_LEAVE(ret_value);
 }
 
-int
-PDC_get_ftnPtr_(const char *ftn, const char *loadpath, void **ftnPtr)
-{
-    int          ret_value  = 0;
-    static void *appHandle  = NULL;
-    void *       ftnHandle  = NULL;
-    char *       this_error = NULL;
-
-    FUNC_ENTER(NULL);
-
-    if (appHandle == NULL) {
-        if ((appHandle = dlopen(loadpath, RTLD_NOW)) == NULL) {
-            this_error = dlerror();
-            PGOTO_ERROR(-1, "dlopen failed: %s", this_error);
-        }
-    }
-    ftnHandle = dlsym(appHandle, ftn);
-    if (ftnHandle == NULL)
-        PGOTO_ERROR(-1, "dlsym failed: %s", dlerror());
-
-    *ftnPtr = ftnHandle;
-
-    ret_value = 0;
-
-done:
-    fflush(stdout);
-    FUNC_LEAVE(ret_value);
-}
-
 // analysis_ftn_cb(hg_handle_t handle)
 HG_TEST_RPC_CB(analysis_ftn, handle)
 {
-    hg_return_t                           ret_value = HG_SUCCESS;
-    analysis_ftn_in_t                     in;
-    analysis_ftn_out_t                    out;
-    struct _pdc_region_analysis_ftn_info *thisFtn        = NULL;
-    int                                   nulliter_count = 0;
-    pdcid_t                               iterIn = -1, iterOut = -1;
-    pdcid_t                               registrationId = -1;
-    void *                                ftnHandle      = NULL;
-    int (*ftnPtr)(pdcid_t, pdcid_t)                      = NULL;
-    int result;
+  hg_return_t                           ret_value = HG_SUCCESS;
+  analysis_ftn_in_t                     in;
+  analysis_ftn_out_t                    out;
+  struct _pdc_region_analysis_ftn_info *thisFtn        = NULL;
+  int                                   nulliter_count = 0;
+  pdcid_t                               iterIn = -1, iterOut = -1;
+  pdcid_t                               registrationId = -1;
+  void *                                ftnHandle      = NULL;
+  int (*ftnPtr)(pdcid_t, pdcid_t)                      = NULL;
+  int result;
 
-    FUNC_ENTER(NULL);
+  FUNC_ENTER(NULL);
 
-    memset(&in, 0, sizeof(in));
-    // Decode input
-    HG_Get_input(handle, &in);
+  memset(&in, 0, sizeof(in));
+  // Decode input
+  HG_Get_input(handle, &in);
 
-    if (PDC_get_ftnPtr_(in.ftn_name, in.loadpath, &ftnHandle) < 0)
-        PGOTO_ERROR(FAIL, "PDC_get_ftnPtr_ returned an error!");
+  if (PDC_get_ftnPtr_(in.ftn_name, in.loadpath, &ftnHandle) < 0)
+    PGOTO_ERROR(FAIL, "PDC_get_ftnPtr_ returned an error!");
 
-    if ((ftnPtr = ftnHandle) == NULL)
-        PGOTO_ERROR(FAIL, "Transforms function lookup failed");
+  if ((ftnPtr = ftnHandle) == NULL)
+    PGOTO_ERROR(FAIL, "Transforms function lookup failed");
 
-    if (ftnPtr != NULL) {
-        if ((iterIn = in.iter_in) == 0) {
-            nulliter_count = 1;
-            printf("input is a NULL iterator\n");
-        }
-        else if (execution_locus == SERVER_MEMORY) {
-            /* inputIter = &PDC_Block_iterator_cache[iterIn]; */
-        }
-        if ((iterOut = in.iter_out) == 0) {
-            nulliter_count += 1;
-            printf("output is a NULL iterator\n");
-        }
-
-        /* For the unusual case where both the input and output iterators
-         * are NULL, we can skip registering the function because
-         * we will only invoke the function ONCE (see below).
-         * Otherwise, go ahead and register...
-         */
-        if (nulliter_count < 2) {
-            if ((thisFtn = (struct _pdc_region_analysis_ftn_info *)calloc(
-                     sizeof(struct _pdc_region_analysis_ftn_info), 1)) != NULL) {
-                thisFtn->ftnPtr    = (int (*)())ftnPtr;
-                thisFtn->n_args    = 2;
-                thisFtn->object_id = (pdcid_t *)calloc(2, sizeof(pdcid_t));
-                registrationId     = PDC_add_analysis_ptr_to_registry_(thisFtn);
-                out.remote_ftn_id  = registrationId;
-            }
-            else {
-                out.remote_ftn_id = registrationId;
-                PGOTO_ERROR(FAIL, "Unable to allocate storage for the analysis function");
-            }
-        }
+  if (ftnPtr != NULL) {
+    if ((iterIn = in.iter_in) == 0) {
+      nulliter_count = 1;
+      printf("input is a NULL iterator\n");
     }
-    else {
-        out.remote_ftn_id = registrationId;
-        PGOTO_ERROR(FAIL, "Failed to resolve %s to a function pointer", in.ftn_name);
+    else if (execution_locus == SERVER_MEMORY) {
+      /* inputIter = &PDC_Block_iterator_cache[iterIn]; */
+    }
+    if ((iterOut = in.iter_out) == 0) {
+      nulliter_count += 1;
+      printf("output is a NULL iterator\n");
     }
 
-    HG_Respond(handle, NULL, NULL, &out);
-
-    /* We NORMALLY don't call the actual function on a simple registration of
-     * the analysis. The only time that we do is when BOTH object data iterators
-     * are NULL.  In this case, we will call the function EXACTLY this one time.
+    /* For the unusual case where both the input and output iterators
+     * are NULL, we can skip registering the function because
+     * we will only invoke the function ONCE (see below).
+     * Otherwise, go ahead and register...
      */
-    if (ftnPtr && (nulliter_count == 2)) {
-        result = ftnPtr(iterIn, iterOut);
-        printf("function call result was %d\n----------------\n", result);
-
-        /* FIXME:
-         * We might consider adding the function result into
-         * thisFtn. Under that assumption, we might need to
-         * somehow add a way to notify the invoking client
-         * with an exception to handle computation errors...
-         */
-        if (thisFtn) {
-            thisFtn->ftn_lastResult = result;
-        }
+    if (nulliter_count < 2) {
+      if ((thisFtn = (struct _pdc_region_analysis_ftn_info *)calloc(
+            sizeof(struct _pdc_region_analysis_ftn_info), 1)) != NULL) {
+        thisFtn->ftnPtr    = (int (*)())ftnPtr;
+        thisFtn->n_args    = 2;
+        thisFtn->object_id = (pdcid_t *)calloc(2, sizeof(pdcid_t));
+        registrationId     = PDC_add_analysis_ptr_to_registry_(thisFtn);
+        out.remote_ftn_id  = registrationId;
+      }
+      else {
+        out.remote_ftn_id = registrationId;
+        PGOTO_ERROR(FAIL, "Unable to allocate storage for the analysis function");
+      }
     }
+  }
+  else {
+    out.remote_ftn_id = registrationId;
+    PGOTO_ERROR(FAIL, "Failed to resolve %s to a function pointer", in.ftn_name);
+  }
+
+  HG_Respond(handle, NULL, NULL, &out);
+
+  /* We NORMALLY don't call the actual function on a simple registration of
+   * the analysis. The only time that we do is when BOTH object data iterators
+   * are NULL.  In this case, we will call the function EXACTLY this one time.
+   */
+  if (ftnPtr && (nulliter_count == 2)) {
+    result = ftnPtr(iterIn, iterOut);
+    printf("function call result was %d\n----------------\n", result);
+
+    /* FIXME:
+     * We might consider adding the function result into
+     * thisFtn. Under that assumption, we might need to
+     * somehow add a way to notify the invoking client
+     * with an exception to handle computation errors...
+     */
+    if (thisFtn) {
+      thisFtn->ftn_lastResult = result;
+    }
+  }
 
 done:
-    fflush(stdout);
-    HG_Free_input(handle, &in);
-    HG_Destroy(handle);
+  HG_Free_input(handle, &in);
+  HG_Destroy(handle);
 
-    FUNC_LEAVE(ret_value);
+  FUNC_LEAVE(ret_value);
 }
 
 // obj_data_iterator_cb(hg_handle_t handle)

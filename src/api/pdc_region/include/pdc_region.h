@@ -35,12 +35,13 @@ struct pdc_region_info {
     pdcid_t               local_id;
     struct _pdc_obj_info *obj;
     size_t                ndim;
+    uint64_t *            dims_size; /**< size of each dim, up to 3 */
     uint64_t *            offset;
-    uint64_t *            size;
     bool                  mapping;
     int                   registered_op;
-    void *                buf;
-    size_t                unit;
+    void *                data_buf; /**< data buffer */
+    uint64_t              data_size; /**< Size of data buffer */
+    size_t                unit; /**< Size of data type */
 };
 
 typedef enum {
@@ -71,18 +72,18 @@ int memcpy_overlap_subregion(int ndim, uint64_t unit, char *buf, uint64_t *offse
 int detect_region_contained(uint64_t *offset, uint64_t *size, uint64_t *offset2, uint64_t *size2, int ndim);
 
 /**
- * Create a region
+ * \brief Create a region
  *
  * \param ndims [IN]            Number of dimensions
  * \param offset [IN]           Offset of each dimension
- * \param size [IN]             Size of each dimension
+ * \param dims_size [IN]        Size of each dimension
  *
  * \return Object id on success/Zero on failure
  */
-pdcid_t PDCregion_create(psize_t ndims, uint64_t *offset, uint64_t *size);
+pdcid_t PDCregion_create(const psize_t ndims, const uint64_t *offset, const uint64_t *dims_size);
 
 /**
- * Close a region
+ * \brief Close a region
  *
  * \param region_id [IN]        ID of the object
  *
@@ -100,7 +101,7 @@ void PDCregion_free(struct pdc_region_info *region);
 pdcid_t PDCregion_transfer_create(void *buf, pdc_access_t access_type, pdcid_t obj_id, pdcid_t local_reg,
                                   pdcid_t remote_reg);
 /**
- * Start a region transfer from local region to remote region for an object on buf.
+ * \brief Start a region transfer from local region to remote region for an object on buf.
  *
  * \param buf [IN]              Start point of an application buffer
  * \param obj_id [IN]           ID of the target object
@@ -122,7 +123,7 @@ perr_t PDCregion_transfer_wait_all(pdcid_t *transfer_request_id, int size);
 
 perr_t PDCregion_transfer_close(pdcid_t transfer_request_id);
 /**
- * Map an application buffer to an object
+ * \brief Map an application buffer to an object
  *
  * \param buf [IN]              Start point of an application buffer
  * \param local_type [IN]       Data type of data in memory
@@ -136,7 +137,7 @@ perr_t PDCbuf_obj_map(void *buf, pdc_var_type_t local_type, pdcid_t local_reg, p
                       pdcid_t remote_reg);
 
 /**
- * Get region information
+ * \brief Get region information
  *
  * \param reg_id [IN]           ID of the region
  * \param obj_id [IN]           ID of the object
@@ -146,7 +147,7 @@ perr_t PDCbuf_obj_map(void *buf, pdc_var_type_t local_type, pdcid_t local_reg, p
 struct pdc_region_info *PDCregion_get_info(pdcid_t reg_id);
 
 /**
- * Unmap all regions within the object from a buffer (write unmap)
+ * \brief Unmap all regions within the object from a buffer (write unmap)
  *
  * \param remote_obj_id [IN]    ID of the target object
  * \param remote_reg_id [IN]    ID of the target region
@@ -156,7 +157,7 @@ struct pdc_region_info *PDCregion_get_info(pdcid_t reg_id);
 perr_t PDCbuf_obj_unmap(pdcid_t remote_obj_id, pdcid_t remote_reg_id);
 
 /**
- * Obtain the region lock
+ * \brief Obtain the region lock
  *
  * \param obj_id [IN]           ID of the object
  * \param reg_id [IN]           ID of the region
@@ -169,7 +170,7 @@ perr_t PDCreg_obtain_lock(pdcid_t obj_id, pdcid_t reg_id, pdc_access_t access_ty
                           pdc_lock_mode_t lock_mode);
 
 /**
- * Release the region lock
+ * \brief Release the region lock
  *
  * \param obj_id [IN]           ID of the object
  * \param reg_id [IN]           ID of the region

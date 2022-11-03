@@ -226,7 +226,7 @@ main(int argc, char **argv)
     ret = PDCbuf_map_transform_register("pdc_transform_compress", &x[0], region_x, obj_xx, region_xx, 0,
                                         INCR_STATE, DATA_OUT);
     if (ret < 0)
-        printf("PDCobj_transform_register(1) failed\n");
+        printf("PDCbuf_map_transform_register(1) failed\n");
 
     ret = PDCbuf_obj_map(&y[0], PDC_FLOAT, region_y, obj_yy, region_yy);
     if (ret < 0)
@@ -235,7 +235,7 @@ main(int argc, char **argv)
     ret = PDCbuf_map_transform_register("pdc_transform_compress", &y[0], region_y, obj_yy, region_yy, 0,
                                         INCR_STATE, DATA_OUT);
     if (ret < 0)
-        printf("PDCobj_transform_register(2) failed\n");
+        printf("PDCbuf_map_transform_register(2) failed\n");
 
     ret = PDCbuf_obj_map(&z[0], PDC_FLOAT, region_z, obj_zz, region_zz);
     if (ret < 0)
@@ -244,7 +244,7 @@ main(int argc, char **argv)
     ret = PDCbuf_map_transform_register("pdc_transform_compress", &z[0], region_z, obj_zz, region_zz, 0,
                                         INCR_STATE, DATA_OUT);
     if (ret < 0)
-        printf("PDCobj_transform_register(3) failed\n");
+        printf("PDCbuf_map_transform_register(3) failed\n");
 
     ret = PDCbuf_obj_map(&px[0], PDC_FLOAT, region_px, obj_pxx, region_pxx);
     if (ret < 0)
@@ -253,7 +253,7 @@ main(int argc, char **argv)
     ret = PDCbuf_map_transform_register("pdc_transform_compress", &px[0], region_px, obj_pxx, region_pxx, 0,
                                         INCR_STATE, DATA_OUT);
     if (ret < 0)
-        printf("PDCobj_transform_register(4) failed\n");
+        printf("PDCbuf_map_transform_register(4) failed\n");
 
     ret = PDCbuf_obj_map(&py[0], PDC_FLOAT, region_py, obj_pyy, region_pyy);
     if (ret < 0)
@@ -262,7 +262,7 @@ main(int argc, char **argv)
     ret = PDCbuf_map_transform_register("pdc_transform_compress", &py[0], region_py, obj_pyy, region_pyy, 0,
                                         INCR_STATE, DATA_OUT);
     if (ret < 0)
-        printf("PDCobj_transform_register(5) failed\n");
+        printf("PDCbuf_map_transform_register(5) failed\n");
 
     ret = PDCbuf_obj_map(&pz[0], PDC_FLOAT, region_pz, obj_pzz, region_pzz);
     if (ret < 0)
@@ -271,7 +271,7 @@ main(int argc, char **argv)
     ret = PDCbuf_map_transform_register("pdc_transform_compress", &pz[0], region_pz, obj_pzz, region_pzz, 0,
                                         INCR_STATE, DATA_OUT);
     if (ret < 0)
-        printf("PDCobj_transform_register(6) failed\n");
+        printf("PDCbuf_map_transform_register(6) failed\n");
 
     ret = PDCbuf_obj_map(&id1[0], PDC_INT, region_id1, obj_id11, region_id11);
     if (ret < 0)
@@ -280,7 +280,7 @@ main(int argc, char **argv)
     ret = PDCbuf_map_transform_register("pdc_transform_compress", &id1[0], region_id1, obj_id11, region_id11,
                                         0, INCR_STATE, DATA_OUT);
     if (ret < 0)
-        printf("PDCobj_transform_register(7) failed\n");
+        printf("PDCbuf_map_transform_register(7) failed\n");
 
     ret = PDCbuf_obj_map(&id2[0], PDC_INT, region_id2, obj_id22, region_id22);
     if (ret < 0)
@@ -289,7 +289,7 @@ main(int argc, char **argv)
     ret = PDCbuf_map_transform_register("pdc_transform_compress", &id2[0], region_id2, obj_id22, region_id22,
                                         0, INCR_STATE, DATA_OUT);
     if (ret < 0)
-        printf("PDCobj_transform_register(8) failed\n");
+        printf("PDCbuf_map_transform_register(8) failed\n");
 
 #ifdef ENABLE_MPI
     MPI_Barrier(MPI_COMM_WORLD);

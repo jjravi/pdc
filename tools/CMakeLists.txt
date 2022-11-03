@@ -2,6 +2,29 @@ cmake_minimum_required (VERSION 2.8.12)
 
 project(PDC_VOL C)
 
+include_directories(../build/)
+
+include_directories(
+  ..//src/server/include
+  ..//src/server/pdc_server_region
+  ..//src/server/pdc_server_region/include
+  ..//src/server/pdc_server_analysis/include
+  ..//src/server/pdc_server_transform/include
+  ..//src/server/dablooms
+  ..//src/api/include
+  ..//src/api/pdc_obj/include
+  ..//src/api/pdc_region/include
+  ..//src/api/pdc_query/include
+  ..//src/api/pdc_transform/include
+  ..//src/api/pdc_transform_old/include
+  ..//src/api/pdc_analysis/include
+  ..//src/api/profiling/include
+  ..//src/utils/include
+  ..//src/api/pdc_persist/include
+)
+
+
+
 include_directories(
   ${PDC_EXT_INCLUDE_DEPENDENCIES}
 )

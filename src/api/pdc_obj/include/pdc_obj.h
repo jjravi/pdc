@@ -232,7 +232,7 @@ perr_t PDCprop_set_obj_tags(pdcid_t obj_prop, char *tags);
  *
  * \return Non-negative on success/Negative on failure
  */
-perr_t PDCprop_set_obj_dims(pdcid_t obj_prop, PDC_int_t ndim, uint64_t *dims);
+perr_t PDCprop_set_obj_dims(pdcid_t obj_prop, PDC_int_t ndim, const uint64_t *dims);
 
 /**
  * Set object type

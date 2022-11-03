@@ -49,79 +49,76 @@ PDC_prop_init()
         PGOTO_ERROR(FAIL, "unable to initialize object property interface");
 
 done:
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 
 pdcid_t
 PDCprop_create(pdc_prop_type_t type, pdcid_t pdcid)
 {
-    pdcid_t                ret_value = 0;
-    struct _pdc_cont_prop *p         = NULL;
-    struct _pdc_obj_prop * q         = NULL;
-    struct _pdc_id_info *  id_info   = NULL;
-    struct _pdc_class *    pdc_class;
-    pdcid_t                new_id_c;
-    pdcid_t                new_id_o;
+  pdcid_t                ret_value = 0;
+  struct _pdc_cont_prop *p         = NULL;
+  struct _pdc_obj_prop * q         = NULL;
+  struct _pdc_id_info *  id_info   = NULL;
+  struct _pdc_class *    pdc_class;
+  pdcid_t                new_id_c;
+  pdcid_t                new_id_o;
 
-    FUNC_ENTER(NULL);
+  FUNC_ENTER(NULL);
 
-    if (type == PDC_CONT_CREATE) {
-        p = PDC_MALLOC(struct _pdc_cont_prop);
-        if (!p)
-            PGOTO_ERROR(0, "PDC container property memory allocation failed");
-        p->cont_life    = PDC_PERSIST;
-        new_id_c        = PDC_id_register(PDC_CONT_PROP, p);
-        p->cont_prop_id = new_id_c;
-        id_info         = PDC_find_id(pdcid);
-        pdc_class       = (struct _pdc_class *)(id_info->obj_ptr);
-        p->pdc          = PDC_CALLOC(struct _pdc_class);
-        if (p->pdc == NULL)
-            PGOTO_ERROR(0, "PDC class allocation failed");
-        if (pdc_class->name)
-            p->pdc->name = strdup(pdc_class->name);
-        p->pdc->local_id = pdc_class->local_id;
+  if (type == PDC_CONT_CREATE) {
+    p = PDC_MALLOC(struct _pdc_cont_prop);
+    if (!p)
+      PGOTO_ERROR(0, "PDC container property memory allocation failed");
+    p->cont_life    = PDC_PERSIST;
+    new_id_c        = PDC_id_register(PDC_CONT_PROP, p);
+    p->cont_prop_id = new_id_c;
+    id_info         = PDC_find_id(pdcid);
+    pdc_class       = (struct _pdc_class *)(id_info->obj_ptr);
+    p->pdc          = PDC_CALLOC(struct _pdc_class);
+    if (p->pdc == NULL)
+      PGOTO_ERROR(0, "PDC class allocation failed");
+    if (pdc_class->name)
+      p->pdc->name = strdup(pdc_class->name);
+    p->pdc->local_id = pdc_class->local_id;
 
-        ret_value = new_id_c;
-    }
-    if (type == PDC_OBJ_CREATE) {
-        q = PDC_MALLOC(struct _pdc_obj_prop);
-        if (!q)
-            PGOTO_ERROR(0, "PDC object property memory allocation failed");
-        q->obj_prop_pub = PDC_MALLOC(struct pdc_obj_prop);
-        if (!q->obj_prop_pub)
-            PGOTO_ERROR(0, "PDC object pub property memory allocation failed");
-        q->obj_prop_pub->ndim             = 0;
-        q->obj_prop_pub->dims             = NULL;
-        q->obj_prop_pub->type             = PDC_UNKNOWN;
-        q->obj_prop_pub->region_partition = PDC_REGION_STATIC;
-        q->obj_prop_pub->consistency      = PDC_CONSISTENCY_DEFAULT;
-        q->data_loc                       = NULL;
-        q->app_name                       = NULL;
-        q->time_step                      = 0;
-        q->tags                           = NULL;
-        q->buf                            = NULL;
-        new_id_o                          = PDC_id_register(PDC_OBJ_PROP, q);
-        q->obj_prop_pub->obj_prop_id      = new_id_o;
-        id_info                           = PDC_find_id(pdcid);
-        pdc_class                         = (struct _pdc_class *)(id_info->obj_ptr);
-        q->pdc                            = PDC_CALLOC(struct _pdc_class);
-        if (q->pdc == NULL)
-            PGOTO_ERROR(0, "PDC class allocation failed");
-        if (pdc_class->name)
-            q->pdc->name = strdup(pdc_class->name);
-        q->pdc->local_id = pdc_class->local_id;
-        q->type_extent   = 0;
-        q->data_state    = 0;
-        q->locus         = CLIENT_MEMORY;
-        memset(&q->transform_prop, 0, sizeof(struct _pdc_transform_state));
+    ret_value = new_id_c;
+  }
+  if (type == PDC_OBJ_CREATE) {
+    q = PDC_MALLOC(struct _pdc_obj_prop);
+    if (!q)
+      PGOTO_ERROR(0, "PDC object property memory allocation failed");
+    q->obj_prop_pub = PDC_MALLOC(struct pdc_obj_prop);
+    if (!q->obj_prop_pub)
+      PGOTO_ERROR(0, "PDC object pub property memory allocation failed");
+    q->obj_prop_pub->ndim             = 0;
+    q->obj_prop_pub->dims             = NULL;
+    q->obj_prop_pub->type             = PDC_UNKNOWN;
+    q->obj_prop_pub->region_partition = PDC_REGION_STATIC;
+    q->obj_prop_pub->consistency      = PDC_CONSISTENCY_DEFAULT;
+    q->data_loc                       = NULL;
+    q->app_name                       = NULL;
+    q->time_step                      = 0;
+    q->tags                           = NULL;
+    q->buf                            = NULL;
+    new_id_o                          = PDC_id_register(PDC_OBJ_PROP, q);
+    q->obj_prop_pub->obj_prop_id      = new_id_o;
+    id_info                           = PDC_find_id(pdcid);
+    pdc_class                         = (struct _pdc_class *)(id_info->obj_ptr);
+    q->pdc                            = PDC_CALLOC(struct _pdc_class);
+    if (q->pdc == NULL)
+      PGOTO_ERROR(0, "PDC class allocation failed");
+    if (pdc_class->name)
+      q->pdc->name = strdup(pdc_class->name);
+    q->pdc->local_id = pdc_class->local_id;
+    q->data_state    = 0;
+    q->locus         = CLIENT_MEMORY;
+    memset(&q->transform_prop, 0, sizeof(struct _pdc_transform_state));
 
-        ret_value = new_id_o;
-    }
+    ret_value = new_id_o;
+  }
 
 done:
-    fflush(stdout);
-    FUNC_LEAVE(ret_value);
+  FUNC_LEAVE(ret_value);
 }
 
 pdcid_t
@@ -176,7 +173,6 @@ PDCprop_obj_dup(pdcid_t prop_id)
     ret_value = new_id;
 
 done:
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 
@@ -196,7 +192,6 @@ PDC_prop_cont_list_null()
     }
 
 done:
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 
@@ -216,7 +211,6 @@ PDC_prop_obj_list_null()
     }
 
 done:
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 
@@ -267,7 +261,6 @@ PDCprop_close(pdcid_t id)
         PGOTO_ERROR(FAIL, "property: problem of freeing id");
 
 done:
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 
@@ -285,7 +278,6 @@ PDC_prop_end()
         PGOTO_ERROR(FAIL, "unable to destroy object property interface");
 
 done:
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 
@@ -317,7 +309,6 @@ PDCcont_prop_get_info(pdcid_t cont_prop)
     ret_value->pdc->local_id = info->pdc->local_id;
 
 done:
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 
@@ -348,7 +339,6 @@ PDCobj_prop_get_info(pdcid_t obj_prop)
         ret_value->dims[i] = info->obj_prop_pub->dims[i];
 
 done:
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 
@@ -400,7 +390,6 @@ PDC_obj_prop_get_info(pdcid_t obj_prop)
         ret_value->obj_prop_pub->dims[i] = info->obj_prop_pub->dims[i];
 
 done:
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 

@@ -25,6 +25,7 @@
 #ifndef PDC_INTERFACE_H
 #define PDC_INTERFACE_H
 
+#include "pdc_utils.h"
 #include "pdc_private.h"
 #include "pdc_linkedlist.h"
 #include "pdc_id_pkg.h"
@@ -170,5 +171,6 @@ struct _pdc_id_info *PDC_find_id(pdcid_t idid);
  * \return ID of the object on success/Negative on failure
  */
 pdcid_t PDC_find_byname(PDC_type_t type, const char *byname);
+
 
 #endif /* PDC_INTERFACE_H */

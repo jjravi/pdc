@@ -54,7 +54,6 @@ PDC_class_init()
         PGOTO_ERROR(FAIL, "unable to initialize pdc class interface");
 
 done:
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 
@@ -77,7 +76,6 @@ PDC_class_create(const char *pdc_name)
     ret_value   = pdcid;
 
 done:
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 
@@ -115,7 +113,6 @@ PDCinit(const char *pdc_name)
     ret_value = pdcid;
 
 done:
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 
@@ -147,7 +144,6 @@ PDC_class_close(pdcid_t pdc)
         PGOTO_ERROR(FAIL, "PDC: problem of freeing id");
 
 done:
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 
@@ -162,7 +158,6 @@ PDC_class_end()
         PGOTO_ERROR(FAIL, "unable to destroy pdc class interface");
 
 done:
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 
@@ -172,6 +167,9 @@ PDCclose(pdcid_t pdcid)
     perr_t ret_value = SUCCEED;
 
     FUNC_ENTER(NULL);
+
+    // NOTE: jjravi additonal engine
+    hg_engine_finalize();
 
 #ifdef ENABLE_APP_CLOSE_SERVER
     PDC_Client_close_all_server();
@@ -220,6 +218,5 @@ PDCclose(pdcid_t pdcid)
     PDC_Client_finalize();
 
 done:
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }

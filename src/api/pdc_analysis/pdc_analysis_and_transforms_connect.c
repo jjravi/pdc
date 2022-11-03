@@ -25,7 +25,7 @@
 #include "pdc_obj_pkg.h"
 #include "pdc_client_connect.h"
 #include "pdc_analysis_pkg.h"
-#include "pdc_transforms_common.h"
+#include "pdc_transforms_common_old.h"
 
 extern hg_context_t *send_context_g;
 extern int           work_todo_g;
@@ -49,87 +49,86 @@ perr_t PDC_free_obj_info(struct _pdc_obj_info *obj);
 perr_t
 PDC_Client_send_iter_recv_id(pdcid_t iter_id, pdcid_t *meta_id)
 {
-    uint64_t                   ret_value = SUCCEED;
-    struct _pdc_iterator_info *thisIter  = NULL;
-    struct _pdc_my_rpc_state * my_rpc_state_p;
-    obj_data_iterator_in_t     in;
-    hg_return_t                hg_ret;
-    int                        server_id = 0;
-    int                        n_retry   = 0;
-    struct _pdc_obj_info *     object_info;
+  uint64_t                   ret_value = SUCCEED;
+  struct _pdc_iterator_info *thisIter  = NULL;
+  struct _pdc_my_rpc_state * my_rpc_state_p;
+  obj_data_iterator_in_t     in;
+  hg_return_t                hg_ret;
+  int                        server_id = 0;
+  int                        n_retry   = 0;
+  struct _pdc_obj_info *     object_info;
 
-    FUNC_ENTER(NULL);
+  FUNC_ENTER(NULL);
 
-    my_rpc_state_p = (struct _pdc_my_rpc_state *)calloc(1, sizeof(struct _pdc_my_rpc_state));
-    if (my_rpc_state_p == NULL)
-        PGOTO_ERROR(FAIL, "PDC_Client_send_iter_recv_id(): Could not allocate my_rpc_state");
+  my_rpc_state_p = (struct _pdc_my_rpc_state *)calloc(1, sizeof(struct _pdc_my_rpc_state));
+  if (my_rpc_state_p == NULL)
+    PGOTO_ERROR(FAIL, "PDC_Client_send_iter_recv_id(): Could not allocate my_rpc_state");
 
-    if ((PDC_Block_iterator_cache != NULL) && (iter_id > 0)) {
-        thisIter = &PDC_Block_iterator_cache[iter_id];
-        /* Find the server association to the specific object */
-        in.client_iter_id = iter_id;
-        object_info       = PDC_obj_get_info(thisIter->objectId);
+  if ((PDC_Block_iterator_cache != NULL) && (iter_id > 0)) {
+    thisIter = &PDC_Block_iterator_cache[iter_id];
+    /* Find the server association to the specific object */
+    in.client_iter_id = iter_id;
+    object_info       = PDC_obj_get_info(thisIter->objectId);
 
-        /* Co-locate iterator info with the actual object */
-        if (object_info != NULL) {
-            server_id    = object_info->obj_info_pub->server_id;
-            in.object_id = object_info->obj_info_pub->meta_id;
-        }
-        else
-            in.object_id = thisIter->objectId; /* Is this ok? */
-        in.reg_id           = thisIter->reg_id;
-        in.sliceCount       = thisIter->sliceCount;
-        in.sliceNext        = thisIter->sliceNext;
-        in.sliceResetCount  = thisIter->sliceResetCount;
-        in.elementsPerSlice = thisIter->elementsPerSlice;
-        in.slicePerBlock    = thisIter->slicePerBlock;
-        in.elementsPerPlane = thisIter->elementsPerPlane;
-        in.elementsPerBlock = thisIter->elementsPerBlock;
-        in.skipCount        = thisIter->skipCount;
-        in.element_size     = thisIter->element_size;
-        in.srcBlockCount    = thisIter->srcBlockCount;
-        in.contigBlockSize  = thisIter->contigBlockSize;
-        in.totalElements    = thisIter->totalElements;
-        in.ndim             = thisIter->ndim;
-        in.dims_0           = thisIter->dims[0];
-        in.dims_1           = thisIter->dims[1];
-        in.dims_2           = thisIter->dims[2];
-        in.dims_3           = thisIter->dims[3];
-        in.storageinfo      = (int)((thisIter->storage_order << 8) | thisIter->pdc_datatype);
+    /* Co-locate iterator info with the actual object */
+    if (object_info != NULL) {
+      server_id    = object_info->obj_info_pub->server_id;
+      in.object_id = object_info->obj_info_pub->meta_id;
     }
+    else
+      in.object_id = thisIter->objectId; /* Is this ok? */
+    in.reg_id           = thisIter->reg_id;
+    in.sliceCount       = thisIter->sliceCount;
+    in.sliceNext        = thisIter->sliceNext;
+    in.sliceResetCount  = thisIter->sliceResetCount;
+    in.elementsPerSlice = thisIter->elementsPerSlice;
+    in.slicePerBlock    = thisIter->slicePerBlock;
+    in.elementsPerPlane = thisIter->elementsPerPlane;
+    in.elementsPerBlock = thisIter->elementsPerBlock;
+    in.skipCount        = thisIter->skipCount;
+    in.element_size     = thisIter->element_size;
+    in.srcBlockCount    = thisIter->srcBlockCount;
+    in.contigBlockSize  = thisIter->contigBlockSize;
+    in.totalElements    = thisIter->totalElements;
+    in.ndim             = thisIter->ndim;
+    in.dims_0           = thisIter->dims[0];
+    in.dims_1           = thisIter->dims[1];
+    in.dims_2           = thisIter->dims[2];
+    in.dims_3           = thisIter->dims[3];
+    in.storageinfo      = (int)((thisIter->storage_order << 8) | thisIter->pdc_datatype);
+  }
 
-    while (pdc_server_info_g[server_id].addr_valid != 1) {
-        if (n_retry > 0)
-            break;
-        if (PDC_Client_lookup_server(server_id) != SUCCEED)
-            PGOTO_ERROR(FAIL, "==CLIENT[%d]: ERROR with PDC_Client_lookup_server", pdc_client_mpi_rank_g);
+  while (pdc_server_info_g[server_id].addr_valid != 1) {
+    if (n_retry > 0)
+      break;
+    if (PDC_Client_lookup_server(server_id) != SUCCEED)
+      PGOTO_ERROR(FAIL, "==CLIENT[%d]: ERROR with PDC_Client_lookup_server", pdc_client_mpi_rank_g);
 
-        n_retry++;
-    }
+    n_retry++;
+  }
 
-    in.server_id = server_id;
-    HG_Create(send_context_g, pdc_server_info_g[server_id].addr, object_data_iterator_register_id_g,
-              &my_rpc_state_p->handle);
-    hg_ret = HG_Forward(my_rpc_state_p->handle, client_register_iterator_rpc_cb, my_rpc_state_p, &in);
-    if (hg_ret != HG_SUCCESS)
-        PGOTO_ERROR(FAIL, "PDC_client_send_iter_recv_id(): Could not start HG_Forward()");
+  in.server_id = server_id;
+  HG_Create(send_context_g, pdc_server_info_g[server_id].addr, object_data_iterator_register_id_g,
+    &my_rpc_state_p->handle);
+  hg_ret = HG_Forward(my_rpc_state_p->handle, client_register_iterator_rpc_cb, my_rpc_state_p, &in);
+  if (hg_ret != HG_SUCCESS)
+    PGOTO_ERROR(FAIL, "PDC_client_send_iter_recv_id(): Could not start HG_Forward()");
 
-    work_todo_g = 1;
-    PDC_Client_check_response(&send_context_g);
+  work_todo_g = 1;
+  PDC_Client_check_response(&send_context_g);
 
-    if (my_rpc_state_p->value == 0) {
-        *meta_id = 0;
-        PGOTO_DONE(FAIL);
-    }
+  if (my_rpc_state_p->value == 0) {
+    *meta_id = 0;
+    PGOTO_DONE(FAIL);
+  }
 
-    *meta_id = my_rpc_state_p->value;
+  *meta_id = my_rpc_state_p->value;
 
 done:
-    fflush(stdout);
-    HG_Destroy(my_rpc_state_p->handle);
-    free(my_rpc_state_p);
+  HG_Destroy(my_rpc_state_p->handle);
+  free(my_rpc_state_p);
 
-    FUNC_LEAVE(ret_value);
+  FUNC_LEAVE(ret_value);
 }
 
 // Callback function for  HG_Forward()
@@ -153,7 +152,6 @@ client_register_iterator_rpc_cb(const struct hg_cb_info *info)
     }
 
 done:
-    fflush(stdout);
     work_todo_g--;
     HG_Free_output(info->info.forward.handle, &output);
 
@@ -242,7 +240,6 @@ PDC_Client_register_obj_analysis(struct _pdc_region_analysis_ftn_info *thisFtn, 
     thisFtn->meta_index = my_rpc_state_p->value;
 
 done:
-    fflush(stdout);
     HG_Destroy(my_rpc_state_p->handle);
     free(my_rpc_state_p);
 
@@ -270,7 +267,6 @@ client_register_analysis_rpc_cb(const struct hg_cb_info *info)
     }
 
 done:
-    fflush(stdout);
     work_todo_g--;
     HG_Free_output(info->info.forward.handle, &output);
 
@@ -332,7 +328,6 @@ PDC_Client_register_region_transform(const char *func, const char *loadpath,
     // Here, we should update the local registry with the returned valued from my_rpc_state_p;
 
 done:
-    fflush(stdout);
     if (object_info)
         PDC_free_obj_info(object_info);
     HG_Destroy(my_rpc_state_p->handle);
@@ -360,7 +355,6 @@ client_register_transform_rpc_cb(const struct hg_cb_info *info)
     }
 
 done:
-    fflush(stdout);
     work_todo_g--;
     HG_Free_output(info->info.forward.handle, &output);
 

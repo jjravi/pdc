@@ -11,15 +11,20 @@ set( LOCAL_INCLUDE_DIR
   ${PDC_SOURCE_DIR}/src/server/pdc_server_region
   ${PDC_SOURCE_DIR}/src/server/pdc_server_region/include
   ${PDC_SOURCE_DIR}/src/server/pdc_server_analysis/include
+  ${PDC_SOURCE_DIR}/src/server/pdc_server_transform/include
+  ${PDC_SOURCE_DIR}/src/server/my_server_rpc/include
   ${PDC_SOURCE_DIR}/src/server/dablooms
   ${PDC_SOURCE_DIR}/src/api/include
   ${PDC_SOURCE_DIR}/src/api/pdc_obj/include
   ${PDC_SOURCE_DIR}/src/api/pdc_region/include
   ${PDC_SOURCE_DIR}/src/api/pdc_query/include
   ${PDC_SOURCE_DIR}/src/api/pdc_transform/include
+  ${PDC_SOURCE_DIR}/src/api/pdc_transform_old/include
   ${PDC_SOURCE_DIR}/src/api/pdc_analysis/include
   ${PDC_SOURCE_DIR}/src/api/profiling/include
   ${PDC_SOURCE_DIR}/src/utils/include
+
+  ${PDC_SOURCE_DIR}/src/api/pdc_persist/include
 )
 
 include_directories(
@@ -82,16 +87,23 @@ set(PDC_SRCS
   ${PDC_SOURCE_DIR}/src/api/pdc_region/pdc_region.c
   ${PDC_SOURCE_DIR}/src/api/pdc_region/pdc_region_transfer.c
   ${PDC_SOURCE_DIR}/src/api/pdc_transform/pdc_transform.c
-  ${PDC_SOURCE_DIR}/src/api/pdc_transform/pdc_transforms_common.c
+  ${PDC_SOURCE_DIR}/src/api/pdc_transform_old/pdc_transform_old.c
+  ${PDC_SOURCE_DIR}/src/api/pdc_transform_old/pdc_transforms_common_old.c
   ${PDC_SOURCE_DIR}/src/server/pdc_client_server_common.c
   ${PDC_SOURCE_DIR}/src/server/pdc_server_region/pdc_server_region_transfer.c
   ${PDC_SOURCE_DIR}/src/server/pdc_server_region/pdc_server_region_cache.c
   ${PDC_SOURCE_DIR}/src/server/pdc_server_region/pdc_server_region_transfer_metadata_query.c
+  ${PDC_SOURCE_DIR}/src/server/pdc_server_transform/pdc_server_transform.c
+  ${PDC_SOURCE_DIR}/src/server/my_server_rpc/my_server_rpc.c
   ${PDC_SOURCE_DIR}/src/utils/pdc_timing.c
   ${PDC_SOURCE_DIR}/src/utils/pdc_malloc.c
   ${PDC_SOURCE_DIR}/src/utils/pdc_interface.c
   ${PDC_SOURCE_DIR}/src/utils/pdc_region_utils.c
-  )
+  ${PDC_SOURCE_DIR}/src/utils/pdc_utils.c
+  ${PDC_SOURCE_DIR}/src/utils/rpc_engine.c
+
+  ${PDC_SOURCE_DIR}/src/api/pdc_persist/pdc_persist.c
+)
 
   add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/profiling)
 
@@ -115,6 +127,12 @@ target_link_libraries(pdc
   ${PDC_EXT_LIB_DEPENDENCIES}
   -ldl
 )
+
+# TODO: jjravi move
+target_include_directories(pdc PUBLIC ${CUDA_INCLUDE_DIRS})
+# target_link_libraries(pdc cusz)
+# target_link_libraries(pdc CUDA::cudart CUDA::cuda_driver)
+
 pdc_set_lib_options(pdc "pdc" ${PDC_LIBTYPE})
 
 set(PDC_EXPORTED_LIBS pdc ${PDC_EXPORTED_LIBS})
@@ -123,6 +141,7 @@ add_executable(close_server
                close_server.c
 )
 target_link_libraries(close_server pdc)
+target_link_libraries(close_server MPI::MPI_C)
 
 install(
   TARGETS
@@ -145,6 +164,10 @@ set(PDC_HEADERS
   ${PDC_SOURCE_DIR}/src/api/pdc_query/include/pdc_query.h
   ${PDC_SOURCE_DIR}/src/api/pdc_region/include/pdc_region.h
   ${PDC_SOURCE_DIR}/src/api/pdc_transform/include/pdc_transform.h
+  ${PDC_SOURCE_DIR}/src/api/pdc_persist/include/pdc_persist.h
+  ${PDC_SOURCE_DIR}/src/api/pdc_transform_old/include/pdc_transform_old.h
+  ${PDC_SOURCE_DIR}/src/utils/include/pdc_timing.h
+  ${PDC_SOURCE_DIR}/src/utils/include/pdc_interface.h
   ${PROJECT_BINARY_DIR}/pdc_config_sys.h
   ${PROJECT_BINARY_DIR}/pdc_config.h
   )

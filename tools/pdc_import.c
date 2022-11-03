@@ -547,7 +547,8 @@ do_dset(hid_t did, char *name, char *app_name)
     }
     size[0] *= dtype_size;
     obj_region.offset = offset;
-    obj_region.size   = size;
+    obj_region.dims_size   = size;
+    obj_region.data_size   = size[0];
 
     if (ndset_g == 1)
         gettimeofday(&write_timer_start_g, 0);

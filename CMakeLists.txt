@@ -27,6 +27,29 @@ endif()
 
 project(PDC C)
 
+# added by jjravi #
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-unused-parameter -Wno-unused-result -Wno-unused-parameter -Wno-unused-function -Wno-unused-variable -Wno-unused-but-set-variable -fcommon")
+
+# data6
+include_directories(/opt/nvidia/nsight-systems/2021.2.4/target-linux-x64/nvtx/include)
+
+# jjravi
+include_directories(/opt/nvidia/nsight-systems/2022.2.1/target-linux-x64/nvtx/include)
+
+set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Choose the type of build." FORCE)
+add_definitions(-DENABLE_MULTITHREAD=1)
+find_package(CUDA REQUIRED)
+
+set(CMAKE_PREFIX_PATH "/global/homes/j/jjravi/cfs_m2621/sept2022/mercury/build/install/share/cmake/mercury" ${CMAKE_PREFIX_PATH})
+set(CMAKE_PREFIX_PATH "/global/homes/j/jjravi/cfs_m2621/sept2022/hdf5/build/install/cmake" ${CMAKE_PREFIX_PATH})
+# add_subdirectory(external/cuSZ EXCLUDE_FROM_ALL)
+# include_directories(external/)
+###################
+# This avoids cmake adding a d when in debug mode...
+# lib<name>.so becomes lib<name>d.so
+set(CMAKE_DEBUG_POSTFIX "")
+###################
+
 include_directories(
   ${PROJECT_SOURCE_DIR}
 )
@@ -162,25 +185,30 @@ function(pdc_set_lib_options libtarget libname libtype)
   if(${libtype} MATCHES "SHARED")
     if(WIN32 AND NOT MINGW)
       set(LIB_RELEASE_NAME "${libname}")
-      set(LIB_DEBUG_NAME "${libname}_D")
+      set(LIB_DEBUG_NAME "${libname}")
+      # set(LIB_DEBUG_NAME "${libname}_D")
       set(LIB_VERSION ${PDC_PACKAGE_VERSION_MAJOR})
     else()
       set(LIB_RELEASE_NAME "${libname}")
-      set(LIB_DEBUG_NAME "${libname}_debug")
+      set(LIB_DEBUG_NAME "${libname}")
+      # set(LIB_DEBUG_NAME "${libname}_debug")
       set(LIB_VERSION ${PDC_PACKAGE_VERSION})
     endif()
   else()
     if(WIN32 AND NOT MINGW)
       set(LIB_RELEASE_NAME "lib${libname}")
-      set(LIB_DEBUG_NAME "lib${libname}_D")
+      set(LIB_DEBUG_NAME "lib${libname}")
+      # set(LIB_DEBUG_NAME "lib${libname}_D")
     else()
       # if the generator supports configuration types or if the CMAKE_BUILD_TYPE has a value
       if(CMAKE_CONFIGURATION_TYPES OR CMAKE_BUILD_TYPE)
         set(LIB_RELEASE_NAME "${libname}")
-        set(LIB_DEBUG_NAME "${libname}_debug")
+        set(LIB_DEBUG_NAME "${libname}")
+        # set(LIB_DEBUG_NAME "${libname}_debug")
       else()
         set(LIB_RELEASE_NAME "lib${libname}")
-        set(LIB_DEBUG_NAME "lib${libname}_debug")
+        set(LIB_DEBUG_NAME "lib${libname}")
+        # set(LIB_DEBUG_NAME "lib${libname}_debug")
       endif()
     endif()
   endif()
@@ -241,7 +269,8 @@ endif()
 #-----------------------------------------------------------------------------
 option(PDC_ENABLE_MPI "Enable MPI." ON)
 if(PDC_ENABLE_MPI)
-  find_package(MPI)
+  find_package(MPI REQUIRED)
+  include_directories(${MPI_INCLUDE_PATH})
   if(MPI_FOUND)
     set(ENABLE_MPI 1)
   endif()
@@ -382,6 +411,32 @@ configure_file(
 #-----------------------------------------------------------------------------
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/api)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/server)
+######################
+
+## Uncommenting to specify GPU architecture is only for testing purpose.
+## uncomment for pre-Turing
+# set(CMAKE_CUDA_ARCHITECTURES 60 62 70 72)
+## uncomment for V100
+# set(CMAKE_CUDA_ARCHITECTURES 70)
+## uncomment for Turing
+# set(CMAKE_CUDA_ARCHITECTURES 75)
+## uncmoment for Ampere
+# set(CMAKE_CUDA_ARCHITECTURES 80 86)
+## uncmoment for A100
+# set(CMAKE_CUDA_ARCHITECTURES 80)
+
+enable_language(CXX)
+enable_language(CUDA)
+
+set(CMAKE_CUDA_ARCHITECTURES 52 60 61 62 70 72 75 80 86)
+set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --extended-lambda --expt-relaxed-constexpr -Wno-deprecated-declarations")
+set(CMAKE_CUDA_STANDARD 17)
+set(CMAKE_CXX_STANDARD 17)
+
+add_subdirectory(external/cuSZ/ EXCLUDE_FROM_ALL)
+add_subdirectory(external/SZ3/ EXCLUDE_FROM_ALL)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/plugins)
+######################
 
 #-----------------------------------------------------------------------------
 # Testing

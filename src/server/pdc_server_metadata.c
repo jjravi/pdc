@@ -301,6 +301,7 @@ find_metadata_by_id(uint64_t obj_id)
             DL_FOREACH(head->metadata, elt)
             {
                 if (elt->obj_id == obj_id) {
+                    FUNC_LEAVE(elt);
                     return elt;
                 }
             }
@@ -359,27 +360,10 @@ find_identical_metadata(pdc_hash_table_entry_head *entry, pdc_metadata_t *a)
         bloom = entry->bloom;
         combine_obj_info_to_string(a, combined_string);
 
-#ifdef ENABLE_TIMING
-        struct timeval pdc_timer_start;
-        struct timeval pdc_timer_end;
-        double         ht_total_sec;
-
-        gettimeofday(&pdc_timer_start, 0);
-#endif
-
         bloom_check = BLOOM_CHECK(bloom, combined_string, strlen(combined_string));
-
-#ifdef ENABLE_TIMING
-        gettimeofday(&pdc_timer_end, 0);
-        ht_total_sec = PDC_get_elapsed_time_double(&pdc_timer_start, &pdc_timer_end);
-#endif
 
 #ifdef ENABLE_MULTITHREAD
         hg_thread_mutex_lock(&pdc_bloom_time_mutex_g);
-#endif
-
-#ifdef ENABLE_TIMING
-        server_bloom_check_time_g += ht_total_sec;
 #endif
 
 #ifdef ENABLE_MULTITHREAD
@@ -1207,15 +1191,6 @@ PDC_insert_metadata_to_hash_table(gen_obj_id_in_t *in, gen_obj_id_out_t *out)
 
     FUNC_ENTER(NULL);
 
-#ifdef ENABLE_TIMING
-    // Timing
-    struct timeval pdc_timer_start;
-    struct timeval pdc_timer_end;
-    double         ht_total_sec;
-
-    gettimeofday(&pdc_timer_start, 0);
-#endif
-
     metadata = (pdc_metadata_t *)malloc(sizeof(pdc_metadata_t));
     if (metadata == NULL) {
         printf("Cannot allocate pdc_metadata_t!\n");
@@ -1262,11 +1237,6 @@ PDC_insert_metadata_to_hash_table(gen_obj_id_in_t *in, gen_obj_id_out_t *out)
     pdc_hash_table_entry_head *lookup_value;
     pdc_metadata_t *           found_identical;
 
-#ifdef ENABLE_MULTITHREAD
-    // Obtain lock for hash table
-    unlocked = 0;
-    hg_thread_mutex_lock(&pdc_metadata_hash_table_mutex_g);
-#endif
 
     if (debug_flag == 1)
         printf("checking hash table with key=%d\n", *hash_key);
@@ -1279,17 +1249,24 @@ PDC_insert_metadata_to_hash_table(gen_obj_id_in_t *in, gen_obj_id_out_t *out)
         if (lookup_value != NULL) {
             if (debug_flag == 1)
                 printf("lookup_value not NULL!\n");
-            // Check if there exist metadata identical to current one
-            found_identical = find_identical_metadata(lookup_value, metadata);
-            if (found_identical != NULL) {
-                printf("==PDC_SERVER[%d]: Found identical metadata with name %s!\n", pdc_server_rank_g,
-                       metadata->obj_name);
-                out->obj_id = 0;
-                free(metadata);
-                goto done;
-            }
-            else {
-                PDC_Server_hash_table_list_insert(lookup_value, metadata);
+
+            // TODO: jjravi just override, if it already exists?
+            // // Check if there exist metadata identical to current one
+            // found_identical = find_identical_metadata(lookup_value, metadata);
+            // if (found_identical != NULL) {
+            //     printf("==PDC_SERVER[%d]: Found identical metadata with name %s!\n", pdc_server_rank_g,
+            //            metadata->obj_name);
+            //     out->obj_id = 0;
+            //     free(metadata);
+            //     goto done;
+            // }
+            // else 
+            {
+              perr_t _status =  PDC_Server_hash_table_list_insert(lookup_value, metadata);
+              if(_status != SUCCEED)
+              {
+                printf("==PDC_SERVER[%d]: failed to insert metadata into hash_table!\n", pdc_server_rank_g);
+              }
             }
         }
         else {
@@ -1335,18 +1312,8 @@ PDC_insert_metadata_to_hash_table(gen_obj_id_in_t *in, gen_obj_id_out_t *out)
     // Fill $out structure for returning the generated obj_id to client
     out->obj_id = metadata->obj_id;
 
-#ifdef ENABLE_TIMING
-    // Timing
-    gettimeofday(&pdc_timer_end, 0);
-    ht_total_sec = PDC_get_elapsed_time_double(&pdc_timer_start, &pdc_timer_end);
-#endif
-
 #ifdef ENABLE_MULTITHREAD
     hg_thread_mutex_lock(&pdc_time_mutex_g);
-#endif
-
-#ifdef ENABLE_TIMING
-    server_insert_time_g += ht_total_sec;
 #endif
 
 #ifdef ENABLE_MULTITHREAD

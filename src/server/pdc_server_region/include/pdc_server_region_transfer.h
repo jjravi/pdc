@@ -72,10 +72,11 @@ pdc_transfer_status_t PDC_try_finish_request(uint64_t transfer_request_id, hg_ha
  * Not a thread-safe function, need protection from pthread_mutex_lock(&transfer_request_id_mutex);
  */
 
+// TODO: jjravi, we can just use UUID?
 pdcid_t PDC_transfer_request_id_register();
 
 perr_t PDC_Server_transfer_request_io(uint64_t obj_id, int obj_ndim, const uint64_t *obj_dims,
-                                      struct pdc_region_info *region_info, void *buf, size_t unit,
+                                      struct pdc_region_info *region_info,
                                       int is_write);
 
 int clean_write_bulk_data(transfer_request_all_data *request_data);

@@ -1,0 +1,27 @@
+PROJECT_NAME           = "pdc"
+OUTPUT_DIRECTORY       = ./doxydoc/
+EXTRACT_ALL            = YES
+EXTRACT_PRIVATE        = NO
+EXTRACT_STATIC         = YES
+INPUT                  = ../src
+INCLUDE_PATH           = /home/jjravi/hpc-io/mercury/build/install/include
+EXTENSION_MAPPING      = .h=C++
+RECURSIVE              = YES
+HAVE_DOT               = YES
+UML_LOOK               = YES
+CALL_GRAPH             = YES
+CALLER_GRAPH           = YES
+GENERATE_LATEX         = NO
+SOURCE_BROWSER         = YES
+INLINE_SOURCES         = NO
+DISABLE_INDEX          = YES
+GENERATE_TREEVIEW      = YES
+REFERENCED_BY_RELATION = YES
+OPTIMIZE_OUTPUT_FOR_C  = YES
+ENABLE_PREPROCESSING   = YES
+MACRO_EXPANSION        = YES
+INLINE_SIMPLE_STRUCTS  = YES
+NUM_PROC_THREADS       = 8
+LOOKUP_CACHE_SIZE      = 5
+SEARCH_INCLUDES        = YES
+

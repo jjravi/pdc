@@ -27,7 +27,7 @@
  ************************************************************************ */
 
 #include "pdc_analysis_pkg.h"
-#include "pdc_transforms_common.h"
+#include "pdc_transforms_common_old.h"
 #include "pdc_client_server_common.h"
 
 #ifdef ENABLE_MULTITHREAD

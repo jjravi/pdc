@@ -31,7 +31,7 @@
 #include "pdc_obj_pkg.h"
 #include "pdc_obj.h"
 #include "pdc_interface.h"
-#include "pdc_transforms_pkg.h"
+#include "pdc_transforms_pkg_old.h"
 #include "pdc_analysis_pkg.h"
 #include "pdc_client_connect.h"
 #include <time.h>
@@ -52,7 +52,6 @@ PDC_obj_init()
         PGOTO_ERROR(FAIL, "unable to initialize object interface");
 
 done:
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 
@@ -172,7 +171,6 @@ PDCobj_create(pdcid_t cont_id, const char *obj_name, pdcid_t obj_prop_id)
 #endif
     ret_value = PDC_obj_create(cont_id, obj_name, obj_prop_id, PDC_OBJ_GLOBAL);
     // done:
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 
@@ -362,7 +360,6 @@ PDC_obj_create(pdcid_t cont_id, const char *obj_name, pdcid_t obj_prop_id, _pdc_
     ret_value = p->obj_info_pub->local_id;
 
 done:
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 
@@ -382,7 +379,6 @@ PDC_obj_list_null()
     }
 
 done:
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 
@@ -452,7 +448,6 @@ PDCobj_flush_start(pdcid_t obj_id)
 
     PDC_Client_flush_obj(obj_id);
 
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 
@@ -465,7 +460,6 @@ PDCobj_flush_all_start()
 
     PDC_Client_flush_obj_all();
 
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 #else
@@ -476,7 +470,6 @@ PDCobj_flush_start(pdcid_t obj_id __attribute__((unused)))
 
     FUNC_ENTER(NULL);
 
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 
@@ -487,7 +480,6 @@ PDCobj_flush_all_start()
 
     FUNC_ENTER(NULL);
 
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 #endif
@@ -504,7 +496,6 @@ PDCobj_close(pdcid_t obj_id)
         PGOTO_ERROR(FAIL, "object: problem of freeing id");
 
 done:
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 
@@ -519,7 +510,6 @@ PDC_obj_end()
         PGOTO_ERROR(FAIL, "unable to destroy object interface");
 
 done:
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 
@@ -635,7 +625,6 @@ PDCobj_open_common(const char *obj_name, pdcid_t pdc, int is_col)
     ret_value = p->obj_info_pub->local_id;
 
 done:
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 
@@ -683,7 +672,6 @@ PDCobj_iter_start(pdcid_t cont_id)
     ret_value = objhl;
 
 done:
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 
@@ -720,7 +708,6 @@ PDCobj_iter_next(obj_handle *ohandle, pdcid_t cont_id)
     ret_value = next;
 
 done:
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 
@@ -753,7 +740,6 @@ PDCobj_iter_get_info(obj_handle *ohandle)
         ret_value->obj_pt->dims[i] = info->obj_info_pub->obj_pt->dims[i];
 
 done:
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 
@@ -771,7 +757,6 @@ PDCprop_set_obj_user_id(pdcid_t obj_prop, uint32_t user_id)
     ((struct _pdc_obj_prop *)(info->obj_ptr))->user_id = user_id;
 
 done:
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 
@@ -792,7 +777,6 @@ PDCprop_set_obj_app_name(pdcid_t obj_prop, char *app_name)
     ((struct _pdc_obj_prop *)(info->obj_ptr))->app_name = strdup(app_name);
 
 done:
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 
@@ -810,7 +794,6 @@ PDCprop_set_obj_time_step(pdcid_t obj_prop, uint32_t time_step)
     ((struct _pdc_obj_prop *)(info->obj_ptr))->time_step = time_step;
 
 done:
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 
@@ -831,7 +814,6 @@ PDCprop_set_obj_data_loc(pdcid_t obj_prop, char *loc)
     ((struct _pdc_obj_prop *)(info->obj_ptr))->data_loc = strdup(loc);
 
 done:
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 
@@ -852,12 +834,11 @@ PDCprop_set_obj_tags(pdcid_t obj_prop, char *tags)
     ((struct _pdc_obj_prop *)(info->obj_ptr))->tags = strdup(tags);
 
 done:
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 
 perr_t
-PDCprop_set_obj_dims(pdcid_t obj_prop, PDC_int_t ndim, uint64_t *dims)
+PDCprop_set_obj_dims(pdcid_t obj_prop, PDC_int_t ndim, const uint64_t *dims)
 {
     perr_t                ret_value = SUCCEED;
     struct _pdc_id_info * info;
@@ -879,7 +860,6 @@ PDCprop_set_obj_dims(pdcid_t obj_prop, PDC_int_t ndim, uint64_t *dims)
     memcpy(prop->obj_prop_pub->dims, dims, ndim * sizeof(uint64_t));
 
 done:
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 
@@ -899,7 +879,6 @@ PDCprop_set_obj_type(pdcid_t obj_prop, pdc_var_type_t type)
     prop->obj_prop_pub->type = type;
 
 done:
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 
@@ -919,7 +898,6 @@ PDCprop_set_obj_transfer_region_type(pdcid_t obj_prop, pdc_region_partition_t re
     prop->obj_prop_pub->region_partition = region_partition;
 
 done:
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 
@@ -939,7 +917,6 @@ PDCprop_set_obj_consistency_semantics(pdcid_t obj_prop, pdc_consistency_t consis
     prop->obj_prop_pub->consistency = consistency;
 
 done:
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 
@@ -959,7 +936,6 @@ PDCprop_set_obj_buf(pdcid_t obj_prop, void *buf)
     prop->buf = buf;
 
 done:
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 
@@ -1038,7 +1014,6 @@ PDCobj_buf_retrieve(pdcid_t obj_id)
     ret_value = buffer;
 
 done:
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 
@@ -1166,7 +1141,6 @@ PDC_obj_get_info(pdcid_t obj_id)
     ret_value->region_list_head = NULL;
 
 done:
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 
@@ -1243,7 +1217,6 @@ PDCobj_get_info(pdcid_t obj_id)
     ret_value = tmp->obj_info_pub;
 
 done:
-    fflush(stdout);
     FUNC_LEAVE(ret_value);
 }
 

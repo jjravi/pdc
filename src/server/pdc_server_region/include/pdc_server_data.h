@@ -474,26 +474,20 @@ hg_return_t PDC_Server_count_write_check_update_storage_meta_cb(const struct hg_
  *
  * \param obj_id [IN]           Object ID
  * \param region_info [IN]      Region information
- * \param buf [IN]              Data staring address
- * \param unit [IN]             Size of data type
  *
  * \return Non-negative on success/Negative on failure
  */
-perr_t PDC_Server_data_write_out(uint64_t obj_id, struct pdc_region_info *region_info, void *buf,
-                                 size_t unit);
+perr_t PDC_Server_data_write_out(uint64_t obj_id, struct pdc_region_info *region_info);
 
 /**
  * Read data from desired storage
  *
  * \param obj_id [IN]           Object ID
  * \param region_info [IN]      Region information
- * \param buf [IN]              Data starting address
- * \param unit [IN]             Size of data type
  *
  * \return Non-negative on success/Negative on failure
  */
-perr_t PDC_Server_data_read_from(uint64_t obj_id, struct pdc_region_info *region_info, void *buf,
-                                 size_t unit);
+perr_t PDC_Server_data_read_from(uint64_t obj_id, struct pdc_region_info *region_info);
 
 /**
  * Read data from desired storage

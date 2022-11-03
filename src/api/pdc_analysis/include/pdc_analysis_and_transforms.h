@@ -213,7 +213,7 @@ extern hg_id_t server_transform_ftn_register_id_g;
 extern hg_id_t object_data_iterator_register_id_g;
 
 extern size_t PDCobj_data_getSliceCount(pdcid_t iter_id);
-extern size_t PDCobj_data_getNextBlock(pdcid_t iter, void **nextBlock, size_t *dims);
+// extern size_t PDCobj_data_getNextBlock(pdcid_t iter, void **nextBlock, size_t *dims);
 extern int    PDCiter_get_nextId(void);
 extern int    pdc_add_analysis_ptr_to_registry_(struct region_analysis_ftn_info *ftnPtr);
 extern perr_t pdc_client_send_iter_recv_id(pdcid_t iter_id, pdcid_t *meta_id);
