@@ -128,6 +128,7 @@ foreach(program ${PROGRAMS})
   add_executable(${program} ${program}.c)
   target_link_libraries(${program} pdc)
   target_link_libraries(${program} MPI::MPI_C)
+  target_link_libraries(${program} m) #-lm
 endforeach(program)
 
 enable_language(CXX)
@@ -142,6 +143,9 @@ target_link_libraries(obj_type_transform pdc MPI::MPI_C MPI::MPI_CXX)
 #
 add_executable(vpicio_compress vpicio_compress.cc)
 target_link_libraries(vpicio_compress pdc MPI::MPI_C MPI::MPI_CXX)
+#
+add_executable(vpicio_persist vpicio_persist.cc)
+target_link_libraries(vpicio_persist pdc MPI::MPI_C MPI::MPI_CXX)
 #
 add_executable(vpicio_compress_obj vpicio_compress_obj.cc)
 target_link_libraries(vpicio_compress_obj pdc MPI::MPI_C MPI::MPI_CXX)
