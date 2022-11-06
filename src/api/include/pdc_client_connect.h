@@ -928,4 +928,7 @@ perr_t PDC_free_kvtag(pdc_kvtag_t **kvtag);
 
 perr_t PDC_Client_del_metadata(pdcid_t id, int is_cont);
 
+perr_t pack_region_metadata(int ndim, uint64_t *offset, uint64_t *size, region_info_transfer_t *transfer);
+
+
 #endif /* PDC_CLIENT_CONNECT_H */

@@ -95,12 +95,12 @@ int main(int argc, char **argv)
   pdcid_t container_id = PDCcont_create_col("c1", container_prop);
   pdcid_t obj_prop_xx = PDCprop_create(PDC_OBJ_CREATE, pdc_id);
 
-  ////////////////////////////////
-  // issue 4 RPCs (these will proceed concurrently using callbacks)
-  int req_num = 4;
-  for (int i = 0; i < req_num; i++) run_my_rpc(i);
-  printf("done issuing run_my_rpc\n");
-  ////////////////////////////////
+  // ////////////////////////////////
+  // // issue 4 RPCs (these will proceed concurrently using callbacks)
+  // int req_num = 4;
+  // for (int i = 0; i < req_num; i++) run_my_rpc(i);
+  // printf("done issuing run_my_rpc\n");
+  // ////////////////////////////////
 
   ////////////////////////////////////////////////////
   PDCprop_set_obj_transfer_region_type(obj_prop_xx, PDC_OBJ_STATIC);
@@ -192,14 +192,18 @@ int main(int argc, char **argv)
     pdcid_t region_id11 = PDCregion_create(ndim, offset_remote, mysize);
     pdcid_t region_id22 = PDCregion_create(ndim, offset_remote, mysize);
 
-    pdcid_t transfer_request_x = PDCregion_transfer_create(&x[0], PDC_WRITE, obj_xx, region_x, region_xx);
-    pdcid_t transfer_request_y = PDCregion_transfer_create(&y[0], PDC_WRITE, obj_yy, region_y, region_yy);
-    pdcid_t transfer_request_z = PDCregion_transfer_create(&z[0], PDC_WRITE, obj_zz, region_z, region_zz);
-    pdcid_t transfer_request_px = PDCregion_transfer_create(&px[0], PDC_WRITE, obj_pxx, region_px, region_pxx);
-    pdcid_t transfer_request_py = PDCregion_transfer_create(&py[0], PDC_WRITE, obj_pyy, region_py, region_pyy);
-    pdcid_t transfer_request_pz = PDCregion_transfer_create(&pz[0], PDC_WRITE, obj_pzz, region_pz, region_pzz);
-    pdcid_t transfer_request_id1 = PDCregion_transfer_create(&id1[0], PDC_WRITE, obj_id11, region_id1, region_id11);
-    pdcid_t transfer_request_id2 = PDCregion_transfer_create(&id2[0], PDC_WRITE, obj_id22, region_id2, region_id22);
+    pdcid_t transfer_request_x, transfer_request_y, transfer_request_z, transfer_request_px, transfer_request_py, transfer_request_pz, transfer_request_id1, transfer_request_id2; 
+
+    pdcid_t transfers[8];
+
+    pdcTransferCreate(&transfers[0], &transfer_request_x, &x[0], PDC_WRITE, obj_xx, region_x, region_xx);
+    pdcTransferCreate(&transfers[1], &transfer_request_y, &y[0], PDC_WRITE, obj_yy, region_y, region_yy);
+    pdcTransferCreate(&transfers[2], &transfer_request_z, &z[0], PDC_WRITE, obj_zz, region_z, region_zz);
+    pdcTransferCreate(&transfers[3], &transfer_request_px, &px[0], PDC_WRITE, obj_pxx, region_px, region_pxx);
+    pdcTransferCreate(&transfers[4], &transfer_request_py, &py[0], PDC_WRITE, obj_pyy, region_py, region_pyy);
+    pdcTransferCreate(&transfers[5], &transfer_request_pz, &pz[0], PDC_WRITE, obj_pzz, region_pz, region_pzz);
+    pdcTransferCreate(&transfers[6], &transfer_request_id1, &id1[0], PDC_WRITE, obj_id11, region_id1, region_id11);
+    pdcTransferCreate(&transfers[7], &transfer_request_id2, &id2[0], PDC_WRITE, obj_id22, region_id2, region_id22);
 
     // ///////////////////
     // pdcTransfer_t transfer_x;
@@ -220,33 +224,41 @@ int main(int argc, char **argv)
       pz[i]  = ((float)id2[i] / numparticles) * z_dim;
     }
 
-    PDC_API_CALL(pdcTransferStart(transfer_request_x));
-    // PDC_API_CALL(PDCregion_transfer_start(transfer_request_x));
-    // PDC_API_CALL(PDCregion_transfer_start(transfer_request_y));
-    // PDC_API_CALL(PDCregion_transfer_start(transfer_request_z));
-    // PDC_API_CALL(PDCregion_transfer_start(transfer_request_px));
-    // PDC_API_CALL(PDCregion_transfer_start(transfer_request_py));
-    // PDC_API_CALL(PDCregion_transfer_start(transfer_request_pz));
-    // PDC_API_CALL(PDCregion_transfer_start(transfer_request_id1));
-    // PDC_API_CALL(PDCregion_transfer_start(transfer_request_id2));
+    PDC_API_CALL(pdcTransferStart(transfer_request_x, transfers[0]));
+    PDC_API_CALL(pdcTransferStart(transfer_request_y, transfers[1]));
+    PDC_API_CALL(pdcTransferStart(transfer_request_z, transfers[2]));
+    PDC_API_CALL(pdcTransferStart(transfer_request_px, transfers[3]));
+    PDC_API_CALL(pdcTransferStart(transfer_request_py, transfers[4]));
+    PDC_API_CALL(pdcTransferStart(transfer_request_pz, transfers[5]));
+    PDC_API_CALL(pdcTransferStart(transfer_request_id1, transfers[6]));
+    PDC_API_CALL(pdcTransferStart(transfer_request_id2, transfers[7]));
+
+    PDC_API_CALL(pdcTransferWait(transfers[0]));
+    PDC_API_CALL(pdcTransferWait(transfers[1]));
+    PDC_API_CALL(pdcTransferWait(transfers[2]));
+    PDC_API_CALL(pdcTransferWait(transfers[3]));
+    PDC_API_CALL(pdcTransferWait(transfers[4]));
+    PDC_API_CALL(pdcTransferWait(transfers[5]));
+    PDC_API_CALL(pdcTransferWait(transfers[6]));
+    PDC_API_CALL(pdcTransferWait(transfers[7]));
 
     PDC_API_CALL(PDCregion_transfer_wait(transfer_request_x));
-    // PDC_API_CALL(PDCregion_transfer_wait(transfer_request_y));
-    // PDC_API_CALL(PDCregion_transfer_wait(transfer_request_z));
-    // PDC_API_CALL(PDCregion_transfer_wait(transfer_request_px));
-    // PDC_API_CALL(PDCregion_transfer_wait(transfer_request_py));
-    // PDC_API_CALL(PDCregion_transfer_wait(transfer_request_pz));
-    // PDC_API_CALL(PDCregion_transfer_wait(transfer_request_id1));
-    // PDC_API_CALL(PDCregion_transfer_wait(transfer_request_id2));
+    PDC_API_CALL(PDCregion_transfer_wait(transfer_request_y));
+    PDC_API_CALL(PDCregion_transfer_wait(transfer_request_z));
+    PDC_API_CALL(PDCregion_transfer_wait(transfer_request_px));
+    PDC_API_CALL(PDCregion_transfer_wait(transfer_request_py));
+    PDC_API_CALL(PDCregion_transfer_wait(transfer_request_pz));
+    PDC_API_CALL(PDCregion_transfer_wait(transfer_request_id1));
+    PDC_API_CALL(PDCregion_transfer_wait(transfer_request_id2));
 
     PDC_API_CALL(PDCregion_transfer_close(transfer_request_x));
-    // PDC_API_CALL(PDCregion_transfer_close(transfer_request_y));
-    // PDC_API_CALL(PDCregion_transfer_close(transfer_request_z));
-    // PDC_API_CALL(PDCregion_transfer_close(transfer_request_px));
-    // PDC_API_CALL(PDCregion_transfer_close(transfer_request_py));
-    // PDC_API_CALL(PDCregion_transfer_close(transfer_request_pz));
-    // PDC_API_CALL(PDCregion_transfer_close(transfer_request_id1));
-    // PDC_API_CALL(PDCregion_transfer_close(transfer_request_id2));
+    PDC_API_CALL(PDCregion_transfer_close(transfer_request_y));
+    PDC_API_CALL(PDCregion_transfer_close(transfer_request_z));
+    PDC_API_CALL(PDCregion_transfer_close(transfer_request_px));
+    PDC_API_CALL(PDCregion_transfer_close(transfer_request_py));
+    PDC_API_CALL(PDCregion_transfer_close(transfer_request_pz));
+    PDC_API_CALL(PDCregion_transfer_close(transfer_request_id1));
+    PDC_API_CALL(PDCregion_transfer_close(transfer_request_id2));
 
     /////////////////////////
     // pdcid_t input1_iter = PDCobj_data_iter_create(obj_id11, region_id1);
@@ -331,11 +343,11 @@ int main(int argc, char **argv)
   PDC_API_CALL(PDCprop_close(obj_prop_id11));
   PDC_API_CALL(PDCprop_close(obj_prop_id22));
 
-  ///////////////////////////////////
-  printf("call wait_my_rpc()\n");
-  wait_my_rpc();
-  printf("finish wait_my_rpc()\n");
-  ///////////////////////////////////
+  // ///////////////////////////////////
+  // printf("call wait_my_rpc()\n");
+  // wait_my_rpc();
+  // printf("finish wait_my_rpc()\n");
+  // ///////////////////////////////////
 
   PDC_API_CALL(PDCcont_close(container_id));
   PDC_API_CALL(PDCprop_close(container_prop));

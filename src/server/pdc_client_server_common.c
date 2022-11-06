@@ -1271,22 +1271,22 @@ done:
 // {
 //     int    ret_value = 1;
 //     size_t i         = 0;
-// 
+//
 //     FUNC_ENTER(NULL);
-// 
+//
 //     if (NULL == a || NULL == b)
 //         PGOTO_ERROR(-1, "==Empty region_list_t structure");
-// 
+//
 //     if (a->ndim != b->ndim)
 //         PGOTO_DONE(-1);
-// 
+//
 //     for (i = 0; i < a->ndim; i++) {
 //         if (a->start[i] != b->start[i])
 //             PGOTO_DONE(-1);
 //         if (a->count[i] != b->count[i])
 //             PGOTO_DONE(-1);
 //     }
-// 
+//
 // done:
 //     FUNC_LEAVE(ret_value);
 // }
@@ -1302,12 +1302,12 @@ int PDC_is_same_region_list(region_list_t *a, region_list_t *b)
     return -1;
   }
 
-  if (a->ndim != b->ndim) 
+  if (a->ndim != b->ndim)
     return -1;
 
   for (i = 0; i < a->ndim; i++) {
 
-    if (a->start[i] != b->start[i]) 
+    if (a->start[i] != b->start[i])
       return -1;
 
     if (a->count[i] != b->count[i])

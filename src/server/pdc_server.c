@@ -1706,6 +1706,7 @@ PDC_Server_mercury_register()
 {
     // NOTE: jjravi Register RPC on server
     my_rpc_register();
+    pdc_persist_register();
 
     // Register RPC, metadata related
     PDC_client_test_connect_register(hg_class_g);
