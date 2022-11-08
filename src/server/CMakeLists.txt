@@ -19,6 +19,7 @@ include_directories(
   ${PDC_SOURCE_DIR}/src/server/pdc_server_transform/include
   ${PDC_SOURCE_DIR}/src/server/pdc_server_persist/include
   ${PDC_SOURCE_DIR}/src/server/my_server_rpc/include
+  ${PDC_SOURCE_DIR}/src/server/pdc_monitor/include
   ${PDC_SOURCE_DIR}/src/server/dablooms
   ${PDC_SOURCE_DIR}/src/api/include
   ${PDC_SOURCE_DIR}/src/api/pdc_obj/include
@@ -56,6 +57,7 @@ add_executable(pdc_server.exe
                ${PDC_SOURCE_DIR}/src/server/pdc_server_transform/pdc_server_transform.c
                ${PDC_SOURCE_DIR}/src/server/pdc_server_persist/pdc_server_persist.c
                ${PDC_SOURCE_DIR}/src/server/my_server_rpc/my_server_rpc.c
+               ${PDC_SOURCE_DIR}/src/server/pdc_monitor/cpu_monitor.c
                ${PDC_SOURCE_DIR}/src/utils/pdc_region_utils.c
                ${PDC_SOURCE_DIR}/src/utils/pdc_timing.c
                ${PDC_SOURCE_DIR}/src/utils/pdc_utils.c
