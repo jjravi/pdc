@@ -9,7 +9,7 @@
  * @struct pdc_persist_in_t
  * @brief This is a struct
  */
-MERCURY_GEN_PROC(pdc_persist_in_t, 
+MERCURY_GEN_PROC(pdc_persist_in_t,
   ((hg_bulk_t)(bulk_handle)) /// need for freeing.
   ((region_info_transfer_t)(remote_region))
   ((uint64_t)(obj_id))
@@ -27,7 +27,7 @@ MERCURY_GEN_PROC(pdc_persist_in_t,
  * @struct pdc_persist_in_t
  * @brief This is a struct
  */
-MERCURY_GEN_PROC(pdc_persist_out_t, 
+MERCURY_GEN_PROC(pdc_persist_out_t,
   ((int32_t)(ret)) /// return status code
 )
 

@@ -2,7 +2,8 @@
 
 extern "C"
 {
-#include "pdc_private.h"
+// #include "pdc_private.h"
+#include "pdc_public.h"
 #include "pdc_analysis.h"
 }
 

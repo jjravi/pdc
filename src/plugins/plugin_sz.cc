@@ -1,9 +1,9 @@
-#include "pdc.h"
-#include "pdc_private.h"
-
+// #include "pdc.h"
+// #include "pdc_private.h"
 extern "C"
 {
-  #include "pdc_utils.h"
+#include "pdc_public.h"
+#include "plugin_helper.h"
 }
 
 #include "SZ3/api/sz.hpp"

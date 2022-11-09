@@ -43,6 +43,17 @@ extern "C"
 
 #define NPARTICLES 8388608
 
+#include <sys/time.h>
+#include <time.h>
+
+// more precise timer
+inline double gettime_ms()
+{
+  struct timespec t;
+  clock_gettime(CLOCK_MONOTONIC_RAW, &t);
+  return (t.tv_sec+t.tv_nsec*1e-9)*1000;
+}
+
 double
 uniform_random_number()
 {
@@ -231,7 +242,6 @@ int main(int argc, char **argv)
     PDC_API_CALL(pdcTransferStart(transfer_request_py, transfers[4]));
     PDC_API_CALL(pdcTransferStart(transfer_request_pz, transfers[5]));
     PDC_API_CALL(pdcTransferStart(transfer_request_id1, transfers[6]));
-    PDC_API_CALL(pdcTransferStart(transfer_request_id2, transfers[7]));
 
     PDC_API_CALL(pdcTransferWait(transfers[0]));
     PDC_API_CALL(pdcTransferWait(transfers[1]));
@@ -240,7 +250,15 @@ int main(int argc, char **argv)
     PDC_API_CALL(pdcTransferWait(transfers[4]));
     PDC_API_CALL(pdcTransferWait(transfers[5]));
     PDC_API_CALL(pdcTransferWait(transfers[6]));
+
+    double start_time = gettime_ms();
+    PDC_API_CALL(pdcTransferStart(transfer_request_id2, transfers[7]));
     PDC_API_CALL(pdcTransferWait(transfers[7]));
+    double end_time = gettime_ms();
+    double diff_time = end_time - start_time;
+    double diff_time_s = diff_time / 1e3;
+    double bw_mbs = ((numparticles*sizeof(int))/1e6)/ diff_time_s;
+    printf("last transfer took: %lf s (%lf MB/s)\n", diff_time_s, bw_mbs);
 
     PDC_API_CALL(PDCregion_transfer_wait(transfer_request_x));
     PDC_API_CALL(PDCregion_transfer_wait(transfer_request_y));

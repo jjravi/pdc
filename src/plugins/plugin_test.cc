@@ -1,5 +1,9 @@
-#include "pdc.h"
-#include "pdc_private.h"
+// #include "pdc.h"
+extern "C"
+{
+#include "pdc_public.h"
+#include "plugin_helper.h"
+}
 
 #include <stdio.h>
 

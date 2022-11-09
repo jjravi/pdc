@@ -1,3 +1,5 @@
+# DYnamic Plugins are compiled separately from PDC.
+
 project(pdc_plugins C CXX CUDA)
 
 set(CMAKE_CUDA_ARCHITECTURES 60 61 62 70 72 75 80 86)
@@ -12,12 +14,20 @@ message(STATUS "HDF5_VERSION: ${HDF5_VERSION}")
 message(STATUS "HDF5_INCLUDE_DIR: ${HDF5_INCLUDE_DIR}")
 message(STATUS "HDF5_LIBRARIES: ${HDF5_LIBRARIES}")
 
+set(PDC_DIR $ENV{PDC_DIR})
+message(STATUS "PDC_DIR: ${PDC_DIR}")
+
+add_subdirectory(${CMAKE_SOURCE_DIR}/../../external/SZ3 EXCLUDE_FROM_ALL)
+
 include_directories(
-  ${PDC_SOURCE_DIR}
-  ${PDC_SOURCE_DIR}/src/client_api/include
+  ${CMAKE_SOURCE_DIR}/../../external/SZ3/include/
+  ${PDC_DIR}/../
+  ${PDC_DIR}/src/utils/include
+  ${PDC_DIR}/src/api/include
   $ENV{BLOSC_DIR}/include
   $ENV{HOME}/include
   ${HDF5_INCLUDE_DIR}
+  /opt/nvidia/nsight-systems/2022.4.1/target-linux-x64/nvtx/include
 )
 
 # enable_language(CXX)
@@ -53,22 +63,22 @@ include_directories(SYSTEM ${MPI_INCLUDE_PATH})
 ############################################################################
 
 add_library(pdc_server_transform_test SHARED server_plugin_test.cc)
-target_include_directories(pdc_server_transform_test PUBLIC ${PDC_SOURCE_DIR}/src/api/)
+target_include_directories(pdc_server_transform_test PUBLIC ${PDC_DIR}/include)
 target_link_libraries(pdc_server_transform_test pdc MPI::MPI_C MPI::MPI_CXX)
 target_link_libraries(pdc_server_transform_test "-Wl,--no-undefined")
 
 add_library(pdc_transform_test SHARED plugin_test.cc)
-target_include_directories(pdc_transform_test PUBLIC ${PDC_SOURCE_DIR}/src/api/)
+target_include_directories(pdc_transform_test PUBLIC ${PDC_DIR}/include/)
 target_link_libraries(pdc_transform_test pdc)
 
 add_library(pdc_transform_sz SHARED plugin_sz.cc)
-target_include_directories(pdc_transform_sz PUBLIC ${PDC_SOURCE_DIR}/src/api/)
+target_include_directories(pdc_transform_sz PUBLIC ${PDC_DIR}/include/)
 target_link_libraries(pdc_transform_sz pdc)
 target_link_libraries(pdc_transform_sz SZ3)
 target_link_libraries(pdc_transform_sz MPI::MPI_C MPI::MPI_CXX)
 
 add_library(pdc_transform_cusz SHARED plugin_cusz.cu)
-target_include_directories(pdc_transform_cusz PUBLIC ${PDC_SOURCE_DIR}/src/api/)
+target_include_directories(pdc_transform_cusz PUBLIC ${PDC_DIR}/include/)
 target_include_directories(pdc_transform_cusz PUBLIC ../../external/cuSZ/src)
 target_link_libraries(pdc_transform_cusz pdc)
 target_link_libraries(pdc_transform_cusz cusz compress argp huff sp pq) 
