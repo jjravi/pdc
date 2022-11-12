@@ -180,6 +180,7 @@ set(PDC_HEADERS
   ${PDC_SOURCE_DIR}/src/api/pdc_transform_old/include/pdc_transform_old.h
   ${PDC_SOURCE_DIR}/src/utils/include/pdc_timing.h
   ${PDC_SOURCE_DIR}/src/utils/include/pdc_interface.h
+  ${PDC_SOURCE_DIR}/src/utils/include/pdc_utils.h
   ${PROJECT_BINARY_DIR}/pdc_config_sys.h
   ${PROJECT_BINARY_DIR}/pdc_config.h
   )

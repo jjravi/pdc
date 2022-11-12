@@ -1,7 +1,6 @@
 #ifndef PDC_PERSIST_H
 #define PDC_PERSIST_H
 
-#include "pdc_private.h"
 #include "pdc_public.h"
 #include "pdc_obj.h"
 

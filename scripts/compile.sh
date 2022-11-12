@@ -1,0 +1,1 @@
+CC=gcc-11 CXX=g++-11 cmake -DCMAKE_CUDA_HOST_COMPILER=g++-11 -DCMAKE_INSTALL_PREFIX=`pwd`/install ..

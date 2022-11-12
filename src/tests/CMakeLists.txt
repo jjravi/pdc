@@ -14,10 +14,16 @@ include_directories(
   ${PDC_INCLUDES_BUILD_TIME}
   ${PROJECT_BINARY_DIR}
   ${PDC_SOURCE_DIR}
-  ${PDC_SOURCE_DIR}/src/client_api/include
+  ${PDC_SOURCE_DIR}/src/api/include
   $ENV{BLOSC_DIR}/include
   $ENV{HOME}/include
   ${HDF5_INCLUDE_DIR}
+  ../api/pdc_obj/include
+  ../api/pdc_region/include
+  ../api/pdc_query/include
+  ../api/pdc_analysis/include
+  ../api/pdc_transform_old/include
+  ../api/pdc_persist/include
 )
 
 include_directories(/global/homes/j/jjravi/cfs_m2621/sept2022/c-blosc/build/install/include)
@@ -195,7 +201,7 @@ OPTION(GEN_TRANSFORM_LIB "Create a transform library" ON)
 if(GEN_TRANSFORM_LIB)
   FIND_LIBRARY(BLOSC_LIBRARY blosc $ENV{BLOSC_DIR}/lib)
   set(PDC_TRANSFORMS_SRCS pdc_transforms_lib.c)
-  add_library(pdctransforms  ${PDC_TRANSFORMS_SRCS})
+  add_library(pdctransforms  SHARED ${PDC_TRANSFORMS_SRCS})
   target_link_libraries(pdctransforms pdc ${BLOSC_LIBRARY})
   # target_link_libraries(neon-read3d HDF5::HDF5)
   # target_link_libraries(neon-read3d ${HDF5_LIBRARIES})
@@ -209,7 +215,7 @@ endif()
 # Create a transform library for testing
 # *******************************************
 set(PDC_ANALYSIS_SRCS pdc_analysis_lib.c)
-add_library(pdcanalysis ${PDC_ANALYSIS_SRCS})
+add_library(pdcanalysis SHARED ${PDC_ANALYSIS_SRCS})
 target_include_directories(pdcanalysis PUBLIC ${PDC_SOURCE_DIR}/src/api/)
 target_link_libraries(pdcanalysis pdc)
 

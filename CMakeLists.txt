@@ -1,7 +1,7 @@
 # CMakeLists files in this project can
 # refer to the root source directory of the project as ${PDC_SOURCE_DIR} and
 # to the root binary directory of the project as ${PDC_BINARY_DIR}.
-cmake_minimum_required (VERSION 2.8.11)
+cmake_minimum_required (VERSION 3.12)
 
 # Setup cmake policies.
 foreach(p
@@ -180,7 +180,7 @@ endif()
 #------------------------------------------------------------------------------
 # Choose static or shared libraries.
 #------------------------------------------------------------------------------
-option(BUILD_SHARED_LIBS "Build with shared libraries." OFF)
+option(BUILD_SHARED_LIBS "Build with shared libraries." ON)
 
 #-------------------------------------------------------------------------------
 function(pdc_set_lib_options libtarget libname libtype)
@@ -435,15 +435,15 @@ set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --extended-lambda --expt-relaxed-const
 set(CMAKE_CUDA_STANDARD 17)
 set(CMAKE_CXX_STANDARD 17)
 
-add_subdirectory(external/cuSZ/ EXCLUDE_FROM_ALL)
-add_subdirectory(external/SZ3/ EXCLUDE_FROM_ALL)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/plugins)
+# add_subdirectory(external/cuSZ/ EXCLUDE_FROM_ALL)
+# add_subdirectory(external/SZ3/ EXCLUDE_FROM_ALL)
+# add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/plugins)
 ######################
 
 #-----------------------------------------------------------------------------
 # Testing
 #-----------------------------------------------------------------------------
-option(BUILD_TESTING "Build testing." OFF)
+option(BUILD_TESTING "Build testing." ON)
 option(BUILD_MPI_TESTING "Build MPI testing." OFF)
 if(NOT PDC_EXTERNALLY_CONFIGURED AND BUILD_TESTING)
   enable_testing()

@@ -4,6 +4,7 @@ extern "C"
 {
 #include "pdc_public.h"
 #include "plugin_helper.h"
+#include "pdc_utils.h"
 }
 
 #include "SZ3/api/sz.hpp"

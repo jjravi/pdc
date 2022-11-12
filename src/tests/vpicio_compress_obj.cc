@@ -195,9 +195,9 @@ int main(int argc, char **argv)
     // PDC_API_CALL( PDCbuf_map_transform_register("pdc_transform_increment", &id1[0], region_id1, obj_id11, region_id11, 0, INCR_STATE, DATA_OUT) );
     // PDC_API_CALL( PDCbuf_map_transform_register("pdc_transform_compress", &id1[0], region_id1, obj_id11, region_id11, 0, INCR_STATE, DATA_OUT) );
     // PDC_API_CALL( PDCbuf_map_transform_register("pdc_passthrough", &id1[0], region_id1, obj_id11, region_id11, 0, INCR_STATE, DATA_OUT) );
-    // PDC_API_CALL( PDCbuf_map_transform_register("pdc_passthrough:libpdc_transform_test.so", &id1[0], region_id1, obj_id11, region_id11, 0, INCR_STATE, DATA_OUT) );
+    PDC_API_CALL( PDCbuf_map_transform_register("pdc_passthrough:libpdc_transform_test.so", &id1[0], region_id1, obj_id11, region_id11, 0, INCR_STATE, DATA_OUT) );
     // PDC_API_CALL( PDCbuf_map_transform_register("pdc_sz_compress:libpdc_transform_sz.so", &id1[0], region_id1, obj_id11, region_id11, 0, INCR_STATE, DATA_OUT) );
-    PDC_API_CALL( PDCbuf_map_transform_register("pdc_sz_compress:libpdc_transform_sz.so", &x[0], region_x, obj_xx, region_xx, 0, INCR_STATE, DATA_OUT) );
+    // PDC_API_CALL( PDCbuf_map_transform_register("pdc_sz_compress:libpdc_transform_sz.so", &x[0], region_x, obj_xx, region_xx, 0, INCR_STATE, DATA_OUT) );
 
     PDC_API_CALL( PDCbuf_obj_map(&x[0], PDC_FLOAT, region_x, obj_xx, region_xx) );
     PDC_API_CALL( PDCbuf_obj_map(&y[0], PDC_FLOAT, region_y, obj_yy, region_yy) );

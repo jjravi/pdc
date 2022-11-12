@@ -25,7 +25,8 @@ set(CMAKE_CXX_COMPILER g++-11)
 ## TODO flag only add to a specific library, e.g. suppressing deprecation on CUDA10 cuSPARSE
 set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --extended-lambda --expt-relaxed-constexpr -Wno-deprecated-declarations")
 
-set(LIB_TYPE STATIC)
+# set(LIB_TYPE STATIC)
+set(LIB_TYPE SHARED)
 
 add_library(pq ${LIB_TYPE} src/component/extrap_lorenzo.cu src/component/interp_spline3.cu)
 add_library(argp ${LIB_TYPE} src/context.cc)
