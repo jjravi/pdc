@@ -190,13 +190,13 @@ static hg_return_t pdc_persist_handler(hg_handle_t handle)
   // set up state structure
   struct pdc_persist_state *pdc_persist_state_p = malloc(sizeof(*pdc_persist_state_p));
   assert(pdc_persist_state_p);
-  pdc_persist_state_p->size = 512;
   pdc_persist_state_p->handle = handle;
 
   // decode input
   HG_API_CALL(HG_Get_input(handle, &pdc_persist_state_p->in));
 
   // This includes allocating a target buffer for bulk transfer
+  pdc_persist_state_p->size = pdc_persist_state_p->in.buf_size;
   pdc_persist_state_p->data_buffer = malloc(pdc_persist_state_p->in.buf_size);
   assert(pdc_persist_state_p->data_buffer);
 

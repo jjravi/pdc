@@ -8,6 +8,4 @@ perr_t pdcTransferCreate(pdcid_t *transfer_id, pdcid_t *legacy_id, void *buf, pd
 perr_t pdcTransferStart(pdcid_t transfer_id, pdcid_t transfer_request_id);
 perr_t pdcTransferWait(pdcid_t transfer_id);
 
-void wait_my_rpc();
-
 #endif /* PDC_PERSIST_H */

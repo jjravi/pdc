@@ -12,5 +12,7 @@
  */
 int PDC_get_var_type_size(pdc_var_type_t dtype);
 
+void print_symbols();
+
 #endif /* PDC_UTILS_H */
 

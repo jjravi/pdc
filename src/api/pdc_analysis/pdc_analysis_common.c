@@ -55,7 +55,7 @@ extern hg_thread_pool_t *hg_test_thread_pool_fs_g;
 static inline int
 compare_gt(int *a, int b)
 {
-    return (*a) > (b);
+  return (*a) > (b);
 }
 struct _pdc_region_analysis_ftn_info ** pdc_region_analysis_registry  = NULL;
 struct _pdc_region_transform_ftn_info **pdc_region_transform_registry = NULL;
@@ -64,23 +64,23 @@ struct _pdc_region_transform_ftn_info **pdc_region_transform_registry = NULL;
 // Dummy function for client to compile, real function is used only by server and code is in pdc_server.c
 perr_t
 PDC_Server_instantiate_data_iterator(obj_data_iterator_in_t *in   ATTRIBUTE(unused),
-                                     obj_data_iterator_out_t *out ATTRIBUTE(unused))
+  obj_data_iterator_out_t *out ATTRIBUTE(unused))
 {
-    return SUCCEED;
+  return SUCCEED;
 }
 void *
 PDC_Server_get_ftn_reference(char *ftn ATTRIBUTE(unused))
 {
-    return NULL;
+  return NULL;
 }
 int
 PDC_get_analysis_registry(struct _pdc_region_analysis_ftn_info ***registry)
 {
-    if (registry) {
-        *registry = pdc_region_analysis_registry;
-        return hg_atomic_get32(&registered_analysis_ftn_count_g);
-    }
-    return 0;
+  if (registry) {
+    *registry = pdc_region_analysis_registry;
+    return hg_atomic_get32(&registered_analysis_ftn_count_g);
+  }
+  return 0;
 };
 #endif
 
@@ -88,91 +88,91 @@ PDC_get_analysis_registry(struct _pdc_region_analysis_ftn_info ***registry)
 static int
 pdc_analysis_registry_init_(size_t newSize)
 {
-    int                                    ret_value = 0;
-    struct _pdc_region_analysis_ftn_info **new_registry;
+  int                                    ret_value = 0;
+  struct _pdc_region_analysis_ftn_info **new_registry;
 
-    FUNC_ENTER(NULL);
+  FUNC_ENTER(NULL);
 
-    if (pdc_region_analysis_registry == NULL) {
-        new_registry = (struct _pdc_region_analysis_ftn_info **)calloc(sizeof(void *), newSize);
-        if (new_registry) {
-            hg_atomic_init32(&registered_analysis_ftn_count_g, 0);
-            pdc_region_analysis_registry = new_registry;
-            analysis_registry_size       = newSize;
-            PGOTO_DONE(newSize);
-        }
+  if (pdc_region_analysis_registry == NULL) {
+    new_registry = (struct _pdc_region_analysis_ftn_info **)calloc(sizeof(void *), newSize);
+    if (new_registry) {
+      hg_atomic_init32(&registered_analysis_ftn_count_g, 0);
+      pdc_region_analysis_registry = new_registry;
+      analysis_registry_size       = newSize;
+      PGOTO_DONE(newSize);
     }
-    else if (newSize > analysis_registry_size) {
-        new_registry = (struct _pdc_region_analysis_ftn_info **)calloc(sizeof(void *), newSize);
-        if (new_registry) {
-            size_t copysize = analysis_registry_size * sizeof(void *);
-            memcpy(new_registry, pdc_region_analysis_registry, copysize);
-            free(pdc_region_analysis_registry);
-            pdc_region_analysis_registry = new_registry;
-            analysis_registry_size       = newSize;
-            PGOTO_DONE(newSize);
-        }
+  }
+  else if (newSize > analysis_registry_size) {
+    new_registry = (struct _pdc_region_analysis_ftn_info **)calloc(sizeof(void *), newSize);
+    if (new_registry) {
+      size_t copysize = analysis_registry_size * sizeof(void *);
+      memcpy(new_registry, pdc_region_analysis_registry, copysize);
+      free(pdc_region_analysis_registry);
+      pdc_region_analysis_registry = new_registry;
+      analysis_registry_size       = newSize;
+      PGOTO_DONE(newSize);
     }
+  }
 
 done:
-    FUNC_LEAVE(ret_value);
+  FUNC_LEAVE(ret_value);
 }
 
 static int
 pdc_transform_registry_init_(size_t newSize)
 {
-    int                                     ret_value = 0;
-    struct _pdc_region_transform_ftn_info **new_registry;
-    size_t                                  copysize;
+  int                                     ret_value = 0;
+  struct _pdc_region_transform_ftn_info **new_registry;
+  size_t                                  copysize;
 
-    FUNC_ENTER(NULL);
+  FUNC_ENTER(NULL);
 
-    if (pdc_region_transform_registry == NULL) {
-        new_registry = (struct _pdc_region_transform_ftn_info **)calloc(sizeof(void *), newSize);
-        if (new_registry) {
-            hg_atomic_init32(&registered_transform_ftn_count_g, 0);
-            pdc_region_transform_registry = new_registry;
-            transform_registry_size       = newSize;
-            PGOTO_DONE(newSize);
-        }
+  if (pdc_region_transform_registry == NULL) {
+    new_registry = (struct _pdc_region_transform_ftn_info **)calloc(sizeof(void *), newSize);
+    if (new_registry) {
+      hg_atomic_init32(&registered_transform_ftn_count_g, 0);
+      pdc_region_transform_registry = new_registry;
+      transform_registry_size       = newSize;
+      PGOTO_DONE(newSize);
     }
-    else if (newSize > transform_registry_size) {
-        new_registry = (struct _pdc_region_transform_ftn_info **)calloc(sizeof(void *), newSize);
-        if (new_registry) {
-            copysize = transform_registry_size * sizeof(void *);
-            memcpy(new_registry, pdc_region_transform_registry, copysize);
-            free(pdc_region_transform_registry);
-            pdc_region_transform_registry = new_registry;
-            transform_registry_size       = newSize;
-            PGOTO_DONE(newSize);
-        }
+  }
+  else if (newSize > transform_registry_size) {
+    new_registry = (struct _pdc_region_transform_ftn_info **)calloc(sizeof(void *), newSize);
+    if (new_registry) {
+      copysize = transform_registry_size * sizeof(void *);
+      memcpy(new_registry, pdc_region_transform_registry, copysize);
+      free(pdc_region_transform_registry);
+      pdc_region_transform_registry = new_registry;
+      transform_registry_size       = newSize;
+      PGOTO_DONE(newSize);
     }
+  }
 
 done:
-    FUNC_LEAVE(ret_value);
+  FUNC_LEAVE(ret_value);
 }
 
 int
 pdc_analysis_registry_finalize_()
 {
-    int               ret_value = 0;
-    hg_atomic_int32_t i;
+  int               ret_value = 0;
+  hg_atomic_int32_t i;
 
-    FUNC_ENTER(NULL);
+  FUNC_ENTER(NULL);
 
-    if ((pdc_region_analysis_registry != NULL) && (analysis_registry_size > 0)) {
-        while (hg_atomic_get32(&i) > 0) {
-            if (pdc_region_analysis_registry[i - 1])
-                free(pdc_region_analysis_registry[i - 1]);
-            pdc_region_analysis_registry[i - 1] = NULL;
-            hg_atomic_decr32(&i);
-        }
-        free(pdc_region_analysis_registry);
-        analysis_registry_size = 0;
-        hg_atomic_init32(&registered_analysis_ftn_count_g, 0);
+  if ((pdc_region_analysis_registry != NULL) && (analysis_registry_size > 0)) {
+    while (hg_atomic_get32(&i) > 0) {
+      if (pdc_region_analysis_registry[i - 1])
+        free(pdc_region_analysis_registry[i - 1]);
+      pdc_region_analysis_registry[i - 1] = NULL;
+      hg_atomic_decr32(&i);
     }
+    free(pdc_region_analysis_registry);
+    analysis_registry_size = 0;
+    hg_atomic_init32(&registered_analysis_ftn_count_g, 0);
+  }
 
-    FUNC_LEAVE(ret_value);
+  FUNC_LEAVE(ret_value);
 }
 
 int
@@ -201,95 +201,95 @@ done:
 int
 PDC_add_analysis_ptr_to_registry_(struct _pdc_region_analysis_ftn_info *ftn_infoPtr)
 {
-    int    ret_value             = 0;
-    size_t initial_registry_size = 64;
-    size_t i, currentCount;
-    int    registry_index;
+  int    ret_value             = 0;
+  size_t initial_registry_size = 64;
+  size_t i, currentCount;
+  int    registry_index;
 
-    FUNC_ENTER(NULL);
+  FUNC_ENTER(NULL);
 
-    if (analysis_registry_size == 0) {
-        if (pdc_analysis_registry_init_(initial_registry_size) == 0) {
-            perror("Unable to initialize analysis registry!");
-            PGOTO_DONE(-1);
-        }
+  if (analysis_registry_size == 0) {
+    if (pdc_analysis_registry_init_(initial_registry_size) == 0) {
+      perror("Unable to initialize analysis registry!");
+      PGOTO_DONE(-1);
     }
-    currentCount = (size_t)hg_atomic_get32(&registered_analysis_ftn_count_g);
-    if (currentCount == analysis_registry_size) {
-        if (pdc_analysis_registry_init_(analysis_registry_size * 2) == 0) {
-            perror("memory allocation failed");
-            PGOTO_DONE(-1);
-        }
+  }
+  currentCount = (size_t)hg_atomic_get32(&registered_analysis_ftn_count_g);
+  if (currentCount == analysis_registry_size) {
+    if (pdc_analysis_registry_init_(analysis_registry_size * 2) == 0) {
+      perror("memory allocation failed");
+      PGOTO_DONE(-1);
     }
-    /* If the new function is already registered
-     * simply return the OLD index.
-     */
-    for (i = 0; i < currentCount; i++) {
-        if (ftn_infoPtr->ftnPtr == pdc_region_analysis_registry[i]->ftnPtr) {
-            PGOTO_DONE((int)i); /* Found match */
-        }
+  }
+  /* If the new function is already registered
+   * simply return the OLD index.
+   */
+  for (i = 0; i < currentCount; i++) {
+    if (ftn_infoPtr->ftnPtr == pdc_region_analysis_registry[i]->ftnPtr) {
+      PGOTO_DONE((int)i); /* Found match */
     }
-    registry_index = hg_atomic_get32(&registered_analysis_ftn_count_g);
-    hg_atomic_incr32(&registered_analysis_ftn_count_g);
-    pdc_region_analysis_registry[registry_index] = ftn_infoPtr;
+  }
+  registry_index = hg_atomic_get32(&registered_analysis_ftn_count_g);
+  hg_atomic_incr32(&registered_analysis_ftn_count_g);
+  pdc_region_analysis_registry[registry_index] = ftn_infoPtr;
 
-    ret_value = registry_index;
+  ret_value = registry_index;
 
 done:
-    FUNC_LEAVE(ret_value);
+  FUNC_LEAVE(ret_value);
 }
 
 int
 PDCiter_get_nextId(void)
 {
-    int                        ret_value              = 0;
-    size_t                     nextId                 = 0;
-    int *                      previous_i_cache_freed = 0;
-    int                        next_free              = 0;
-    struct _pdc_iterator_info *previous_state;
+  int                        ret_value              = 0;
+  size_t                     nextId                 = 0;
+  int *                      previous_i_cache_freed = 0;
+  int                        next_free              = 0;
+  struct _pdc_iterator_info *previous_state;
 
-    FUNC_ENTER(NULL);
+  FUNC_ENTER(NULL);
 
-    if (PDC_Block_iterator_cache == NULL) {
-        PDC_Block_iterator_cache =
-            (struct _pdc_iterator_info *)calloc(iterator_cache_entries, sizeof(struct _pdc_iterator_info));
-        if (PDC_Block_iterator_cache == NULL)
-            PGOTO_ERROR(-1, "calloc failed");
+  if (PDC_Block_iterator_cache == NULL) {
+    PDC_Block_iterator_cache =
+      (struct _pdc_iterator_info *)calloc(iterator_cache_entries, sizeof(struct _pdc_iterator_info));
+    if (PDC_Block_iterator_cache == NULL)
+      PGOTO_ERROR(-1, "calloc failed");
 
-        i_cache_freed = (int *)calloc(iterator_cache_entries, sizeof(int));
-        /* Index 0 is NOT-USED other than to indicate an empty iterator */
-        hg_atomic_init32(&i_cache_index, 1);
-        hg_atomic_init32(&i_free_index, 0);
-    }
+    i_cache_freed = (int *)calloc(iterator_cache_entries, sizeof(int));
+    /* Index 0 is NOT-USED other than to indicate an empty iterator */
+    hg_atomic_init32(&i_cache_index, 1);
+    hg_atomic_init32(&i_free_index, 0);
+  }
 
-    if (hg_atomic_get32(&i_free_index) > 0) {
-        next_free = hg_atomic_decr32(&i_free_index);
-        nextId    = i_cache_freed[next_free];
-    }
-    else {
-        next_free = hg_atomic_incr32(&i_cache_index);
-        nextId    = next_free - 1; /* use the "current" index */
-    }
+  if (hg_atomic_get32(&i_free_index) > 0) {
+    next_free = hg_atomic_decr32(&i_free_index);
+    nextId    = i_cache_freed[next_free];
+  }
+  else {
+    next_free = hg_atomic_incr32(&i_cache_index);
+    nextId    = next_free - 1; /* use the "current" index */
+  }
 
-    if (nextId == iterator_cache_entries) {
-        /* Realloc the cache and free list */
-        previous_i_cache_freed   = i_cache_freed;
-        previous_state           = PDC_Block_iterator_cache;
-        PDC_Block_iterator_cache = (struct _pdc_iterator_info *)calloc(iterator_cache_entries * 2,
-                                                                       sizeof(struct _pdc_iterator_info));
-        memcpy(PDC_Block_iterator_cache, previous_state,
-               iterator_cache_entries * sizeof(struct _pdc_iterator_info));
-        i_cache_freed = (int *)calloc(iterator_cache_entries * 2, sizeof(int));
-        memcpy(i_cache_freed, previous_i_cache_freed, iterator_cache_entries * sizeof(int));
-        iterator_cache_entries *= 2;
-        free(previous_i_cache_freed);
-        free(previous_state);
-    }
+  if (nextId == iterator_cache_entries) {
+    /* Realloc the cache and free list */
+    previous_i_cache_freed   = i_cache_freed;
+    previous_state           = PDC_Block_iterator_cache;
+    PDC_Block_iterator_cache = (struct _pdc_iterator_info *)calloc(iterator_cache_entries * 2,
+      sizeof(struct _pdc_iterator_info));
+    memcpy(PDC_Block_iterator_cache, previous_state,
+      iterator_cache_entries * sizeof(struct _pdc_iterator_info));
+    i_cache_freed = (int *)calloc(iterator_cache_entries * 2, sizeof(int));
+    memcpy(i_cache_freed, previous_i_cache_freed, iterator_cache_entries * sizeof(int));
+    iterator_cache_entries *= 2;
+    free(previous_i_cache_freed);
+    free(previous_state);
+  }
 
-    ret_value = nextId;
+  ret_value = nextId;
 
 done:
-    FUNC_LEAVE(ret_value);
+  FUNC_LEAVE(ret_value);
 }
 
 /*
@@ -321,97 +321,97 @@ done:
 int
 PDC_get_transforms(struct _pdc_region_transform_ftn_info ***registry)
 {
-    int ret_value = 0;
+  int ret_value = 0;
 
-    FUNC_ENTER(NULL);
+  FUNC_ENTER(NULL);
 
-    if (registry) {
-        *registry = pdc_region_transform_registry;
-        PGOTO_DONE(hg_atomic_get32(&registered_transform_ftn_count_g));
-    }
+  if (registry) {
+    *registry = pdc_region_transform_registry;
+    PGOTO_DONE(hg_atomic_get32(&registered_transform_ftn_count_g));
+  }
 
 done:
-    FUNC_LEAVE(ret_value);
+  FUNC_LEAVE(ret_value);
 }
 
 int
 PDC_add_transform_ptr_to_registry_(struct _pdc_region_transform_ftn_info *ftn_infoPtr)
 {
-    int    ret_value             = 0;
-    size_t initial_registry_size = 64;
-    size_t i, currentCount;
-    int    registry_index;
+  int    ret_value             = 0;
+  size_t initial_registry_size = 64;
+  size_t i, currentCount;
+  int    registry_index;
 
-    FUNC_ENTER(NULL);
+  FUNC_ENTER(NULL);
 
-    if (transform_registry_size == 0) {
-        if (pdc_transform_registry_init_(initial_registry_size) == 0)
-            PGOTO_ERROR(-1, "Unable to initialize transform registry!");
+  if (transform_registry_size == 0) {
+    if (pdc_transform_registry_init_(initial_registry_size) == 0)
+      PGOTO_ERROR(-1, "Unable to initialize transform registry!");
+  }
+  currentCount = (size_t)hg_atomic_get32(&registered_transform_ftn_count_g);
+  if (currentCount == transform_registry_size) {
+    if (pdc_transform_registry_init_(transform_registry_size * 2) == 0)
+      PGOTO_ERROR(-1, "memory allocation failed");
+  }
+  /* If the new function is already registered
+   * simply return the OLD index.
+   */
+  for (i = 0; i < currentCount; i++) {
+    if ((ftn_infoPtr->ftnPtr == pdc_region_transform_registry[i]->ftnPtr) &&
+      (ftn_infoPtr->object_id == pdc_region_transform_registry[i]->object_id)) {
+      PGOTO_DONE((int)i); /* Found match */
     }
-    currentCount = (size_t)hg_atomic_get32(&registered_transform_ftn_count_g);
-    if (currentCount == transform_registry_size) {
-        if (pdc_transform_registry_init_(transform_registry_size * 2) == 0)
-            PGOTO_ERROR(-1, "memory allocation failed");
-    }
-    /* If the new function is already registered
-     * simply return the OLD index.
-     */
-    for (i = 0; i < currentCount; i++) {
-        if ((ftn_infoPtr->ftnPtr == pdc_region_transform_registry[i]->ftnPtr) &&
-            (ftn_infoPtr->object_id == pdc_region_transform_registry[i]->object_id)) {
-            PGOTO_DONE((int)i); /* Found match */
-        }
-    }
+  }
 
-    registry_index = hg_atomic_get32(&registered_transform_ftn_count_g);
-    hg_atomic_incr32(&registered_transform_ftn_count_g);
-    pdc_region_transform_registry[registry_index] = ftn_infoPtr;
+  registry_index = hg_atomic_get32(&registered_transform_ftn_count_g);
+  hg_atomic_incr32(&registered_transform_ftn_count_g);
+  pdc_region_transform_registry[registry_index] = ftn_infoPtr;
 
-    ret_value = registry_index;
+  ret_value = registry_index;
 
 done:
-    FUNC_LEAVE(ret_value);
+  FUNC_LEAVE(ret_value);
 }
 
 int
 PDC_update_transform_server_meta_index(int client_index, int meta_index)
 {
-    int                                    ret_value = 0;
-    struct _pdc_region_transform_ftn_info *ftnPtr;
+  int                                    ret_value = 0;
+  struct _pdc_region_transform_ftn_info *ftnPtr;
 
-    FUNC_ENTER(NULL);
+  FUNC_ENTER(NULL);
 
-    if (client_index < registered_transform_ftn_count_g) {
-        ftnPtr             = pdc_region_transform_registry[client_index];
-        ftnPtr->meta_index = meta_index;
-    }
-    else
-        PGOTO_ERROR(-1, "Bad client index(%d)", client_index);
+  if (client_index < registered_transform_ftn_count_g) {
+    ftnPtr             = pdc_region_transform_registry[client_index];
+    ftnPtr->meta_index = meta_index;
+  }
+  else
+    PGOTO_ERROR(-1, "Bad client index(%d)", client_index);
 
 done:
-    FUNC_LEAVE(ret_value);
+  FUNC_LEAVE(ret_value);
 }
 
 void
 PDC_set_execution_locus(_pdc_loci_t locus_identifier)
 {
-    FUNC_ENTER(NULL);
+  FUNC_ENTER(NULL);
 
-    execution_locus = locus_identifier;
+  execution_locus = locus_identifier;
 
-    FUNC_LEAVE_VOID;
+  FUNC_LEAVE_VOID;
 }
 
 _pdc_loci_t
 PDC_get_execution_locus()
 {
-    _pdc_loci_t ret_value = 0;
+  _pdc_loci_t ret_value = 0;
 
-    FUNC_ENTER(NULL);
+  FUNC_ENTER(NULL);
 
-    ret_value = execution_locus;
+  ret_value = execution_locus;
 
-    FUNC_LEAVE(ret_value);
+  FUNC_LEAVE(ret_value);
 }
 
 // analysis_ftn_cb(hg_handle_t handle)
@@ -509,24 +509,24 @@ done:
 // obj_data_iterator_cb(hg_handle_t handle)
 HG_TEST_RPC_CB(obj_data_iterator, handle)
 {
-    hg_return_t             ret_value = HG_SUCCESS;
-    obj_data_iterator_in_t  in;
-    obj_data_iterator_out_t out;
+  hg_return_t             ret_value = HG_SUCCESS;
+  obj_data_iterator_in_t  in;
+  obj_data_iterator_out_t out;
 
-    FUNC_ENTER(NULL);
+  FUNC_ENTER(NULL);
 
-    memset(&in, 0, sizeof(in));
-    // Decode input
-    HG_Get_input(handle, &in);
-    // printf("obj_data_iterator_cb entered!\n");
-    ret_value = PDC_Server_instantiate_data_iterator(&in, &out);
+  memset(&in, 0, sizeof(in));
+  // Decode input
+  HG_Get_input(handle, &in);
+  // printf("obj_data_iterator_cb entered!\n");
+  ret_value = PDC_Server_instantiate_data_iterator(&in, &out);
 
-    HG_Respond(handle, NULL, NULL, &out);
+  HG_Respond(handle, NULL, NULL, &out);
 
-    HG_Free_input(handle, &in);
-    HG_Destroy(handle);
+  HG_Free_input(handle, &in);
+  HG_Destroy(handle);
 
-    FUNC_LEAVE(ret_value);
+  FUNC_LEAVE(ret_value);
 }
 
 HG_TEST_THREAD_CB(obj_data_iterator)
@@ -535,74 +535,74 @@ HG_TEST_THREAD_CB(analysis_ftn)
 hg_id_t
 PDC_analysis_ftn_register(hg_class_t *hg_class)
 {
-    hg_id_t ret_value;
+  hg_id_t ret_value;
 
-    FUNC_ENTER(NULL);
+  FUNC_ENTER(NULL);
 
-    ret_value =
-        MERCURY_REGISTER(hg_class, "analysis_ftn", analysis_ftn_in_t, analysis_ftn_out_t, analysis_ftn_cb);
+  ret_value =
+    MERCURY_REGISTER(hg_class, "analysis_ftn", analysis_ftn_in_t, analysis_ftn_out_t, analysis_ftn_cb);
 
-    FUNC_LEAVE(ret_value);
+  FUNC_LEAVE(ret_value);
 }
 
 hg_id_t
 PDC_obj_data_iterator_register(hg_class_t *hg_class)
 {
-    hg_id_t ret_value;
+  hg_id_t ret_value;
 
-    FUNC_ENTER(NULL);
+  FUNC_ENTER(NULL);
 
-    ret_value = MERCURY_REGISTER(hg_class, "obj_data_iterator", obj_data_iterator_in_t,
-                                 obj_data_iterator_out_t, obj_data_iterator_cb);
+  ret_value = MERCURY_REGISTER(hg_class, "obj_data_iterator", obj_data_iterator_in_t,
+    obj_data_iterator_out_t, obj_data_iterator_cb);
 
-    FUNC_LEAVE(ret_value);
+  FUNC_LEAVE(ret_value);
 }
 
 void
 PDC_free_analysis_registry()
 {
-    int index;
+  int index;
 
-    FUNC_ENTER(NULL);
+  FUNC_ENTER(NULL);
 
-    if (pdc_region_analysis_registry && (registered_analysis_ftn_count_g > 0)) {
-        for (index = 0; index < registered_analysis_ftn_count_g; index++) {
-            free(pdc_region_analysis_registry[index]);
-        }
-        free(pdc_region_analysis_registry);
-        pdc_region_analysis_registry = NULL;
+  if (pdc_region_analysis_registry && (registered_analysis_ftn_count_g > 0)) {
+    for (index = 0; index < registered_analysis_ftn_count_g; index++) {
+      free(pdc_region_analysis_registry[index]);
     }
+    free(pdc_region_analysis_registry);
+    pdc_region_analysis_registry = NULL;
+  }
 
-    FUNC_LEAVE_VOID;
+  FUNC_LEAVE_VOID;
 }
 
 void
 PDC_free_transform_registry()
 {
-    int index;
+  int index;
 
-    FUNC_ENTER(NULL);
+  FUNC_ENTER(NULL);
 
-    if (pdc_region_transform_registry && (registered_transform_ftn_count_g > 0)) {
-        for (index = 0; index < registered_transform_ftn_count_g; index++) {
-            free(pdc_region_transform_registry[index]);
-        }
-        free(pdc_region_transform_registry);
-        pdc_region_transform_registry = NULL;
+  if (pdc_region_transform_registry && (registered_transform_ftn_count_g > 0)) {
+    for (index = 0; index < registered_transform_ftn_count_g; index++) {
+      free(pdc_region_transform_registry[index]);
     }
+    free(pdc_region_transform_registry);
+    pdc_region_transform_registry = NULL;
+  }
 
-    FUNC_LEAVE_VOID;
+  FUNC_LEAVE_VOID;
 }
 
 void
 PDC_free_iterator_cache()
 {
 
-    FUNC_ENTER(NULL);
+  FUNC_ENTER(NULL);
 
-    if (PDC_Block_iterator_cache != NULL)
-        free(PDC_Block_iterator_cache);
-    PDC_Block_iterator_cache = NULL;
+  if (PDC_Block_iterator_cache != NULL)
+    free(PDC_Block_iterator_cache);
+  PDC_Block_iterator_cache = NULL;
 
-    FUNC_LEAVE_VOID;
+  FUNC_LEAVE_VOID;
 }

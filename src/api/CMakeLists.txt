@@ -24,6 +24,7 @@ set( LOCAL_INCLUDE_DIR
   ${PDC_SOURCE_DIR}/src/api/pdc_analysis/include
   ${PDC_SOURCE_DIR}/src/api/profiling/include
   ${PDC_SOURCE_DIR}/src/utils/include
+  ${PDC_SOURCE_DIR}/src/utils
 
   ${PDC_SOURCE_DIR}/src/api/my_rpc/include
   ${PDC_SOURCE_DIR}/src/api/pdc_persist/include
@@ -104,6 +105,8 @@ set(PDC_SRCS
   ${PDC_SOURCE_DIR}/src/utils/pdc_region_utils.c
   ${PDC_SOURCE_DIR}/src/utils/pdc_utils.c
   ${PDC_SOURCE_DIR}/src/utils/rpc_engine.c
+  ${PDC_SOURCE_DIR}/src/utils/symbols.c
+  ${PDC_SOURCE_DIR}/src/utils/list.c
 
   ${PDC_SOURCE_DIR}/src/utils/compare-int.c
   ${PDC_SOURCE_DIR}/src/utils/compare-string.c

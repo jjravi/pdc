@@ -6,8 +6,113 @@
 #include <dirent.h>
 #include <sys/stat.h>
 
-char *
-remove_relative_dirs(char *workingDir, char *application)
+#define log(M, ...) fprintf(stdout, "[%s:%d] " M "\n", strrchr(__FILE__, '/') > 0 \
+  ? strrchr(__FILE__, '/') + 1 : __FILE__ , __LINE__, ##__VA_ARGS__); 
+#define error(M, ...) fprintf(stderr, "[%s:%d] " M " %s\n", strrchr(__FILE__, '/') > 0 \
+  ? strrchr(__FILE__, '/') + 1 : __FILE__ , __LINE__, ##__VA_ARGS__, strerror(errno)); 
+
+#define _GNU_SOURCE
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <limits.h>
+#include <fcntl.h>
+#include <stdlib.h>
+#include <alloca.h>
+#include <string.h>
+#include <dlfcn.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/mman.h>
+#include <link.h>
+#include <dlfcn.h>
+#include <sys/wait.h>
+#include <signal.h>
+#include <errno.h>
+
+#include "list.h"
+// #include "tmplibrary.h"
+// #include "debug.h"
+
+#ifdef Linux
+#include "memfd.h"
+#endif
+
+// #include "decompress.h"
+
+extern char **environ;
+
+/*
+
+   So.. We don't want to bother with reflective bla-bla-bla. Just
+   upload buffer to temporary file, load it as a library using standard
+   glibc calls, then delete
+
+ */
+
+static inline
+const char *gettemptpl() {
+  static const char *templates[] = {
+#ifdef Linux
+    "/dev/shm/XXXXXX",
+    "/run/shm/XXXXXX",
+    "/run/",
+#endif
+    "/tmp/XXXXXX",
+    "/var/tmp/XXXXXX",
+    NULL
+  };
+
+  static const char *tmpdir = NULL;
+  if (! tmpdir) {
+    int i;
+    for (i=0; templates[i]; i++) {
+      char *buf = alloca(strlen(templates[i]+1));
+      strcpy(buf, templates[i]);
+      int fd = mkstemp(buf);
+      int found = 0;
+      if (fd != -1) {
+        int page_size = sysconf(_SC_PAGESIZE);
+        if (ftruncate(fd, page_size) != -1) {
+          void *map = mmap(
+            NULL,
+            page_size,
+            PROT_READ|PROT_EXEC,
+#ifdef Linux
+            MAP_PRIVATE|MAP_DENYWRITE,
+#else
+            MAP_PRIVATE,
+#endif
+            fd,
+            0
+            );
+          if (map != MAP_FAILED) {
+            munmap(map, page_size);
+            found = 1;
+          } else {
+            printf("Couldn't use %s -> %m\n", buf);
+          }
+        }
+
+        unlink(buf);
+        close(fd);
+
+        if (found) {
+          tmpdir = templates[i];
+          break;
+        }
+      }
+      printf("TRY: %s -> %d (%m)\n", buf, fd);
+
+    }
+    if (!tmpdir) {
+      abort();
+    }
+  }
+
+  return tmpdir;
+}
+
+char *remove_relative_dirs(char *workingDir, char *application)
 {
   char *ret_value = NULL;
   int   k, levels_up = 0;
@@ -36,8 +141,7 @@ remove_relative_dirs(char *workingDir, char *application)
   FUNC_LEAVE(ret_value);
 }
 
-char *
-PDC_find_in_path(char *workingDir, char *application)
+char *PDC_find_in_path(char *workingDir, char *application)
 {
   struct stat fileStat;
   char *      ret_value = NULL;
@@ -103,8 +207,7 @@ done:
  *         environment variables.
  */
 
-char *
-PDC_get_argv0_()
+char *PDC_get_argv0_()
 {
   char *       ret_value          = NULL;
   static char *_argv0             = NULL;
@@ -173,8 +276,7 @@ done:
   FUNC_LEAVE(ret_value);
 }
 
-char *
-PDC_get_realpath(char *fname, char *app_path)
+char *PDC_get_realpath(char *fname, char *app_path)
 {
   char *ret_value = NULL;
   int   notreadable;
@@ -199,8 +301,88 @@ done:
   FUNC_LEAVE(ret_value);
 }
 
-int
-PDC_get_ftnPtr_(const char *ftn, const char *loadpath, void **ftnPtr)
+
+#define _GNU_SOURCE
+#include <stdlib.h>
+#include <stdio.h>
+#include <dlfcn.h>
+#include <errno.h>
+#include "symbols.h"
+
+typedef struct {
+  void * data;
+  int size;
+  int current;
+} lib_t;
+
+lib_t libdata;
+
+static bool load_library_from_file(char * path, lib_t *libdata) {
+  struct stat st;
+  FILE * file;
+  size_t read;
+
+  if ( stat(path, &st) < 0 ) {
+    error("failed to stat");
+    return false;
+  }
+
+  log("lib size is %zu", st.st_size); 
+
+  libdata->size = st.st_size;
+  libdata->data = malloc( st.st_size );
+  libdata->current = 0;
+
+  file = fopen(path, "r");
+
+  read = fread(libdata->data, 1, st.st_size, file); 
+  log("read %zu bytes", read);
+
+  fclose(file);
+
+  return true;
+}
+
+static int my_func(const char *libpath, const char *libname, const char *objname,
+  const void *addr, const size_t size,
+  const symbol_bind binding, const symbol_type type,
+  void *custom __attribute__((unused)))
+{
+  printf("%s (%s):", libpath, libname);
+
+  if (*objname)
+    printf(" %s:", objname);
+  else
+    printf(" unnamed");
+
+  if (size > 0)
+    printf(" %zu-byte", size);
+
+  if (binding == LOCAL_SYMBOL)
+    printf(" local");
+  else
+    if (binding == GLOBAL_SYMBOL)
+      printf(" global");
+    else
+      if (binding == WEAK_SYMBOL)
+        printf(" weak");
+
+  if (type == FUNC_SYMBOL)
+    printf(" function");
+  else
+    if (type == OBJECT_SYMBOL || type == COMMON_SYMBOL)
+      printf(" variable");
+    else
+      if (type == THREAD_SYMBOL)
+        printf(" thread-local variable");
+
+  printf(" at %p\n", addr);
+  fflush(stdout);
+
+  return 0;
+}
+
+int PDC_get_ftnPtr_(const char *ftn, const char *loadpath, void **ftnPtr)
 {
   int          ret_value  = 0;
   static void *appHandle  = NULL;
@@ -215,6 +397,8 @@ PDC_get_ftnPtr_(const char *ftn, const char *loadpath, void **ftnPtr)
       PGOTO_ERROR(-1, "dlopen failed: %s", this_error);
     }
   }
+
+  // symbols(my_func, NULL);
   ftnHandle = dlsym(appHandle, ftn);
   if (ftnHandle == NULL)
     PGOTO_ERROR(-1, "dlsym failed: %s", dlerror());
@@ -224,12 +408,10 @@ PDC_get_ftnPtr_(const char *ftn, const char *loadpath, void **ftnPtr)
   ret_value = 0;
 
 done:
-  fflush(stdout);
   FUNC_LEAVE(ret_value);
 }
 
-int
-PDC_get_var_type_size(pdc_var_type_t dtype)
+int PDC_get_var_type_size(pdc_var_type_t dtype)
 {
   int ret_value = 0;
 
@@ -284,8 +466,14 @@ PDC_get_var_type_size(pdc_var_type_t dtype)
         "PDC_get_var_type_size: WARNING - Using an unknown datatype"); /* Probably a poor default */
       break;
   }
-
 done:
   FUNC_LEAVE(ret_value);
+}
+
+void print_symbols()
+{
+  FUNC_ENTER();
+  symbols(my_func, NULL);
+  FUNC_LEAVE(NULL);
 }
 

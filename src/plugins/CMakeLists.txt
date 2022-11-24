@@ -20,6 +20,15 @@ message(STATUS "PDC_DIR: ${PDC_DIR}")
 add_subdirectory(external/SZ3 EXCLUDE_FROM_ALL)
 add_subdirectory(external/cuSZ EXCLUDE_FROM_ALL)
 
+set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build." FORCE)
+
+
+macro(remove_cxx_flag flag)
+  string(REPLACE "${flag}" "" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
+endmacro()
+remove_cxx_flag("-O3")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall -O2 -rdynamic")
+
 include_directories(
   external/SZ3/include/SZ3/
   external/cuSZ/src/

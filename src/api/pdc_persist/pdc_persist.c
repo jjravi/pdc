@@ -359,8 +359,6 @@ void test_hash_table_iterating_remove(void)
   hash_table_free(hash_table);
 }
 
-
-
 extern const char *server_address_str_g;
 extern hg_id_t pdc_persist_id_g;
 
@@ -657,6 +655,16 @@ perr_t pdcTransferCreate(pdcid_t *transfer_id, pdcid_t *legacy_id, void *buf, pd
        int)p->obj_dims[0], (long long int)p->obj_dims[1], (long long int)p->obj_dims[2], (long long
        int)p->local_region_offset[0], (long long int)reg1->offset[0]);
     */
+
+    if(reg2->registered_op & PDC_TRANSFORM)
+    {
+      printf("need to do a transform\n");
+    }
+    else
+    {
+      printf("NO need to do a transform\n");
+    }
+
     *legacy_id = PDC_id_register(PDC_TRANSFER_REQUEST, p);
     *transfer_id = fast_rand();
 done:

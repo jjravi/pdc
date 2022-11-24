@@ -1,8 +1,11 @@
 #ifndef PDC_TRANSFORM_H
 #define PDC_TRANSFORM_H
 
-// void run_my_rpc(int value);
-// void wait_my_rpc();
+#include "pdc_public.h"
+#include "pdc_obj.h"
+
+perr_t pdcTransformRegionRegister(char *func, pdcid_t region_id);
+perr_t pdcTransformObjectRegister(char *func, pdcid_t object_id);
 
 #endif /* PDC_TRANSFORM_H */
 

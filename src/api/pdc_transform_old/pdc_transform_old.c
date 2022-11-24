@@ -47,6 +47,40 @@ extern int pdc_client_mpi_size_g;
 
 static char *default_pdc_transforms_lib = "libpdctransforms.so";
 
+typedef struct {
+  void * data;
+  int size;
+  int current;
+} lib_t;
+
+lib_t libdata;
+
+static bool load_library_from_file(char * path, lib_t *libdata) {
+  struct stat st;
+  FILE * file;
+  size_t read;
+
+  if ( stat(path, &st) < 0 ) {
+    error("failed to stat");
+    return false;
+  }
+
+  printf("lib size is %zu", st.st_size); 
+
+  libdata->size = st.st_size;
+  libdata->data = malloc( st.st_size );
+  libdata->current = 0;
+
+  file = fopen(path, "r");
+
+  read = fread(libdata->data, 1, st.st_size, file); 
+  printf("read %zu bytes", read);
+
+  fclose(file);
+
+  return true;
+}
+
 perr_t
 PDCobj_transform_register(char *func, pdcid_t iterIn, pdcid_t iterOut)
 {
@@ -271,8 +305,9 @@ PDCbuf_map_transform_register(char *func, void *buf, pdcid_t src_region_id, pdci
   char *                                 thisApp           = NULL;
   char *                                 colonsep          = NULL;
   char *                                 transformslibrary = NULL;
-  char *                                 applicationDir    = NULL;
+  char *                                 relpath = NULL;
   char *                                 userdefinedftn    = NULL;
+  char *                                 dir_path          = NULL;
   char *                                 loadpath          = NULL;
   int                                    local_regIndex;
 
@@ -281,24 +316,40 @@ PDCbuf_map_transform_register(char *func, void *buf, pdcid_t src_region_id, pdci
   thisApp = PDC_get_argv0_();
   if (thisApp)
   {
-    applicationDir = dirname(strdup(thisApp));
+    dir_path = dirname(strdup(thisApp));
   }
   userdefinedftn = strdup(func);
+  transformslibrary = default_pdc_transforms_lib;
 
   if ((colonsep = strrchr(userdefinedftn, ':')) != NULL) {
     *colonsep++       = 0;
-    transformslibrary = colonsep;
+    relpath = colonsep;
+    transformslibrary = basename(relpath);
+    dir_path = dirname(relpath);
   }
-  else
-    transformslibrary = default_pdc_transforms_lib;
+  loadpath = PDC_get_realpath(transformslibrary, dir_path);
 
-  loadpath = PDC_get_realpath(transformslibrary, applicationDir);
+  lib_t ldata;
+  load_library_from_file(loadpath, &ldata);
+  char tmp[PATH_MAX] = {};
+  // snprintf(tmp, sizeof(tmp), "/tmp/%s", transformslibrary);
+  snprintf(tmp, sizeof(tmp), "/dev/shm/%s", transformslibrary);
+  // printf("write to %s\n", tmp);
 
+  // if(!access(tmp, R_OK)) unlink(tmp);
+  // int fd = open(tmp, O_CREAT|O_WRONLY|O_TRUNC, 0755);
+  // size_t n = write(fd, ldata.data, ldata.size);
+  // close(fd);
+
+  // printf("transformslibrary: %s in %s\n", transformslibrary, loadpath);
+  // if (PDC_get_ftnPtr_(userdefinedftn, tmp, &ftnHandle) < 0)
   if (PDC_get_ftnPtr_(userdefinedftn, loadpath, &ftnHandle) < 0)
     PGOTO_ERROR(FAIL, "PDC_get_ftnPtr_ returned an error!");
 
   if ((ftnPtr = ftnHandle) == NULL)
     PGOTO_ERROR(FAIL, "Transforms function lookup failed\n");
+
+  printf("ftnPtr: %p\n", ftnPtr);
 
   if ((thisFtn = PDC_MALLOC(struct _pdc_region_transform_ftn_info)) == NULL)
     PGOTO_ERROR(FAIL, "PDC register_obj_transforms memory allocation failed");
@@ -351,8 +402,6 @@ PDCbuf_map_transform_register(char *func, void *buf, pdcid_t src_region_id, pdci
     (int)when, local_regIndex);
 
 done:
-  if (applicationDir)
-    free(applicationDir);
   if (userdefinedftn)
     free(userdefinedftn);
   if (loadpath)

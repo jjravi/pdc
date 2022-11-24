@@ -1,157 +1,214 @@
-//  #include <aio.h>
-//  #include <assert.h>
-//  #include <fcntl.h>
-//  #include <stdio.h>
-//  #include <stdlib.h>
-//  #include <sys/stat.h>
-//  #include <sys/types.h>
-//  #include <unistd.h>
-//  
-//  #include "pdc_server_transform.h"
-//  #include "pdc_private.h"
-//  
-//  #define HG_API_CALL(apiFuncCall)                                         \
-//  {                                                                        \
-//    hg_return_t _status = apiFuncCall;                                     \
-//    if (_status != HG_SUCCESS) {                                           \
-//      fprintf(stderr, "%s:%d: error: function %s failed with error %s.\n", \
-//        __FILE__, __LINE__, #apiFuncCall, HG_Error_to_string(_status));    \
-//      exit(-1);                                                            \
-//    }                                                                      \
-//  }
-//  
-//  // my_rpc: This is a RPC operation. It includes a small bulk transfer, driven by the server, that moves data from the client to the server.  The server writes the data to a local file.
-//  
-//  // There are 3 key callbacks here:
-//  // - my_rpc_handler(): handles an incoming RPC operation
-//  // - my_rpc_handler_bulk_cb(): handles completion of bulk transfer
-//  // - my_rpc_handler_write_cb(): handles completion of async write and sends response
-//  
-//  
-//  // NOTES: this is all event-driven. Data is written using an aio operation with SIGEV_THREAD notification.
-//  //
-//  // Note that the open and close are blocking for now because there is no standard aio variant of those functions.
-//  //
-//  // All I/O calls *could* be blocking here. The problem with that approach is that you would need to use a thread pool with mercury to prevent it from stalling while running callbacks, and the threadpool size would then dictate both request concurrency and I/O concurrency simultaneously.  You would still also need to handle callbacks for the HG transfer.
-//  
-//  /// struct used to carry state of overall operation across callbacks
-//  struct my_rpc_state {
-//    hg_size_t size;
-//    void *buffer;
-//    hg_bulk_t bulk_handle;
-//    hg_handle_t handle;
-//    struct aiocb acb;
-//    my_rpc_in_t in;
-//  };
-//  
-//  /// callback triggered upon completion of async write
-//  static void my_rpc_handler_write_cb(union sigval sig)
-//  {
-//    FUNC_ENTER(NULL);
-//    sleep(3);
-//    struct my_rpc_state *my_rpc_state_p = sig.sival_ptr;
-//    int ret = aio_error(&my_rpc_state_p->acb);
-//    assert(ret == 0);
-//  
-//    my_rpc_out_t out;
-//    out.ret = 0;
-//  
-//    // NOTE: really this should be nonblocking
-//    close(my_rpc_state_p->acb.aio_fildes);
-//  
-//    // send ack to client
-//    // NOTE: don't bother specifying a callback here for completion of sending response. This is just a best effort response.
-//    HG_API_CALL(HG_Respond(my_rpc_state_p->handle, NULL, NULL, &out));
-//  
-//    HG_Bulk_free(my_rpc_state_p->bulk_handle);
-//    HG_Destroy(my_rpc_state_p->handle);
-//    free(my_rpc_state_p->buffer);
-//    free(my_rpc_state_p);
-//  
-//    FUNC_LEAVE(NULL);
-//    return;
-//  }
-//  
-//  /// callback triggered upon completion of bulk transfer
-//  static hg_return_t my_rpc_handler_bulk_cb(const struct hg_cb_info *info)
-//  {
-//    FUNC_ENTER(NULL);
-//    sleep(2);
-//    assert(info->ret == 0);
-//  
-//    // open file (NOTE: this is blocking for now, for simplicity )
-//    char filename[256];
-//    struct my_rpc_state *my_rpc_state_p = info->arg;
-//    sprintf(filename, "/tmp/hg-stock-%d.txt", my_rpc_state_p->in.input_val);
-//    memset(&my_rpc_state_p->acb, 0, sizeof(my_rpc_state_p->acb));
-//    my_rpc_state_p->acb.aio_fildes = open(filename, O_WRONLY | O_CREAT, S_IWUSR | S_IRUSR);
-//    assert(my_rpc_state_p->acb.aio_fildes > -1);
-//  
-//    // set up async I/O operation (write the bulk data that we just pulled from the client)
-//    my_rpc_state_p->acb.aio_offset = 0;
-//    my_rpc_state_p->acb.aio_buf = my_rpc_state_p->buffer;
-//    my_rpc_state_p->acb.aio_nbytes = 512;
-//    my_rpc_state_p->acb.aio_sigevent.sigev_notify = SIGEV_THREAD;
-//    my_rpc_state_p->acb.aio_sigevent.sigev_notify_attributes = NULL;
-//    my_rpc_state_p->acb.aio_sigevent.sigev_notify_function =
-//      my_rpc_handler_write_cb;
-//    my_rpc_state_p->acb.aio_sigevent.sigev_value.sival_ptr = my_rpc_state_p;
-//  
-//    // post async write (just dump data to stdout)
-//    int ret = aio_write(&my_rpc_state_p->acb);
-//    assert(ret == 0);
-//  
-//    HG_API_CALL(HG_Bulk_free(my_rpc_state_p->in.bulk_handle));
-//    HG_API_CALL(HG_Destroy(my_rpc_state_p->handle));
-//    FUNC_LEAVE(0);
-//    return 0;
-//  }
-//  
-//  /// callback/handler triggered upon receipt of rpc request
-//  static hg_return_t my_rpc_handler(hg_handle_t handle)
-//  {
-//    FUNC_ENTER(NULL);
-//    sleep(1);
-//    // set up state structure
-//    struct my_rpc_state *my_rpc_state_p = malloc(sizeof(*my_rpc_state_p));
-//    assert(my_rpc_state_p);
-//    my_rpc_state_p->size = 512;
-//    my_rpc_state_p->handle = handle;
-//  
-//    // This includes allocating a target buffer for bulk transfer
-//    my_rpc_state_p->buffer = malloc(512);
-//    assert(my_rpc_state_p->buffer);
-//  
-//    // decode input
-//    HG_API_CALL(HG_Get_input(handle, &my_rpc_state_p->in));
-//  
-//    printf("Got RPC request with input_val: %d\n", my_rpc_state_p->in.input_val);
-//  
-//    // register local target buffer for bulk access
-//    const struct hg_info *hgi = HG_Get_info(handle);
-//    assert(hgi);
-//    int ret = HG_Bulk_create(hgi->hg_class, 1, &my_rpc_state_p->buffer, &my_rpc_state_p->size,
-//      HG_BULK_WRITE_ONLY, &my_rpc_state_p->bulk_handle);
-//    assert(ret == 0);
-//  
-//    // initiate bulk transfer from client to server
-//    ret = HG_Bulk_transfer(hgi->context, my_rpc_handler_bulk_cb, my_rpc_state_p,
-//      HG_BULK_PULL, hgi->addr, my_rpc_state_p->in.bulk_handle, 0,
-//      my_rpc_state_p->bulk_handle, 0, my_rpc_state_p->size, HG_OP_ID_IGNORE);
-//    assert(ret == 0);
-//  
-//    FUNC_LEAVE(0);
-//    return 0;
-//  }
-//  
-//  /// register my_rpc type with Mercury
-//  hg_id_t my_rpc_register()
-//  {
-//    FUNC_ENTER(NULL);
-//    hg_class_t *hg_class = hg_engine_get_class();
-//    // printf("got hg_class: %p\n", hg_class);
-//    hg_id_t tmp = MERCURY_REGISTER(hg_class, "my_rpc", my_rpc_in_t, my_rpc_out_t, my_rpc_handler);
-//    FUNC_LEAVE(tmp);
-//    return tmp;
-//  }
-//  
+#include "pdc_server_transform.h"
+#include <aio.h>
+#include <assert.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
+
+#include "pdc_private.h"
+
+#define HG_API_CALL(apiFuncCall)                                         \
+{                                                                        \
+  hg_return_t _status = apiFuncCall;                                     \
+  if (_status != HG_SUCCESS) {                                           \
+    fprintf(stderr, "%s:%d: error: function %s failed with error %s.\n", \
+      __FILE__, __LINE__, #apiFuncCall, HG_Error_to_string(_status));    \
+    exit(-1);                                                            \
+  }                                                                      \
+}
+
+/// struct used to carry state of overall operation across callbacks
+struct pdc_transform_state {
+  hg_size_t payload_size;
+  void *opaque_ptr;
+  hg_bulk_t bulk_handle;
+  hg_handle_t handle;
+  pdc_transform_in_t in;
+};
+
+/// callback triggered upon completion of async write
+static void pdc_transform_handler_write_cb(union sigval sig)
+{
+  FUNC_ENTER(NULL);
+  struct pdc_transform_state *pdc_transform_state_p = sig.sival_ptr;
+  // int ret = aio_error(&pdc_transform_state_p->acb);
+  // assert(ret == 0);
+
+  pdc_transform_out_t out;
+  out.ret = 0;
+
+  // NOTE: really this should be nonblocking
+  // close(pdc_transform_state_p->acb.aio_fildes);
+
+  // send ack to client
+  // NOTE: don't bother specifying a callback here for completion of sending response. This is just a best effort response.
+  HG_API_CALL(HG_Respond(pdc_transform_state_p->handle, NULL, NULL, &out));
+
+  HG_Bulk_free(pdc_transform_state_p->bulk_handle);
+  HG_Destroy(pdc_transform_state_p->handle);
+  // free(pdc_transform_state_p->payload);
+  free(pdc_transform_state_p);
+
+  FUNC_LEAVE(NULL);
+  return;
+}
+
+/// callback triggered upon completion of bulk transfer
+static hg_return_t pdc_transform_handler_bulk_cb(const struct hg_cb_info *info)
+{
+  FUNC_ENTER(NULL);
+  assert(info->ret == 0);
+  struct pdc_transform_state *pdc_transform_state_p = info->arg;
+
+  struct factory_payload *payload = (struct factory_payload*)pdc_transform_state_p->opaque_ptr;
+
+  ///////////////////////////////
+  // printf("payload->func_name: %s\n", payload->func_name);
+  // printf("payload->func_name_length: %ld\n", payload->func_name_length);
+  // printf("payload->file_name: %s\n", payload->file_name);
+  // printf("payload->file_name_length: %ld\n", payload->file_name_length);
+  // printf("payload->code_size: %ld\n", payload->code_size);
+
+  char tmp[PATH_MAX] = {};
+  // snprintf(tmp, sizeof(tmp), "/tmp/%s", transformslibrary);
+  snprintf(tmp, sizeof(tmp), "/dev/shm/%s", payload->file_name);
+  // printf("write to %s\n", tmp);
+  if(!access(tmp, R_OK)) unlink(tmp);
+  int fd = open(tmp, O_CREAT|O_WRONLY|O_TRUNC, 0755);
+  size_t n = write(fd, pdc_transform_state_p->opaque_ptr+sizeof(size_t)*3+NAME_MAX*2, payload->code_size);
+  close(fd);
+  //////////////////////////
+
+  // 3. server callback dlopen and dlsym
+  void *appHandle = NULL;
+
+  if( (appHandle = dlopen(tmp, RTLD_NOW)) == NULL)
+  {
+    fprintf(stderr, "dlopen failed: %s", dlerror());
+  }
+  // print_symbols();
+
+  // 4. returns function address to client.
+  void *ftnHandle = NULL;
+
+  if ( (ftnHandle = dlsym(appHandle, payload->func_name)) == NULL)
+  {
+    fprintf(stderr, "dlsym failed: %s", dlerror());
+  }
+  printf("function address: %p\n", ftnHandle);
+
+  /*
+  {
+    struct pdc_region_info *remote_reg_info;
+    uint64_t obj_dims[3];
+    remote_reg_info = (struct pdc_region_info *)malloc(sizeof(struct pdc_region_info));
+    remote_reg_info->ndim   = (pdc_transform_state_p->in.remote_region).ndim;
+    remote_reg_info->offset = (uint64_t *)malloc(remote_reg_info->ndim * sizeof(uint64_t));
+    remote_reg_info->dims_size   = (uint64_t *)malloc(remote_reg_info->ndim * sizeof(uint64_t));
+
+    // TODO: jjravi replace with for loop
+    if (remote_reg_info->ndim >= 1) {
+      (remote_reg_info->offset)[0] = (pdc_transform_state_p->in.remote_region).start_0;
+      (remote_reg_info->dims_size)[0]   = (pdc_transform_state_p->in.remote_region).count_0;
+      obj_dims[0]                  = (pdc_transform_state_p->in).obj_dim0;
+    }
+    if (remote_reg_info->ndim >= 2) {
+      (remote_reg_info->offset)[1] = (pdc_transform_state_p->in.remote_region).start_1;
+      (remote_reg_info->dims_size)[1]   = (pdc_transform_state_p->in.remote_region).count_1;
+      obj_dims[1]                  = (pdc_transform_state_p->in).obj_dim1;
+    }
+    if (remote_reg_info->ndim >= 3) {
+      (remote_reg_info->offset)[2] = (pdc_transform_state_p->in.remote_region).start_2;
+      (remote_reg_info->dims_size)[2]   = (pdc_transform_state_p->in.remote_region).count_2;
+      obj_dims[2]                  = (pdc_transform_state_p->in).obj_dim2;
+    }
+    /////////
+    remote_reg_info->unit = pdc_transform_state_p->in.remote_unit;
+    remote_reg_info->data_buf = pdc_transform_state_p->data_buffer;
+
+    // TODO: region size is different from bytes (compression)
+    remote_reg_info->data_size = pdc_transform_state_p->in.buf_size;
+    // remote_reg_info->data_size = remote_reg_info->unit * remote_reg_info->dims_size[0];
+    for(size_t i = 1; i < remote_reg_info->ndim; i++)
+    {
+      remote_reg_info->data_size *= remote_reg_info->dims_size[i];
+    }
+
+    PDC_Server_transfer_request_io(
+      pdc_transform_state_p->in.obj_id,
+      pdc_transform_state_p->in.obj_ndim,
+      obj_dims,
+      remote_reg_info, 1
+    );
+  }
+  */
+  /////////////////////////////////////////
+  {
+    pdc_transform_out_t out;
+    out.ftn_addr = (int64_t)ftnHandle;
+    out.ret = 0;
+    HG_API_CALL(HG_Respond(pdc_transform_state_p->handle, NULL, NULL, &out));
+    HG_Bulk_free(pdc_transform_state_p->bulk_handle);
+    HG_Destroy(pdc_transform_state_p->handle);
+    free(pdc_transform_state_p->opaque_ptr);
+    free(pdc_transform_state_p);
+  }
+
+  HG_API_CALL(HG_Bulk_free(pdc_transform_state_p->in.bulk_handle));
+  HG_API_CALL(HG_Destroy(pdc_transform_state_p->handle));
+
+  FUNC_LEAVE(0);
+  return 0;
+}
+
+/// callback/handler triggered upon receipt of rpc request
+static hg_return_t pdc_transform_handler(hg_handle_t handle)
+{
+  // TODO: should do the same as pdc_client_server_common.c:724
+  // transfer_request, handle
+  FUNC_ENTER(NULL);
+  // set up state structure
+  struct pdc_transform_state *pdc_transform_state_p = malloc(sizeof(*pdc_transform_state_p));
+  assert(pdc_transform_state_p);
+  pdc_transform_state_p->handle = handle;
+
+  // decode input
+  HG_API_CALL(HG_Get_input(handle, &pdc_transform_state_p->in));
+
+  pdc_transform_state_p->payload_size = pdc_transform_state_p->in.buf_size;
+  // pdc_transform_state_p->payload = malloc(pdc_transform_state_p->in.buf_size);
+  // assert(pdc_transform_state_p->payload);
+  pdc_transform_state_p->opaque_ptr = malloc(pdc_transform_state_p->in.buf_size);
+  assert(pdc_transform_state_p->opaque_ptr);
+
+  printf("Got RPC request with buf_size: %ld\n", pdc_transform_state_p->in.buf_size);
+
+  // register local target buffer for bulk access
+  const struct hg_info *hgi = HG_Get_info(handle);
+  assert(hgi);
+  int ret = HG_Bulk_create(hgi->hg_class, 1, &pdc_transform_state_p->opaque_ptr, &pdc_transform_state_p->payload_size,
+    HG_BULK_WRITE_ONLY, &pdc_transform_state_p->bulk_handle);
+  assert(ret == 0);
+
+  // initiate bulk transfer from client to server
+  ret = HG_Bulk_transfer(hgi->context, pdc_transform_handler_bulk_cb, pdc_transform_state_p,
+    HG_BULK_PULL, hgi->addr, pdc_transform_state_p->in.bulk_handle, 0,
+    pdc_transform_state_p->bulk_handle, 0, pdc_transform_state_p->payload_size, HG_OP_ID_IGNORE);
+  assert(ret == 0);
+
+  FUNC_LEAVE(0);
+  return 0;
+}
+
+/// register pdc_transform type with Mercury
+hg_id_t pdc_transform_register()
+{
+  FUNC_ENTER(NULL);
+  hg_class_t *hg_class = hg_engine_get_class();
+  hg_id_t tmp = MERCURY_REGISTER(hg_class, "pdc_transform", pdc_transform_in_t, pdc_transform_out_t, pdc_transform_handler);
+  FUNC_LEAVE(tmp);
+  return tmp;
+}

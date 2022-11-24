@@ -1,37 +1,40 @@
-//  #include "rpc_engine.h"
-//  
-//  #ifndef MY_RPC_H
-//  #define MY_RPC_H
-//  
-//  /** @struct my_rpc_in_t
-//   * My super secret structure you can't access fields
-//   */
-//  
-//  /**
-//   * @struct my_rpc_in_t
-//   * @brief This is a struct
-//   *
-//   * Typical usage requires that we either supply the number of times to bar followed by some other baz ...
-//   * @code
-//   * int nbars = 12; // must be uint8_t because of some reason
-//   * @endcode
-//   *
-//   *  @var my_rpc_in_t::int32_t
-//   *    A foo.
-//   *  @var my_rpc_in_t::hg_bulk_t bulk_handle
-//   *    Also a Foo.
-//   *  @var my_rpc_in_t::baz
-//   *    (unused field)
-//   */
-//  MERCURY_GEN_PROC(my_rpc_in_t, ((int32_t)(input_val))((hg_bulk_t)(bulk_handle)))
-//  
-//  /// @brief ret
-//  /// Typical usage requires that we either supply the number of times to bar followed by some other baz ...
-//  /// @code
-//  /// int nbars = 12; // must be uint8_t because of some reason
-//  /// @endcode
-//  MERCURY_GEN_PROC(my_rpc_out_t, ((int32_t)(ret)))
-//  
-//  hg_id_t my_rpc_register();
-//  
-//  #endif // MY_RPC_H
+#ifndef PDC_SERVER_TRANSFORM_H
+#define PDC_SERVER_TRANSFORM_H
+
+#include "rpc_engine.h"
+
+// #define NAME_MAX   (255)
+
+struct factory_payload
+{
+  size_t func_name_length;
+  size_t file_name_length;
+  size_t code_size;
+
+  char func_name[NAME_MAX];
+  char file_name[NAME_MAX];
+  void *code_binary;
+};
+
+/**
+ * @struct pdc_transform_in_t
+ * @brief This is a struct
+ */
+MERCURY_GEN_PROC(pdc_transform_in_t,
+  ((hg_bulk_t)(bulk_handle)) /// need for freeing.
+  ((uint64_t)(obj_id))
+  ((uint64_t)(buf_size))
+)
+
+/**
+ * @struct pdc_transform_in_t
+ * @brief This is a struct
+ */
+MERCURY_GEN_PROC(pdc_transform_out_t,
+  ((int64_t)(ftn_addr)) /// transform address 
+  ((int32_t)(ret))       /// return status code
+)
+
+hg_id_t pdc_transform_register();
+
+#endif // PDC_SERVER_TRANSFORM_H

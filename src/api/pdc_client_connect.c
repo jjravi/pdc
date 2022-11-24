@@ -62,9 +62,10 @@
 
 const char *server_address_str_g;
 
-// TODO: jjravi move demo my_rpc somewhere
+// TODO: jjravi delete demo my_rpc somewhere
 hg_id_t my_rpc_id_g;
 hg_id_t pdc_persist_id_g;
+hg_id_t pdc_transform_id_g;
 
 int                    is_client_debug_g      = 0;
 pdc_server_selection_t pdc_server_selection_g = PDC_SERVER_DEFAULT;
@@ -1180,6 +1181,7 @@ drc_access_again:
   // NOTE: jjravi Register RPC on client
   my_rpc_id_g = my_rpc_register();
   pdc_persist_id_g = pdc_persist_register();
+  pdc_transform_id_g = pdc_transform_register();
 
   // Register RPC
   client_test_connect_register_id_g = PDC_client_test_connect_register(*hg_class);

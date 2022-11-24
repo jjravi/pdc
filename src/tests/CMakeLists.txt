@@ -144,6 +144,9 @@ include_directories(SYSTEM ${MPI_INCLUDE_PATH})
 add_executable(obj_transform obj_transform.cc)
 target_link_libraries(obj_transform pdc MPI::MPI_C MPI::MPI_CXX)
 #
+add_executable(direct_transform direct_transform.cc)
+target_link_libraries(direct_transform pdc MPI::MPI_C MPI::MPI_CXX)
+#
 add_executable(obj_type_transform obj_type_transform.cc)
 target_link_libraries(obj_type_transform pdc MPI::MPI_C MPI::MPI_CXX)
 #
@@ -162,12 +165,12 @@ target_link_libraries(sdrbench_hurricane_isabel pdc MPI::MPI_C MPI::MPI_CXX)
 add_executable(vpicio_compress_obj_server vpicio_compress_obj_server.cc)
 target_link_libraries(vpicio_compress_obj_server pdc MPI::MPI_C MPI::MPI_CXX)
 #
-add_executable(vpicio_compress_obj_gpu vpicio_compress_obj_gpu.cu)
-target_link_libraries(vpicio_compress_obj_gpu pdc MPI::MPI_C MPI::MPI_CXX)
-target_link_libraries(vpicio_compress_obj_gpu -lcuda -lcusparse -lstdc++)
+# add_executable(vpicio_compress_obj_gpu vpicio_compress_obj_gpu.cu)
+# target_link_libraries(vpicio_compress_obj_gpu pdc MPI::MPI_C MPI::MPI_CXX)
+# target_link_libraries(vpicio_compress_obj_gpu -lcuda -lcusparse -lstdc++)
 #
-add_executable(init_pdc_gpu init_pdc_gpu.cu)
-target_link_libraries(init_pdc_gpu pdc MPI::MPI_C MPI::MPI_CXX -lstdc++)
+# add_executable(init_pdc_gpu init_pdc_gpu.cu)
+# target_link_libraries(init_pdc_gpu pdc MPI::MPI_C MPI::MPI_CXX -lstdc++)
 # add_executable(nyx_sdrbench nyx_sdrbench.cc)
 # target_link_libraries(nyx_sdrbench pdc MPI::MPI_C MPI::MPI_CXX)
 

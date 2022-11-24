@@ -30,6 +30,7 @@ include_directories(
   ${PDC_SOURCE_DIR}/src/api/pdc_analysis/include
   ${PDC_SOURCE_DIR}/src/api/profiling/include
   ${PDC_SOURCE_DIR}/src/utils/include
+  ${PDC_SOURCE_DIR}/src/utils/
   ${MERCURY_INCLUDE_DIR}
   ${FASTBIT_INCLUDE_DIR}
 
@@ -67,6 +68,8 @@ add_executable(pdc_server.exe
                # ${PDC_SOURCE_DIR}/src/utils/pdc_interface.c
                # ${PDC_SOURCE_DIR}/src/api/pdc_persist/pdc_persist.c
                ${PDC_SOURCE_DIR}/src/utils/rpc_engine.c
+               ${PDC_SOURCE_DIR}/src/utils/symbols.c
+               ${PDC_SOURCE_DIR}/src/utils/list.c
 )
 
 install(
