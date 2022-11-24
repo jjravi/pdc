@@ -2,7 +2,19 @@ cmake_minimum_required (VERSION 2.8.12)
 
 project(PDC_VOL C)
 
+# /home/jjravi/hpc-io/pdc/build/install/share/cmake
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/../build/install/share/cmake)
+message(STATUS "CMAKE_MODULE_PATH: ${CMAKE_MODULE_PATH}")
 include_directories(../build/)
+
+# data6
+include_directories(/opt/nvidia/nsight-systems/2021.2.4/target-linux-x64/nvtx/include)
+
+# jjravi
+include_directories(/opt/nvidia/nsight-systems/2022.2.1/target-linux-x64/nvtx/include)
+
+include_directories(/opt/nvidia/nsight-systems/2022.4.1/target-linux-x64/nvtx/include)
+
 
 include_directories(
   ..//src/server/include
@@ -23,13 +35,11 @@ include_directories(
   ..//src/api/pdc_persist/include
 )
 
-
-
 include_directories(
   ${PDC_EXT_INCLUDE_DEPENDENCIES}
 )
 
-find_package(PDC REQUIRED)
+find_package(PDC REQUIRED ${CMAKE_CURRENT_SOURCE_DIR}/../build/)
 if(PDC_FOUND)
     #message(STATUS "PDC include directory: ${PDC_INCLUDE_DIR}")
   set(PDC_EXT_INCLUDE_DEPENDENCIES ${PDC_INCLUDE_DIR}
@@ -38,40 +48,21 @@ if(PDC_FOUND)
   set(PDC_EXT_LIB_DEPENDENCIES pdc ${PDC_EXT_LIB_DEPENDENCIES})
 endif()
 
-#HDF5
-option(USE_SYSTEM_HDF5 "Use system-installed HDF5." ON)
-  if(USE_SYSTEM_HDF5)
-  find_package(HDF5 NO_MODULE NAMES hdf5 COMPONENTS C shared)
-  if(HDF5_FOUND)
-    set(HDF5_C_SHARED_LIBRARY hdf5-shared)
-#    if(NOT TARGET ${HDF5_C_SHARED_LIBRARY})
-#      message(FATAL_ERROR "Could not find hdf5 shared target, please make "
-#"sure that HDF5 has ben compiled with shared libraries enabled.")
-#    endif()
-    set(PDC_EXT_INCLUDE_DEPENDENCIES
-        ${PDC_EXT_INCLUDE_DEPENDENCIES}
-        ${HDF5_INCLUDE_DIR}
-      )
-    set(PDC_EXT_LIB_DEPENDENCIES
-      ${PDC_EXT_LIB_DEPENDENCIES}
-      ${HDF5_C_SHARED_LIBRARY}
-    )
-  else()
-    # Allow for HDF5 autotools builds
-    find_package(HDF5 MODULE REQUIRED)
-    if(HDF5_FOUND)
-      set(PDC_EXT_INCLUDE_DEPENDENCIES
-        ${PDC_EXT_INCLUDE_DEPENDENCIES}
-        ${HDF5_INCLUDE_DIRS}
-      )
-      set(PDC_EXT_LIB_DEPENDENCIES
-        ${PDC_EXT_LIB_DEPENDENCIES}
-        ${HDF5_LIBRARIES}
-      )
-    else()
-      message(FATAL_ERROR "Could not find HDF5, please check HDF5_DIR.")
-    endif()
-  endif()
+find_package(HDF5 NO_MODULE NAMES hdf5 COMPONENTS C shared REQUIRED PATHS $ENV{HDF5_DIR})
+message(STATUS "HDF5_FOUND: ${HDF5_FOUND}")
+message(STATUS "HDF5_VERSION: ${HDF5_VERSION}")
+message(STATUS "HDF5_INCLUDE_DIR: ${HDF5_INCLUDE_DIR}")
+message(STATUS "HDF5_LIBRARIES: ${HDF5_LIBRARIES}")
+include_directories(${HDF5_INCLUDE_DIR})
+
+# Mercury
+find_package(MERCURY REQUIRED)
+if(MERCURY_FOUND)
+  message(STATUS "mercury dir ${MERCURY_DIR}")
+  # set(PDC_EXT_INCLUDE_DEPENDENCIES ${MERCURY_INCLUDE_DIR}
+  #   ${PDC_EXT_INCLUDE_DEPENDENCIES}
+  #   )
+  # set(PDC_EXT_LIB_DEPENDENCIES mercury ${PDC_EXT_LIB_DEPENDENCIES})
 endif()
 
 add_definitions(-DENABLE_MPI=1)
@@ -79,13 +70,17 @@ add_library(cjson cjson/cJSON.c)
 
 set(PROGRAMS
   pdc_ls
-  pdc_import
-  pdc_export
+  # pdc_import
+  # pdc_export
   )
 
 foreach(program ${PROGRAMS})
   add_executable(${program} ${program}.c)
-  target_link_libraries(${program} ${PDC_EXT_LIB_DEPENDENCIES})
+  # target_link_libraries(${program} ${PDC_EXT_LIB_DEPENDENCIES})
+  target_link_libraries(${program} mercury)
+  # target_link_libraries(${program} MPI::MPI_C)
+  target_link_libraries(${program} hdf5-shared)
   target_link_libraries(${program} cjson)
+  # target_link_libraries(${program} pdc)
 endforeach(program)
 

@@ -129,10 +129,27 @@ static hg_return_t pdc_transform_cb(const struct hg_cb_info *info)
 
 static char *default_pdc_transforms_lib = "libpdctransforms.so";
 
-perr_t pdcTransformRegionRegister(char *func, pdcid_t region_id)
+perr_t pdcTransformRegionRegister(char *name, char *func, pdcid_t region_id, pdc_compute_variant_exec_t executor)
 {
   FUNC_ENTER(NULL);
+
+  printf("registering for: %s\n", name);
   printf("registering function: %s\n", func);
+  switch(executor)
+  {
+    case PDC_COMPUTE_CPU: 
+      printf("registering for device: CPU");
+      break;
+    case PDC_COMPUTE_GPU:
+      printf("registering for device: GPU");
+      break;
+    case PDC_COMPUTE_DPU:
+      printf("registering for device: DPU");
+      break;
+    default:
+      printf("registering for device: UNKNOWN");
+      break;
+  }
 
   // client ties function address to region
   // region will 
@@ -237,7 +254,7 @@ perr_t pdcTransformRegionRegister(char *func, pdcid_t region_id)
    FUNC_LEAVE(ret_value);
 }
 
-perr_t pdcTransformObjectRegister(char *func, pdcid_t object_id)
+perr_t pdcTransformObjectRegister(char *name, char *func, pdcid_t object_id, pdc_compute_variant_exec_t executor)
 {
   // read file
 

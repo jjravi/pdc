@@ -114,7 +114,10 @@ int main(int argc, char **argv)
     // PDC_API_CALL( PDCbuf_map_transform_register("pdc_sz_compress:libpdc_transform_sz.so", &x[0], region_x, obj_xx, region_xx, 0, INCR_STATE, DATA_OUT) );
     // PDC_API_CALL( PDCbuf_map_transform_register("pdc_passthrough:libpdc_transform_test.so", &x[0], region_x, obj_xx, region_xx, 0, INCR_STATE, DATA_OUT) );
     // PDC_API_CALL( PDCbuf_map_transform_register("pdc_passthrough:/home/jjravi/hpc-io/pdc/src/plugins/build/libpdc_transform_test.so", &x[0], region_x, obj_xx, region_xx, 0, INCR_STATE, DATA_OUT) );
-    PDC_API_CALL( pdcTransformRegionRegister("pdc_passthrough:/home/jjravi/hpc-io/pdc/src/plugins/build/libpdc_transform_test.so", region_xx) );
+
+    PDC_API_CALL( pdcTransformRegionRegister("PASSTHROUGH", "pdc_passthrough:/home/jjravi/hpc-io/pdc/src/plugins/build/libpdc_transform_test.so", region_xx, PDC_COMPUTE_CPU) );
+    PDC_API_CALL( pdcTransformRegionRegister("PASSTHROUGH", "pdc_passthrough:/home/jjravi/hpc-io/pdc/src/plugins/build/libpdc_transform_test.so", region_xx, PDC_COMPUTE_GPU) );
+    PDC_API_CALL( pdcTransformRegionRegister("PASSTHROUGH", "pdc_passthrough:/home/jjravi/hpc-io/pdc/src/plugins/build/libpdc_transform_test.so", region_xx, PDC_COMPUTE_DPU) );
 
     pdcid_t transfer_request_x; 
     pdcid_t transfers[1];
