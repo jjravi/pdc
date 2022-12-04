@@ -1,5 +1,6 @@
 #include "pdc_client_server_common.h"
 #include "pdc_server_data.h"
+#include <mpi.h>
 static int io_by_region_g = 1;
 
 int

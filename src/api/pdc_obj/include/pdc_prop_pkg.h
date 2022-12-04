@@ -65,6 +65,9 @@ struct _pdc_obj_prop {
     uint64_t                    locus;
     uint32_t                    data_state;
     struct _pdc_transform_state transform_prop;
+
+    pdc_compression_error_bound_t err_bound_type;
+    pdc_compression_error_bound_value_t err_bound_val;
 };
 
 /***************************************/

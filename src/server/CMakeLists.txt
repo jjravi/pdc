@@ -65,7 +65,8 @@ add_executable(pdc_server.exe
                ${PDC_SOURCE_DIR}/src/api/pdc_analysis/pdc_analysis_common.c
                ${PDC_SOURCE_DIR}/src/api/pdc_transform_old/pdc_transforms_common_old.c
                ${PDC_SOURCE_DIR}/src/api/pdc_analysis/pdc_hist_pkg.c
-               # ${PDC_SOURCE_DIR}/src/utils/pdc_interface.c
+               ${PDC_SOURCE_DIR}/src/utils/pdc_interface.c
+               ${PDC_SOURCE_DIR}/src/utils/pdc_malloc.c
                # ${PDC_SOURCE_DIR}/src/api/pdc_persist/pdc_persist.c
                ${PDC_SOURCE_DIR}/src/utils/rpc_engine.c
                ${PDC_SOURCE_DIR}/src/utils/symbols.c

@@ -71,6 +71,7 @@ struct _pdc_client_transform_args {
     void *                                 transform_result;
     struct _pdc_region_transform_ftn_info *this_transform;
     struct pdc_region_info *               region_info;
+    pdcid_t                                id;
     int                                    type_extent;
     int                                    transform_state;
     int                                    ret;

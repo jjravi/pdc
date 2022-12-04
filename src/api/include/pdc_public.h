@@ -70,6 +70,28 @@ typedef struct pdc_histogram_t { //?????????
     uint64_t *     bin;
 } pdc_histogram_t;
 
+typedef enum
+{
+  PDC_COMPRESSION_PSNR = 0,
+  PDC_COMPRESSION_ABS = 1
+} pdc_compression_error_bound_t;
+
+typedef struct pdc_compression_error_bound_value_t
+{
+  union
+  {
+    int32_t psnr;
+    float abs;
+  } lower_bound;
+
+  union
+  {
+    int32_t psnr;
+    float abs;
+  } upper_bound;
+
+} pdc_compression_error_bound_value_t;
+
 #define SUCCEED 0
 #define FAIL    (-1)
 

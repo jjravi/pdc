@@ -16,15 +16,7 @@ perr_t pdcTransformRegionRegister(char* name, char *func, pdcid_t region_id, pdc
 
 perr_t pdcTransformObjectRegister(char* name, char *func, pdcid_t object_id, pdc_compute_variant_exec_t executor);
 
-typedef enum
-{
-  PSNR = 0,
-  ABS = 1
-} pdc_compression_error_bound_t;
-
-// perr_t PDCprop_set_obj_error_range(obj_prop_qrain, 40, 80, PSNR);
-perr_t PDCprop_set_obj_error_range(pdcid_t object_id, int low, int high, pdc_compression_error_bound_t eb_type);
-
+perr_t PDCprop_set_obj_error_range(pdcid_t object_id, pdc_compression_error_bound_t eb_type, pdc_compression_error_bound_value_t eb_val);
 
 #endif /* PDC_TRANSFORM_H */
 

@@ -8,7 +8,9 @@
 #include <unistd.h>
 
 #include "pdc_server_persist.h"
+#include "pdc_obj_pkg.h"
 #include "pdc_private.h"
+#include "pdc_prop.h"
 
 #define HG_API_CALL(apiFuncCall)                                         \
 {                                                                        \
@@ -90,6 +92,11 @@ static hg_return_t pdc_persist_handler_bulk_cb(const struct hg_cb_info *info)
     remote_reg_info->ndim   = (pdc_persist_state_p->in.remote_region).ndim;
     remote_reg_info->offset = (uint64_t *)malloc(remote_reg_info->ndim * sizeof(uint64_t));
     remote_reg_info->dims_size   = (uint64_t *)malloc(remote_reg_info->ndim * sizeof(uint64_t));
+
+    remote_reg_info->obj = (struct _pdc_obj_info *)malloc(sizeof(struct _pdc_obj_info));
+    remote_reg_info->obj->obj_pt = (struct _pdc_obj_prop *)malloc(sizeof(struct _pdc_obj_prop));
+    remote_reg_info->obj->obj_pt->obj_prop_pub = (struct pdc_obj_prop *)malloc(sizeof(struct pdc_obj_prop));
+    remote_reg_info->obj->obj_pt->obj_prop_pub->type = pdc_persist_state_p->in.storageinfo;
 
     // TODO: jjravi replace with for loop
     if (remote_reg_info->ndim >= 1) {

@@ -25,6 +25,9 @@
 #ifndef PDC_SERVER_COMMON_H
 #define PDC_SERVER_COMMON_H
 
+#include <stdint.h>
+#include <mercury.h>
+
 #define PDC_ALLOC_BASE_NUM         64
 #define PDC_SERVER_TASK_INIT_VALUE 1000
 

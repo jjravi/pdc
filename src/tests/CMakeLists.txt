@@ -135,6 +135,7 @@ foreach(program ${PROGRAMS})
   target_link_libraries(${program} pdc)
   target_link_libraries(${program} MPI::MPI_C)
   target_link_libraries(${program} m) #-lm
+  target_link_libraries(${program} "-Wl,--no-undefined")
 endforeach(program)
 
 enable_language(CXX)
@@ -146,6 +147,7 @@ target_link_libraries(obj_transform pdc MPI::MPI_C MPI::MPI_CXX)
 #
 add_executable(direct_transform direct_transform.cc)
 target_link_libraries(direct_transform pdc MPI::MPI_C MPI::MPI_CXX)
+target_link_libraries(direct_transform "-Wl,--no-undefined")
 #
 add_executable(obj_type_transform obj_type_transform.cc)
 target_link_libraries(obj_type_transform pdc MPI::MPI_C MPI::MPI_CXX)

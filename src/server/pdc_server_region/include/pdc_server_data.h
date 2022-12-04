@@ -26,11 +26,9 @@
 #define PDC_SERVER_DATA_H
 
 #include "pdc_server_common.h"
-#include "pdc_client_server_common.h"
-#include "pdc_region.h"
-#include "pdc_query.h"
 #include <sys/time.h>
 #include <pthread.h>
+#include "pdc_public.h"
 
 #ifdef ENABLE_FASTBIT
 #include "iapi.h"

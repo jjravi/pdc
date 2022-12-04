@@ -41,6 +41,7 @@
 #include "pdc_analysis_pkg.h"
 #include "pdc_transforms_common_old.h"
 #include "pdc_client_connect.h"
+#include "pdc_server_persist.h"
 #include "pdc_server_transform.h"
 #include "my_server_rpc.h"
 
@@ -946,7 +947,7 @@ client_region_release_with_transform_cb(const struct hg_cb_info *callback_info)
   struct _pdc_client_transform_args *transform_args;
   region_lock_out_t                  output;
   size_t                             size;
-  size_t (*this_transform)(void *, pdc_var_type_t, int, uint64_t *, void **, pdc_var_type_t) = NULL;
+  size_t (*this_transform)(void *, pdc_var_type_t, int, uint64_t *, void **, pdc_var_type_t, pdcid_t) = NULL;
   void *result;
 
   FUNC_ENTER(NULL);
@@ -957,7 +958,7 @@ client_region_release_with_transform_cb(const struct hg_cb_info *callback_info)
   this_transform = transform_args->this_transform->ftnPtr;
   size           = this_transform(transform_args->data, transform_args->this_transform->dest_type,
     transform_args->region_info->ndim, transform_args->region_info->dims_size, &result,
-    transform_args->this_transform->dest_type);
+    transform_args->this_transform->dest_type, transform_args->id);
 
   transform_args->size = size;
 
@@ -4012,6 +4013,7 @@ PDC_Client_region_release(pdcid_t remote_obj_id, struct _pdc_obj_info *object_in
   FUNC_ENTER(NULL);
 
   printf("%s\n", __FUNCTION__);
+  // printf("object_info: %p\n", object_info);
 
   if (region_info->registered_op & PDC_TRANSFORM) {
     transform_index = -1;

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.14...3.18)
 
-set(CMAKE_CUDA_HOST_COMPILER gcc-11)
+set(CMAKE_CUDA_HOST_COMPILER g++-11)
 
 project(cusz_asap CUDA CXX)
 set(CMAKE_CUDA_STANDARD 14)

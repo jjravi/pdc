@@ -204,8 +204,11 @@ perr_t pdcTransformRegionRegister(char *name, char *func, pdcid_t region_id, pdc
   payload->func_name_length = func_name_length;
   payload->file_name_length = file_name_length;
   payload->code_size = file_size;
-  strncpy(payload->func_name, userdefinedftn, func_name_length);
-  strncpy(payload->file_name, transformslibrary, file_name_length);
+  // strncpy(payload->func_name, userdefinedftn, func_name_length);
+  // strncpy(payload->file_name, transformslibrary, file_name_length);
+  // printf("userdefinedftn: %s\n", userdefinedftn);
+  sprintf(payload->func_name, "%s", userdefinedftn);
+  sprintf(payload->file_name, "%s", transformslibrary);
   // memcpy(payload->code_binary, file_buffer, file_size);
   memcpy(opaque_ptr+sizeof(size_t)*3+NAME_MAX*2, file_buffer, file_size);
   printf("payload->func_name: %s\n", payload->func_name);
@@ -251,19 +254,177 @@ perr_t pdcTransformRegionRegister(char *name, char *func, pdcid_t region_id, pdc
    hg_engine_addr_free(svr_addr);
    req_num++;
    wait_transform_rpcs();
-   FUNC_LEAVE(ret_value);
+
+  struct pdc_region_info *reg;
+  struct _pdc_id_info *reginfo;
+  reginfo = PDC_find_id(region_id);
+  reg = (struct pdc_region_info *)(reginfo->obj_ptr);
+  reg->registered_op |= PDC_TRANSFORM;
+
+  FUNC_LEAVE(ret_value);
 }
 
 perr_t pdcTransformObjectRegister(char *name, char *func, pdcid_t object_id, pdc_compute_variant_exec_t executor)
 {
-  // read file
+  FUNC_ENTER(NULL);
 
-  // send rpc file to server
+  printf("registering for: %s\n", name);
+  printf("registering function: %s\n", func);
+  switch(executor)
+  {
+    case PDC_COMPUTE_CPU: 
+      printf("registering for device: CPU");
+      break;
+    case PDC_COMPUTE_GPU:
+      printf("registering for device: GPU");
+      break;
+    case PDC_COMPUTE_DPU:
+      printf("registering for device: DPU");
+      break;
+    default:
+      printf("registering for device: UNKNOWN");
+      break;
+  }
 
-  // > server callback dlopen and dlsym
+  // client ties function address to region
+  // region will 
 
-  // > returns function address to client.
+  perr_t ret_value = SUCCEED;
+
+  // 1. read file
+  char *dir_path = NULL;
+  char *userdefinedftn = strdup(func);
+  char *transformslibrary = default_pdc_transforms_lib;
+  char *colonsep = NULL;
+  if ((colonsep = strrchr(userdefinedftn, ':')) != NULL)
+  {
+    *colonsep++ = 0;
+    char *relpath = colonsep;
+    transformslibrary = basename(relpath);
+    dir_path = dirname(relpath);
+  }
+  else
+  {
+    char *thisApp = PDC_get_argv0_();
+    dir_path = dirname(strdup(thisApp));
+  }
+  char *loadpath = PDC_get_realpath(transformslibrary, dir_path);
+
+  size_t func_name_length = strlen(userdefinedftn);
+  size_t file_name_length = strlen(transformslibrary);
+  void *file_buffer;
+  size_t file_size;
+  {
+    struct stat st;
+
+    if ( stat(loadpath, &st) < 0 ) {
+      error("failed to stat");
+    }
+
+    // printf("lib size is %zu\n", st.st_size);
+    file_size = st.st_size;
+    file_buffer = malloc( st.st_size );
+    FILE *file = fopen(loadpath, "r");
+
+    size_t read = fread(file_buffer, 1, st.st_size, file); 
+    // printf("read %zu bytes\n", read);
+
+    fclose(file);
+  }
+  size_t total_payload_size = sizeof(struct factory_payload) + file_size;
+  void *opaque_ptr = malloc(total_payload_size);
+  printf("opaque_ptr size: %ld\n", total_payload_size);
+  // struct factory_payload *payload = (struct factory_payload*)malloc(total_payload_size);
+  struct factory_payload *payload = (struct factory_payload*)opaque_ptr;
+  payload->func_name_length = func_name_length;
+  payload->file_name_length = file_name_length;
+  payload->code_size = file_size;
+  // strncpy(payload->func_name, userdefinedftn, func_name_length);
+  // strncpy(payload->file_name, transformslibrary, file_name_length);
+  // printf("userdefinedftn: %s\n", userdefinedftn);
+  sprintf(payload->func_name, "%s", userdefinedftn);
+  sprintf(payload->file_name, "%s", transformslibrary);
+  // memcpy(payload->code_binary, file_buffer, file_size);
+  memcpy(opaque_ptr+sizeof(size_t)*3+NAME_MAX*2, file_buffer, file_size);
+  printf("payload->func_name: %s\n", payload->func_name);
+  printf("payload->func_name_length: %ld\n", payload->func_name_length);
+  printf("payload->file_name: %s\n", payload->file_name);
+  printf("payload->file_name_length: %ld\n", payload->file_name_length);
+  ////////////////////////////
+
+  // 2. send rpc file to server
+  hg_addr_t svr_addr;
+  hg_engine_addr_lookup(server_address_str_g, &svr_addr);
+
+  // set up state structure
+  struct pdc_transform_state_client *pdc_transform_state_p = malloc(sizeof(*pdc_transform_state_p));
+
+  pdc_transform_state_p->value = 42;
+  pdc_transform_state_p->size = total_payload_size;
+  pdc_transform_state_p->buffer = (void *)payload;
+
+  // create create handle to represent this rpc operation
+  hg_engine_create_handle(svr_addr, pdc_transform_id_g, &pdc_transform_state_p->handle);
+
+   // register buffer for rdma/bulk access by server
+   const struct hg_info *hgi = HG_Get_info(pdc_transform_state_p->handle);
+   assert(hgi);
+   pdc_transform_in_t in;
+   int ret = HG_Bulk_create(
+     hgi->hg_class, 1, 
+     &pdc_transform_state_p->buffer, 
+     &pdc_transform_state_p->size,
+     HG_BULK_READ_ONLY, &in.bulk_handle);
+   pdc_transform_state_p->bulk_handle = in.bulk_handle;
+   assert(ret == 0);
+
+   ////////////////////////////
+   struct _pdc_obj_info *  object_info;
+    struct _pdc_id_info *  info1;
+   info1 = PDC_find_id(object_id);
+   if (info1 == NULL)
+     fprintf(stderr, "cannot locate object ID");
+   object_info = (struct _pdc_obj_info *)(info1->obj_ptr);
+   ////////////////////////////
+ 
+   // Send rpc. Note that we are also transmitting the bulk handle in the input struct.
+   // send transfer_request metadata
+   in.obj_id = object_info->obj_info_pub->meta_id;
+   in.buf_size = total_payload_size;
+ 
+   ret = HG_Forward(pdc_transform_state_p->handle, pdc_transform_cb, pdc_transform_state_p, &in);
+   assert(ret == 0);
+ 
+   hg_engine_addr_free(svr_addr);
+   req_num++;
+   wait_transform_rpcs();
+
+  // struct pdc_region_info *reg;
+  // struct _pdc_id_info *reginfo;
+  // reginfo = PDC_find_id(region_id);
+  // reg = (struct pdc_region_info *)(reginfo->obj_ptr);
+  // reg->registered_op |= PDC_TRANSFORM;
+
+  FUNC_LEAVE(ret_value);
+
+
 }
 
+perr_t PDCprop_set_obj_error_range(pdcid_t object_id, pdc_compression_error_bound_t eb_type, pdc_compression_error_bound_value_t eb_val)
+{
+  perr_t ret_value = SUCCEED;
+  struct _pdc_id_info *info;
+
+  FUNC_ENTER(NULL);
+
+  info = PDC_find_id(object_id);
+  if (info == NULL)
+    PGOTO_ERROR(FAIL, "cannot locate object property ID");
+  ((struct _pdc_obj_prop *)(info->obj_ptr))->err_bound_type = eb_type;
+  ((struct _pdc_obj_prop *)(info->obj_ptr))->err_bound_val = eb_val;
+ 
+done:
+  FUNC_LEAVE(ret_value);
+}
 
 

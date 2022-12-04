@@ -30,14 +30,8 @@
 #include "pdc_prop_pkg.h"
 #include "pdc_analysis_and_transforms_common.h"
 #include "pdc_query.h"
-
 #include "mercury_macros.h"
-#include "mercury_proc_string.h"
 #include "mercury_atomic.h"
-#include "mercury_list.h"
-#include "mercury_config.h"
-#include "mercury_thread_pool.h"
-#include "pdc_timing.h"
 #include "pdc_server_region_transfer_metadata_query.h"
 #include "pdc_server_region_transfer.h"
 
@@ -50,6 +44,7 @@
 #include <time.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <inttypes.h>
 
 #ifdef ENABLE_MULTITHREAD
 hg_thread_mutex_t pdc_client_info_mutex_g;
@@ -356,6 +351,12 @@ typedef struct pdc_data_server_io_list_t {
 
 typedef struct data_server_region_t {
   uint64_t obj_id;
+
+  // Object-level transform
+  int obj_transform_enable; // TRANSFORM_MAGIC
+  int64_t transform_ftn_addr;
+  /////////////////////////
+
   int      fd; // file handle
   int      close_flag;
 

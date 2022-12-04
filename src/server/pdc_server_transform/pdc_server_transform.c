@@ -9,6 +9,12 @@
 #include <unistd.h>
 
 #include "pdc_private.h"
+#include "pdc_interface.h"
+#include "pdc_id_pkg.h"
+#include "pdc_obj_pkg.h"
+#include "pdc_prop_pkg.h"
+#include "pdc_utlist.h"
+#include "pdc_client_server_common.h"
 
 #define HG_API_CALL(apiFuncCall)                                         \
 {                                                                        \
@@ -19,6 +25,8 @@
     exit(-1);                                                            \
   }                                                                      \
 }
+
+extern int data_sieving_g;
 
 /// struct used to carry state of overall operation across callbacks
 struct pdc_transform_state {
@@ -145,6 +153,16 @@ static hg_return_t pdc_transform_handler_bulk_cb(const struct hg_cb_info *info)
     );
   }
   */
+
+  /////////////////////////////////////////
+  data_server_region_t *region         = NULL;
+  // uint64_t write_size = pdc_transform_state_p->in.data_size;
+
+  region = PDC_Server_get_obj_region(pdc_transform_state_p->in.obj_id);
+  PDC_Server_register_obj_region_by_pointer(&region, pdc_transform_state_p->in.obj_id, 0);
+  region->obj_transform_enable = TRANSFORM_ENABLE_MAGIC;
+  region->transform_ftn_addr = ftnHandle;
+
   /////////////////////////////////////////
   {
     pdc_transform_out_t out;
@@ -184,7 +202,29 @@ static hg_return_t pdc_transform_handler(hg_handle_t handle)
   pdc_transform_state_p->opaque_ptr = malloc(pdc_transform_state_p->in.buf_size);
   assert(pdc_transform_state_p->opaque_ptr);
 
-  printf("Got RPC request with buf_size: %ld\n", pdc_transform_state_p->in.buf_size);
+  printf("Got RPC request with buf_size: %ld for obj_id: %lu\n", pdc_transform_state_p->in.buf_size, pdc_transform_state_p->in.obj_id);
+
+  // printf("region: %lu\n", region);
+  // printf("region->obj_id: %lu\n", region->obj_id);
+
+  // struct _pdc_id_info *objinfo1 = NULL; 
+  // printf("derefering now:\n");
+  // objinfo1 = PDC_find_id((pdcid_t)pdc_transform_state_p->in.obj_id);
+  // printf("derefering done:\n");
+  // if (objinfo1 == NULL)
+  // {
+  //   fprintf(stderr, "cannot locate object ID: %ld", pdc_transform_state_p->in.obj_id);
+  // }
+  // else
+  // {
+  //   struct _pdc_obj_info *obj1 = NULL;
+  //   obj1 = (struct _pdc_obj_info *)(objinfo1->obj_ptr);
+  //   if (obj1)
+  //   {
+  //     printf("object found!\n");
+  //     // printf("object 1 properties, time_step: %d\n", obj1->obj_pt, obj1->obj_pt->time_step);
+  //   }
+  // }
 
   // register local target buffer for bulk access
   const struct hg_info *hgi = HG_Get_info(handle);

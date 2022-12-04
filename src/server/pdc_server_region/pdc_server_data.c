@@ -60,6 +60,9 @@
 #include "pdc_hist_pkg.h"
 #include "pdc_timing.h"
 #include "pdc_region.h"
+#include "pdc_obj_pkg.h"
+#include "pdc_prop_pkg.h"
+#include "pdc_prop.h"
 
 // Global object region info list in local data server
 data_server_region_t *      dataserver_region_g     = NULL;
@@ -4583,9 +4586,12 @@ PDC_Server_data_write_out(uint64_t obj_id, struct pdc_region_info *region_info)
   assert(region_info->data_size > 0);
 
   uint64_t write_size = region_info->data_size;
+  // printf("obj_id: %lu\n", obj_id);
 
   region = PDC_Server_get_obj_region(obj_id);
   PDC_Server_register_obj_region_by_pointer(&region, obj_id, 0);
+  // printf("region: %lu\n", region);
+  // printf("region->obj_id: %lu\n", region->obj_id);
 
   region_list_t *request_region = (region_list_t *)calloc(1, sizeof(region_list_t));
   for (i = 0; i < region_info->ndim; i++) {
@@ -4597,6 +4603,32 @@ PDC_Server_data_write_out(uint64_t obj_id, struct pdc_region_info *region_info)
   request_region->ndim      = region_info->ndim;
   request_region->unit_size = region_info->unit;
   strcpy(request_region->storage_location, region->storage_location);
+
+  ////// DO SERVER TRANSFORM HERE //////
+  printf("region: %p\n", region);
+  if(region->obj_transform_enable == TRANSFORM_ENABLE_MAGIC)
+  {
+    // printf("region_info->obj->obj_pt->obj_prop_pub->type: %ld\n", region_info->obj->obj_pt->obj_prop_pub->type);
+    void *ftnHandle = region->transform_ftn_addr;
+    // printf("need to do the transform with ftn: %p\n", ftnHandle);
+
+    size_t (*this_transform)(void *, pdc_var_type_t, int, uint64_t *, void **, pdc_var_type_t, pdcid_t) = NULL;
+    this_transform = ftnHandle;
+
+    uint64_t dims_size[1] = {1};
+
+    void *result;
+    size_t size = this_transform(
+      region_info->data_buf, 
+      region_info->obj->obj_pt->obj_prop_pub->type,
+      region_info->ndim,
+      region_info->dims_size,
+      &result,
+      region_info->obj->obj_pt->obj_prop_pub->type,
+      obj_id 
+    );
+  }
+  //////////////////////////////////////
 
   // TODO: jjravi Detect overwrite
   region_list_t *elt;
@@ -5079,6 +5111,7 @@ PDC_Server_get_local_storage_meta_with_one_name(storage_meta_query_one_name_args
     i = 0;
     DL_FOREACH(region_head, region_elt)
     {
+        printf("region_elt: %p\n", region_elt);
         if (i >= region_count) {
             printf("==PDC_SERVER[%d] %s - More regions %d than allocated %d\n", pdc_server_rank_g, __func__,
                    i, region_count);

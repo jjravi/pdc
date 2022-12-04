@@ -20,25 +20,31 @@ message(STATUS "PDC_DIR: ${PDC_DIR}")
 add_subdirectory(external/SZ3 EXCLUDE_FROM_ALL)
 add_subdirectory(external/cuSZ EXCLUDE_FROM_ALL)
 
-set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build." FORCE)
-
+set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Choose the type of build." FORCE)
+# set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build." FORCE)
 
 macro(remove_cxx_flag flag)
   string(REPLACE "${flag}" "" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
 endmacro()
 remove_cxx_flag("-O3")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall -O2 -rdynamic")
-
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fpermissive")
 include_directories(
   external/SZ3/include/SZ3/
   external/cuSZ/src/
   ${PDC_DIR}/../
   ${PDC_DIR}/src/utils/include
   ${PDC_DIR}/src/api/include
+  ../api/pdc_obj/include
+  ../api/pdc_analysis/include
+  ../server/include
+  ../server/pdc_server_region/include
   $ENV{BLOSC_DIR}/include
+  $ENV{MERCURY_DIR}/include
   $ENV{HOME}/include
   ${HDF5_INCLUDE_DIR}
   /opt/nvidia/nsight-systems/2022.4.1/target-linux-x64/nvtx/include
+  /opt/nvidia/nsight-systems/2022.4.2/target-linux-x64/nvtx/include
 )
 
 link_directories(${PDC_DIR}/lib)

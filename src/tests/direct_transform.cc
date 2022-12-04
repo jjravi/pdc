@@ -8,22 +8,22 @@
 
 extern "C"
 {
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <getopt.h>
-#include <time.h>
-#include <sys/time.h>
-#include <math.h>
-#include <inttypes.h>
-
-#include "pdc.h"
-#include "pdc_transform.h"
-
-#ifdef ENABLE_MPI
-#include "pdc_mpi.h"
-#endif
+  #include <stdio.h>
+  #include <stdlib.h>
+  #include <string.h>
+  #include <unistd.h>
+  #include <getopt.h>
+  #include <time.h>
+  #include <sys/time.h>
+  #include <math.h>
+  #include <inttypes.h>
+  
+  #include "pdc.h"
+  #include "pdc_transform.h"
+  
+  #ifdef ENABLE_MPI
+  #include "pdc_mpi.h"
+  #endif
 }
 
 #undef NDEBUG // enable asserts on release build
@@ -69,7 +69,7 @@ int main(int argc, char **argv)
 
   for(int x = 0; x < 250*250; x++)
   {
-    sub_region[x] = x * 2; 
+    sub_region[x] = x * 2;
   }
 
   pdcid_t pdc_id = PDCinit("pdc");
@@ -90,6 +90,13 @@ int main(int argc, char **argv)
   PDCprop_set_obj_user_id(obj_prop_xx, getuid());
   PDCprop_set_obj_app_name(obj_prop_xx, (char *)std::string("VPICIO").c_str());
   PDCprop_set_obj_tags(obj_prop_xx, (char *)std::string("tag0=1").c_str());
+
+
+  pdc_compression_error_bound_value_t eb_val;
+  eb_val.lower_bound.abs = 1e-7;
+  eb_val.upper_bound.abs = 1e-6;
+  pdc_compression_error_bound_t eb_type = PDC_COMPRESSION_PSNR;
+  PDCprop_set_obj_error_range(obj_prop_xx, eb_type, eb_val);
 
   for(int timestep = 0; timestep < 1; timestep++)
   {
@@ -115,14 +122,14 @@ int main(int argc, char **argv)
     // PDC_API_CALL( PDCbuf_map_transform_register("pdc_passthrough:libpdc_transform_test.so", &x[0], region_x, obj_xx, region_xx, 0, INCR_STATE, DATA_OUT) );
     // PDC_API_CALL( PDCbuf_map_transform_register("pdc_passthrough:/home/jjravi/hpc-io/pdc/src/plugins/build/libpdc_transform_test.so", &x[0], region_x, obj_xx, region_xx, 0, INCR_STATE, DATA_OUT) );
 
-    PDC_API_CALL( pdcTransformRegionRegister("PASSTHROUGH", "pdc_passthrough:/home/jjravi/hpc-io/pdc/src/plugins/build/libpdc_transform_test.so", region_xx, PDC_COMPUTE_CPU) );
-    PDC_API_CALL( pdcTransformRegionRegister("PASSTHROUGH", "pdc_passthrough:/home/jjravi/hpc-io/pdc/src/plugins/build/libpdc_transform_test.so", region_xx, PDC_COMPUTE_GPU) );
-    PDC_API_CALL( pdcTransformRegionRegister("PASSTHROUGH", "pdc_passthrough:/home/jjravi/hpc-io/pdc/src/plugins/build/libpdc_transform_test.so", region_xx, PDC_COMPUTE_DPU) );
+    // PDC_API_CALL( pdcTransformRegionRegister("PASSTHROUGH", "pdc_passthrough:/home/jjravi/hpc-io/pdc/src/plugins/build/libpdc_transform_test.so", region_xx, PDC_COMPUTE_CPU) );
+    // PDC_API_CALL( pdcTransformRegionRegister("PASSTHROUGH", "pdc_passthrough:/home/jjravi/hpc-io/pdc/src/plugins/build/libpdc_transform_test.so", region_xx, PDC_COMPUTE_GPU) );
+    // PDC_API_CALL( pdcTransformRegionRegister("PASSTHROUGH", "pdc_passthrough:/home/jjravi/hpc-io/pdc/src/plugins/build/libpdc_transform_test.so", region_xx, PDC_COMPUTE_DPU) );
+    PDC_API_CALL( pdcTransformObjectRegister("PASSTHROUGH", "pdc_passthrough:/home/jjravi/hpc-io/pdc/src/plugins/build/libpdc_transform_test.so", obj_xx, PDC_COMPUTE_DPU) );
 
-    pdcid_t transfer_request_x; 
+    pdcid_t transfer_request_x;
     pdcid_t transfers[1];
     pdcTransferCreate(&transfers[0], &transfer_request_x, &x[0], PDC_WRITE, obj_xx, region_x, region_xx);
-    exit(0);
 
     ///////////////////////////////////////////////////////////////////////////////
     // PDC_API_CALL( PDCbuf_obj_map(&x[0], PDC_FLOAT, region_x, obj_xx, region_xx) );

@@ -129,6 +129,8 @@ set(PDC_BUILD_INCLUDE_DEPENDENCIES
 )
 
 add_library(pdc ${PDC_SRCS})
+target_link_libraries(pdc m) # -lm (links math lib)
+target_link_libraries(pdc "-Wl,--no-undefined")
 
 target_include_directories(pdc
   PUBLIC  "$<BUILD_INTERFACE:${PDC_BUILD_INCLUDE_DEPENDENCIES}>"
@@ -176,6 +178,7 @@ set(PDC_HEADERS
   ${PDC_SOURCE_DIR}/src/api/pdc_obj/include/pdc_obj.h
   ${PDC_SOURCE_DIR}/src/api/pdc_region/include/pdc_region.h
   ${PDC_SOURCE_DIR}/src/api/pdc_obj/include/pdc_prop.h
+  ${PDC_SOURCE_DIR}/src/api/pdc_obj/include/pdc_cont_pkg.h
   ${PDC_SOURCE_DIR}/src/api/pdc_query/include/pdc_query.h
   ${PDC_SOURCE_DIR}/src/api/pdc_region/include/pdc_region.h
   ${PDC_SOURCE_DIR}/src/api/pdc_transform/include/pdc_transform.h
@@ -183,6 +186,10 @@ set(PDC_HEADERS
   ${PDC_SOURCE_DIR}/src/api/pdc_transform_old/include/pdc_transform_old.h
   ${PDC_SOURCE_DIR}/src/utils/include/pdc_timing.h
   ${PDC_SOURCE_DIR}/src/utils/include/pdc_interface.h
+  ${PDC_SOURCE_DIR}/src/utils/include/pdc_private.h
+  ${PDC_SOURCE_DIR}/src/utils/include/pdc_linkedlist.h
+  ${PDC_SOURCE_DIR}/src/utils/include/pdc_id_pkg.h
+
   ${PDC_SOURCE_DIR}/src/utils/include/pdc_utils.h
   ${PROJECT_BINARY_DIR}/pdc_config_sys.h
   ${PROJECT_BINARY_DIR}/pdc_config.h

@@ -20,8 +20,27 @@ MERCURY_GEN_PROC(pdc_persist_in_t,
   ((uint32_t)(remote_unit))
   ((int32_t)(obj_ndim))
   ((uint32_t)(meta_server_id))
+  ((int32_t)(registered_op))
   ((uint8_t)(access_type))
+  ((int32_t)(storageinfo))
 )
+
+  // TODO: jjravi delete registered_op
+
+/*
+ * The datatype isn't strictly needed but it can be nice
+ * to have if we eventually provide a default 'fill value'.
+ * This would be used when the server creates a temp in
+ * place of a mapped region.
+ * Generally, we assume that either a region is mapped
+ * we haven't mapped because the object is an output
+ * and we really don't care what the initial values are.
+ * Note we package pdc_datatype into storage_info...
+ * +--------+---------------+---------------+
+ * |XXXXXXX | XXXXXXXXXXXXX | pdc_datatype  |
+ * +---//---+---------------+---------------+
+ * 31     16 15            8 7             0
+ */
 
 /**
  * @struct pdc_persist_in_t

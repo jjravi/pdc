@@ -563,7 +563,7 @@ void run_pdc_persist(pdc_transfer_request *trans_request, pdcid_t transfer_id)
   in.remote_unit = trans_request->unit;
   in.meta_server_id = trans_request->metadata_server_id;
   in.access_type = trans_request->access_type;
-
+  in.storageinfo = trans_request->mem_type;
   ///////////////////////////////////////
 
   ret = HG_Forward(pdc_persist_state_p->handle, pdc_persist_cb, pdc_persist_state_p, &in);
