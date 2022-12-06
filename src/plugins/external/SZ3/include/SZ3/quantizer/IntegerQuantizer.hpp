@@ -18,7 +18,8 @@ namespace SZ {
         LinearQuantizer(double eb, int r = 32768) : error_bound(eb),
                                                     error_bound_reciprocal(1.0 / eb),
                                                     radius(r) {
-            assert(eb != 0);
+            // TODO:jjravi entropy is zero?
+            // assert(eb != 0);
         }
 
         int get_radius() const { return radius; }

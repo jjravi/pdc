@@ -71,13 +71,11 @@ int main(int argc, char **argv)
   std::string filename(argv[1]);
   if (rank == 0) printf("Reading %s\n", filename.c_str());
 
-  float *full = (float *)malloc(100 * 500 * 500 * sizeof(float));
+  double *full = (double *)malloc(11 * 500 * 500 * 500 * sizeof(double));
 
   FILE *fp = fopen(filename.c_str(), "rb");
-  fread(full, sizeof(float), 100*500*500, fp);
+  fread(full, sizeof(double), 11*500*500*500, fp);
   fclose(fp);
-
-  float (&data)[100][500][500] = *reinterpret_cast<float(*)[100][500][500]>(full);
 
   pdcid_t pdc_id = PDCinit("pdc");
  
@@ -86,102 +84,78 @@ int main(int argc, char **argv)
   pdcid_t obj_prop_subrr = PDCprop_create(PDC_OBJ_CREATE, pdc_id);
   pdcid_t obj_prop_fullrr = PDCprop_create(PDC_OBJ_CREATE, pdc_id);
 
-
-  uint64_t numparticles = 125*125;
+  uint64_t numparticles = 250*250*250;
   uint64_t  dims[1] = {numparticles * size};
   PDCprop_set_obj_transfer_region_type(obj_prop_subrr, PDC_REGION_STATIC);
   PDCprop_set_obj_dims(obj_prop_subrr, 1, dims);
-  PDCprop_set_obj_type(obj_prop_subrr, PDC_FLOAT);
+  PDCprop_set_obj_type(obj_prop_subrr, PDC_DOUBLE);
   PDCprop_set_obj_time_step(obj_prop_subrr, 0);
   PDCprop_set_obj_user_id(obj_prop_subrr, getuid());
   PDCprop_set_obj_app_name(obj_prop_subrr, (char *)std::string("ISABEL").c_str());
   PDCprop_set_obj_tags(obj_prop_subrr, (char *)std::string("tag0=1").c_str());
 
-  for(int ts_id = 0; ts_id < 100; ts_id++)
+  for(int ts_id = 0; ts_id < 11; ts_id++)
   {
     if(rank == 0) printf("ts_id=%d\n", ts_id);
-    float (&ts0)[500][500] = *reinterpret_cast<float(*)[500][500]>(&full[ts_id]);
-    int num_subregions = size;
+    double (&ts0)[500][500][500] = *reinterpret_cast<double(*)[500][500][500]>(&full[ts_id]);
 
     int x_offset = 0;
     int y_offset = 0;
+    int z_offset = 0;
 
     switch(rank)
     {
       case 0:
-        x_offset = 125*0;
-        y_offset = 125*0;
+        x_offset = 250*0;
+        y_offset = 250*0;
+        z_offset = 250*0;
         break;
       case 1:
-        x_offset = 125*1;
-        y_offset = 125*0;
+        x_offset = 250*1;
+        y_offset = 250*0;
+        z_offset = 250*0;
         break;
       case 2:
-        x_offset = 125*2;
-        y_offset = 125*0;
+        x_offset = 250*0;
+        y_offset = 250*1;
+        z_offset = 250*0;
         break;
       case 3:
-        x_offset = 125*3;
-        y_offset = 125*0;
+        x_offset = 250*1;
+        y_offset = 250*1;
+        z_offset = 250*0;
         break;
       case 4:
-        x_offset = 125*0;
-        y_offset = 125*1;
+        x_offset = 250*0;
+        y_offset = 250*0;
+        z_offset = 250*1;
         break;
       case 5:
-        x_offset = 125*1;
-        y_offset = 125*1;
+        x_offset = 250*1;
+        y_offset = 250*0;
+        z_offset = 250*1;
         break;
       case 6:
-        x_offset = 125*2;
-        y_offset = 125*1;
+        x_offset = 250*0;
+        y_offset = 250*1;
+        z_offset = 250*1;
         break;
       case 7:
-        x_offset = 125*3;
-        y_offset = 125*1;
-        break;
-      case 8:
-        x_offset = 125*0;
-        y_offset = 125*2;
-        break;
-      case 9:
-        x_offset = 125*1;
-        y_offset = 125*2;
-        break;
-      case 10:
-        x_offset = 125*2;
-        y_offset = 125*2;
-        break;
-      case 11:
-        x_offset = 125*3;
-        y_offset = 125*2;
-        break;
-      case 12:
-        x_offset = 125*0;
-        y_offset = 125*3;
-        break;
-      case 13:
-        x_offset = 125*1;
-        y_offset = 125*3;
-        break;
-      case 14:
-        x_offset = 125*2;
-        y_offset = 125*3;
-        break;
-      case 15:
-        x_offset = 125*3;
-        y_offset = 125*3;
+        x_offset = 250*1;
+        y_offset = 250*1;
+        z_offset = 250*1;
         break;
       default:
         assert(false);
         break;
     }
 
-    float sub_region[125][125];
+    double sub_region[250][250][250];
 
-    for(int x = 0; x < 125; x++)
-      for(int y = 0; y < 125; y++)
-        sub_region[x][y] = ts0[x+x_offset][y+y_offset];
+    for(int x = 0; x < 250; x++)
+      for(int y = 0; y < 250; y++)
+        for(int z = 0; z < 250; z++)
+          sub_region[x][y][z] = ts0[x+x_offset][y+y_offset][z+z_offset];
 
     PDCprop_set_obj_time_step(obj_prop_subrr, ts_id);
     pdcid_t obj_xx = PDCobj_create_mpi(container_id,   ("obj-var-xx"+std::to_string(ts_id)).c_str(), obj_prop_subrr, 0, comm);
@@ -197,25 +171,25 @@ int main(int argc, char **argv)
     mysize[0] = numparticles;
 
     // create a region
-    pdcid_t subregion_x   = PDCregion_create(ndim, offset, mysize);
-    pdcid_t subregion_xx   = PDCregion_create(ndim, offset_remote, mysize);
+    pdcid_t region_x   = PDCregion_create(ndim, offset, mysize);
+    pdcid_t region_xx   = PDCregion_create(ndim, offset_remote, mysize);
 
-    // PDC_API_CALL( PDCbuf_map_transform_register("pdc_cusz_compress:libpdc_transform_cusz.so", &sub_region[0], subregion_x, obj_xx, subregion_xx, 0, INCR_STATE, DATA_OUT) );
-    PDC_API_CALL( PDCbuf_map_transform_register("pdc_sz_compress:libpdc_transform_sz.so", &sub_region[0], subregion_x, obj_xx, subregion_xx, 0, INCR_STATE, DATA_OUT) );
-    // PDC_API_CALL( PDCbuf_map_transform_register("pdc_entropy:libanalyze_entropy.so", &sub_region[0], subregion_x, obj_xx, subregion_xx, 0, INCR_STATE, DATA_OUT) );
+    // PDC_API_CALL( PDCbuf_map_transform_register("pdc_cusz_compress:libpdc_transform_cusz.so", &sub_region[0], region_x, obj_xx, region_xx, 0, INCR_STATE, DATA_OUT) );
+    PDC_API_CALL( PDCbuf_map_transform_register("pdc_sz_compress:libpdc_transform_sz.so", &sub_region[0], region_x, obj_xx, region_xx, 0, INCR_STATE, DATA_OUT) );
+    // PDC_API_CALL( PDCbuf_map_transform_register("pdc_entropy:libanalyze_entropy.so", &sub_region[0], region_x, obj_xx, region_xx, 0, INCR_STATE, DATA_OUT) );
 
     MPI_Barrier(MPI_COMM_WORLD);
-    PDC_API_CALL( PDCbuf_obj_map(&sub_region[0], PDC_FLOAT, subregion_x, obj_xx, subregion_xx) );
-    PDC_API_CALL( PDCreg_obtain_lock(obj_xx, subregion_xx, PDC_WRITE, PDC_NOBLOCK) );
+    PDC_API_CALL( PDCbuf_obj_map(&sub_region[0], PDC_DOUBLE, region_x, obj_xx, region_xx) );
+    PDC_API_CALL( PDCreg_obtain_lock(obj_xx, region_xx, PDC_WRITE, PDC_NOBLOCK) );
 
     // TODO: compute
     sleep(1);
 
-    PDC_API_CALL( PDCreg_release_lock(obj_xx, subregion_xx, PDC_WRITE) );
-    PDC_API_CALL( PDCbuf_obj_unmap(obj_xx, subregion_xx) );
+    PDC_API_CALL( PDCreg_release_lock(obj_xx, region_xx, PDC_WRITE) );
+    PDC_API_CALL( PDCbuf_obj_unmap(obj_xx, region_xx) );
 
-    PDC_API_CALL(PDCregion_close(subregion_x));
-    PDC_API_CALL(PDCregion_close(subregion_xx));
+    PDC_API_CALL(PDCregion_close(region_x));
+    PDC_API_CALL(PDCregion_close(region_xx));
     PDC_API_CALL(PDCobj_close(obj_xx));
 
     free(offset);
@@ -227,6 +201,7 @@ int main(int argc, char **argv)
 #endif
     if(rank == 0) printf("\n* * *\n");
     sleep(1);
+    break;
   }
 
   PDC_API_CALL(PDCprop_close(obj_prop_subrr));

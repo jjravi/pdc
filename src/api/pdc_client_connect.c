@@ -4012,7 +4012,7 @@ PDC_Client_region_release(pdcid_t remote_obj_id, struct _pdc_obj_info *object_in
 
   FUNC_ENTER(NULL);
 
-  printf("%s\n", __FUNCTION__);
+  // printf("%s\n", __FUNCTION__);
   // printf("object_info: %p\n", object_info);
 
   if (region_info->registered_op & PDC_TRANSFORM) {
@@ -4021,7 +4021,7 @@ PDC_Client_region_release(pdcid_t remote_obj_id, struct _pdc_obj_info *object_in
     // Get the current data_state of this object::
     readyState = currentState = object_info->obj_pt->data_state;
     ret_value = maybe_run_transform(remote_obj_id, object_info, region_info, access_type, data_type, &currentState, &transform_index, &transform_result, &transform_size);
-    printf("transform_size: %ld\n", transform_size);
+    // printf("transform_size: %ld\n", transform_size);
     if ((ret_value == SUCCEED) && (readyState != currentState)) {
       // update_metadata(object_info, data_type, currentState, transform_size, registry[transform_index]);
       PGOTO_DONE(ret_value);

@@ -37,6 +37,7 @@ include_directories(/opt/nvidia/nsight-systems/2021.2.4/target-linux-x64/nvtx/in
 include_directories(/opt/nvidia/nsight-systems/2022.2.1/target-linux-x64/nvtx/include)
 
 include_directories(/opt/nvidia/nsight-systems/2022.4.1/target-linux-x64/nvtx/include)
+include_directories(/opt/nvidia/nsight-systems/2022.4.2/target-linux-x64/nvtx/include)
 
 set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Choose the type of build." FORCE)
 add_definitions(-DENABLE_MULTITHREAD=1)

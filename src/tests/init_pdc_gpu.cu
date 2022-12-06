@@ -150,7 +150,8 @@ int main(int argc, char **argv)
 
   pdcid_t region_x   = PDCregion_create(ndim, offset, mysize);
   pdcid_t region_xx   = PDCregion_create(ndim, offset_remote, mysize);
-  PDC_API_CALL( PDCbuf_map_transform_register("pdc_cusz_compress:libpdc_transform_cusz.so", &d_x[0], region_x, obj_xx, region_xx, 0, INCR_STATE, DATA_OUT) );
+  // PDC_API_CALL( PDCbuf_map_transform_register("pdc_cusz_compress:libpdc_transform_cusz.so", &d_x[0], region_x, obj_xx, region_xx, 0, INCR_STATE, DATA_OUT) );
+  PDC_API_CALL( PDCbuf_map_transform_register("pdc_entropy:libanalyze_entropy.so", &d_x[0], region_x, obj_xx, region_xx, 0, INCR_STATE, DATA_OUT) );
 
   PDC_API_CALL( PDCbuf_obj_map(&d_x[0], PDC_FLOAT, region_x, obj_xx, region_xx) );
   PDC_API_CALL( PDCreg_obtain_lock(obj_xx, region_xx, PDC_WRITE, PDC_NOBLOCK) );

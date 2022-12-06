@@ -148,7 +148,8 @@ size_t pdc_cusz_compress_cpp(void *dataIn, pdc_var_type_t srcType, int ndim, uin
   size_t uncompressed_alloclen = len * 1.03;
   size_t decompressed_alloclen = uncompressed_alloclen;
   CUDA_RUNTIME_API_CALL(cudaMalloc(&d_uncompressed, sizeof(T) * uncompressed_alloclen));
-  CUDA_RUNTIME_API_CALL(cudaMemcpy(d_uncompressed, dataIn, sizeof(T) * len, cudaMemcpyDeviceToDevice));
+  // CUDA_RUNTIME_API_CALL(cudaMemcpy(d_uncompressed, dataIn, sizeof(T) * len, cudaMemcpyDeviceToDevice));
+  CUDA_RUNTIME_API_CALL(cudaMemcpy(d_uncompressed, dataIn, sizeof(T) * len, cudaMemcpyHostToDevice));
 
   // printf("peeking uncompressed data, 20 elements\n");
   // peek_devdata(d_uncompressed, 20);

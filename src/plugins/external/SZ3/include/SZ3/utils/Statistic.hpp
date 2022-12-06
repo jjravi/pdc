@@ -77,7 +77,7 @@ namespace SZ {
     }
 
     template<typename Type>
-    void verify(Type *ori_data, Type *data, size_t num_elements, double &psnr, double &nrmse) {
+    void verify(Type *ori_data, Type *data, size_t num_elements, double &psnr, double &nrmse, bool verbose=true) {
         size_t i = 0;
         double Max = ori_data[0];
         double Min = ori_data[0];
@@ -130,14 +130,17 @@ namespace SZ {
         double normErr = sqrt(sum);
         double normErr_norm = normErr / sqrt(l2sum);
 
-        printf("Min=%.20G, Max=%.20G, range=%.20G\n", Min, Max, range);
-        printf("Max absolute error = %.2G\n", diffMax);
-        printf("Max relative error = %.2G\n", diffMax / (Max - Min));
-        printf("Max pw relative error = %.2G\n", maxpw_relerr);
-        printf("PSNR = %f, NRMSE= %.10G\n", psnr, nrmse);
-        printf("normError = %f, normErr_norm = %f\n", normErr, normErr_norm);
-        printf("acEff=%f\n", acEff);
-//        printf("errAutoCorr=%.10f\n", autocorrelation1DLag1<double>(diff, num_elements, diff_sum / num_elements));
+        if(verbose)
+        {
+          printf("Min=%.20G, Max=%.20G, range=%.20G\n", Min, Max, range);
+          printf("Max absolute error = %.2G\n", diffMax);
+          printf("Max relative error = %.2G\n", diffMax / (Max - Min));
+          printf("Max pw relative error = %.2G\n", maxpw_relerr);
+          printf("PSNR = %f, NRMSE= %.10G\n", psnr, nrmse);
+          printf("normError = %f, normErr_norm = %f\n", normErr, normErr_norm);
+          printf("acEff=%f\n", acEff);
+          //        printf("errAutoCorr=%.10f\n", autocorrelation1DLag1<double>(diff, num_elements, diff_sum / num_elements));
+        }
         free(diff);
     }
 

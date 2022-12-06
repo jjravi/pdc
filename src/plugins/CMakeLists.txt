@@ -107,3 +107,17 @@ target_link_libraries(pdc_transform_cusz -lcuda)
 target_link_libraries(pdc_transform_cusz MPI::MPI_C MPI::MPI_CXX)
 set_target_properties(pdc_transform_cusz PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
 
+
+add_library(analyze_entropy SHARED plugin_entropy.cu)
+target_include_directories(analyze_entropy PUBLIC ${PDC_DIR}/include/)
+target_link_libraries(analyze_entropy pdc)
+target_link_libraries(analyze_entropy ) 
+target_link_libraries(analyze_entropy -lcuda)
+target_link_libraries(analyze_entropy rt)
+# target_link_libraries(analyze_entropy CUDA::cudart)
+# target_link_libraries(analyze_entropy OpenMP::OpenMP_CXX)
+target_link_libraries(analyze_entropy MPI::MPI_C MPI::MPI_CXX)
+target_link_libraries(analyze_entropy "${OpenMP_CXX_FLAGS}")
+target_compile_options(analyze_entropy PRIVATE "${OpenMP_CXX_FLAGS}")
+set_target_properties(analyze_entropy PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
+

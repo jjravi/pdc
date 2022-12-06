@@ -65,7 +65,7 @@ static bool load_library_from_file(char * path, lib_t *libdata) {
     return false;
   }
 
-  printf("lib size is %zu", st.st_size); 
+  // printf("lib size is %zu", st.st_size);
 
   libdata->size = st.st_size;
   libdata->data = malloc( st.st_size );
@@ -74,7 +74,7 @@ static bool load_library_from_file(char * path, lib_t *libdata) {
   file = fopen(path, "r");
 
   read = fread(libdata->data, 1, st.st_size, file); 
-  printf("read %zu bytes", read);
+  // printf("read %zu bytes", read);
 
   fclose(file);
 
@@ -349,7 +349,7 @@ PDCbuf_map_transform_register(char *func, void *buf, pdcid_t src_region_id, pdci
   if ((ftnPtr = ftnHandle) == NULL)
     PGOTO_ERROR(FAIL, "Transforms function lookup failed\n");
 
-  printf("ftnPtr: %p\n", ftnPtr);
+  // printf("ftnPtr: %p\n", ftnPtr);
 
   if ((thisFtn = PDC_MALLOC(struct _pdc_region_transform_ftn_info)) == NULL)
     PGOTO_ERROR(FAIL, "PDC register_obj_transforms memory allocation failed");
