@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.14...3.18)
 
-set(CMAKE_CUDA_HOST_COMPILER g++-11)
+set(CMAKE_CUDA_HOST_COMPILER g++)
 
 project(cusz_asap CUDA CXX)
 set(CMAKE_CUDA_STANDARD 14)
@@ -13,14 +13,15 @@ set(CMAKE_CXX_STANDARD 14)
 ## For command line, use, for example `cmake -DCMAKE_CUDA_ARCHITECTURES="75" ..` 
 ## to specify CUDA arch.
 
-set(CMAKE_CUDA_HOST_COMPILER gcc-11)
+set(CMAKE_CUDA_HOST_COMPILER gcc)
 enable_language(CUDA)
 
-set(CMAKE_C_COMPILER gcc-11)
-set(CMAKE_CXX_COMPILER g++-11)
+set(CMAKE_C_COMPILER gcc)
+set(CMAKE_CXX_COMPILER g++)
 
 #include_directories(src)
 #include_directories(src/pSZ)
+link_directories(/opt/nvidia/hpc_sdk/Linux_x86_64/2022/math_libs/lib64/)
 
 ## TODO flag only add to a specific library, e.g. suppressing deprecation on CUDA10 cuSPARSE
 set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --extended-lambda --expt-relaxed-constexpr -Wno-deprecated-declarations")
