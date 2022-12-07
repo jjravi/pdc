@@ -1,0 +1,6 @@
+compression ratio = 24.39 
+compression time = 0.437339
+compressed data file = /dev/shm/QCLOUDf48.log10.bin.f32.sz
+compression ratio = 24.39 
+compression time = 0.440269
+compressed data file = /dev/shm/QCLOUDf48.log10.bin.f32.sz

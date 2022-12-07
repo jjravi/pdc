@@ -1,0 +1,12 @@
+compression ratio = 4.27 
+compression time = 4.348145
+compressed data file = /dev/shm/einspline_115_69_69_288.f32.sz
+compression ratio = 4.27 
+compression time = 4.415143
+compressed data file = /dev/shm/einspline_115_69_69_288.f32.sz
+compression ratio = 4.27 
+compression time = 4.443317
+compressed data file = /dev/shm/einspline_115_69_69_288.f32.sz
+compression ratio = 4.27 
+compression time = 4.428924
+compressed data file = /dev/shm/einspline_115_69_69_288.f32.sz

@@ -1,0 +1,12 @@
+compression ratio = 6.94 
+compression time = 0.511524
+compressed data file = /dev/shm/QVAPORf48.bin.f32.sz
+compression ratio = 6.94 
+compression time = 0.525275
+compressed data file = /dev/shm/QVAPORf48.bin.f32.sz
+compression ratio = 6.94 
+compression time = 0.528981
+compressed data file = /dev/shm/QVAPORf48.bin.f32.sz
+compression ratio = 6.94 
+compression time = 0.528817
+compressed data file = /dev/shm/QVAPORf48.bin.f32.sz
