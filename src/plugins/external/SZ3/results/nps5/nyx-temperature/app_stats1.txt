@@ -1,0 +1,3 @@
+compression ratio = 98.50 
+compression time = 5.941844
+compressed data file = /dev/shm/temperature.f32.sz

@@ -1,0 +1,12 @@
+compression ratio = 3.98 
+compression time = 1.279535
+compressed data file = /dev/shm/QRAINf48.log10.bin.f32.sz
+compression ratio = 3.98 
+compression time = 1.316102
+compressed data file = /dev/shm/QRAINf48.log10.bin.f32.sz
+compression ratio = 3.98 
+compression time = 1.359098
+compressed data file = /dev/shm/QRAINf48.log10.bin.f32.sz
+compression ratio = 3.98 
+compression time = 1.360802
+compressed data file = /dev/shm/QRAINf48.log10.bin.f32.sz
