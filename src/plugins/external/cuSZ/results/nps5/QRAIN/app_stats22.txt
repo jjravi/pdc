@@ -1,0 +1,396 @@
+  ::  allocated 4-byte codec 
+  ::  allocated 4-byte codec 
+  ::  allocated 4-byte codec 
+ ERR  Cannot store all Huffman codewords in 32-bit representation
+ ERR  Huffman codeword representation requires at least 33 bits (longest codeword: 25 bits)
+  !!  switch to fallback codec 
+  !!  online allocate fallback (8-byte) codec 
+ ERR  Cannot store all Huffman codewords in 32-bit representation
+ ERR  Huffman codeword representation requires at least 33 bits (longest codeword: 25 bits)
+  !!  switch to fallback codec 
+  !!  online allocate fallback (8-byte) codec 
+  ::  allocated 4-byte codec 
+ ERR  Cannot store all Huffman codewords in 32-bit representation
+ ERR  Huffman codeword representation requires at least 33 bits (longest codeword: 25 bits)
+  !!  switch to fallback codec 
+  !!  online allocate fallback (8-byte) codec 
+  ::  allocated 4-byte codec 
+ ERR  Cannot store all Huffman codewords in 32-bit representation
+ ERR  Huffman codeword representation requires at least 33 bits (longest codeword: 25 bits)
+  !!  switch to fallback codec 
+  !!  online allocate fallback (8-byte) codec 
+ ERR  Cannot store all Huffman codewords in 32-bit representation
+ ERR  Huffman codeword representation requires at least 33 bits (longest codeword: 25 bits)
+  !!  switch to fallback codec 
+  !!  online allocate fallback (8-byte) codec 
+  ::  allocated 4-byte codec 
+  ::  allocated 4-byte codec 
+ ERR  Cannot store all Huffman codewords in 32-bit representation
+ ERR  Huffman codeword representation requires at least 33 bits (longest codeword: 25 bits)
+  !!  switch to fallback codec 
+  !!  online allocate fallback (8-byte) codec 
+ ERR  Cannot store all Huffman codewords in 32-bit representation
+ ERR  Huffman codeword representation requires at least 33 bits (longest codeword: 25 bits)
+  !!  switch to fallback codec 
+  !!  online allocate fallback (8-byte) codec 
+  ::  allocated 4-byte codec 
+ ERR  Cannot store all Huffman codewords in 32-bit representation
+ ERR  Huffman codeword representation requires at least 33 bits (longest codeword: 25 bits)
+  !!  switch to fallback codec 
+  !!  online allocate fallback (8-byte) codec 
+  ::  allocated 4-byte codec 
+  ::  allocated 4-byte codec 
+  ::  allocated 4-byte codec 
+  ::  allocated 4-byte codec 
+  ::  allocated 4-byte codec 
+  ::  allocated 4-byte codec 
+  ::  allocated 4-byte codec 
+  ::  allocated 4-byte codec 
+  ::  allocated 4-byte codec 
+ ERR  Cannot store all Huffman codewords in 32-bit representation
+ ERR  Huffman codeword representation requires at least 33 bits (longest codeword: 25 bits)
+  !!  switch to fallback codec 
+  !!  online allocate fallback (8-byte) codec 
+  ::  allocated 4-byte codec 
+ ERR  Cannot store all Huffman codewords in 32-bit representation
+ ERR  Huffman codeword representation requires at least 33 bits (longest codeword: 25 bits)
+  !!  switch to fallback codec 
+  !!  online allocate fallback (8-byte) codec 
+ ERR  Cannot store all Huffman codewords in 32-bit representation
+ ERR  Huffman codeword representation requires at least 33 bits (longest codeword: 25 bits)
+  !!  switch to fallback codec 
+  !!  online allocate fallback (8-byte) codec 
+ ERR  Cannot store all Huffman codewords in 32-bit representation
+ ERR  Huffman codeword representation requires at least 33 bits (longest codeword: 25 bits)
+  !!  switch to fallback codec 
+  !!  online allocate fallback (8-byte) codec 
+  ::  allocated 4-byte codec 
+ ERR  Cannot store all Huffman codewords in 32-bit representation
+ ERR  Huffman codeword representation requires at least 33 bits (longest codeword: 25 bits)
+  !!  switch to fallback codec 
+  !!  online allocate fallback (8-byte) codec 
+  ::  allocated 4-byte codec 
+  ::  allocated 4-byte codec 
+  ::  allocated 4-byte codec 
+ ERR  Cannot store all Huffman codewords in 32-bit representation
+ ERR  Huffman codeword representation requires at least 33 bits (longest codeword: 25 bits)
+  !!  switch to fallback codec 
+  !!  online allocate fallback (8-byte) codec 
+ ERR  Cannot store all Huffman codewords in 32-bit representation
+ ERR  Huffman codeword representation requires at least 33 bits (longest codeword: 25 bits)
+  !!  switch to fallback codec 
+  !!  online allocate fallback (8-byte) codec 
+ ERR  Cannot store all Huffman codewords in 32-bit representation
+ ERR  Huffman codeword representation requires at least 33 bits (longest codeword: 25 bits)
+  !!  switch to fallback codec 
+  !!  online allocate fallback (8-byte) codec 
+ ERR  Cannot store all Huffman codewords in 32-bit representation
+ ERR  Huffman codeword representation requires at least 33 bits (longest codeword: 25 bits)
+  !!  switch to fallback codec 
+  !!  online allocate fallback (8-byte) codec 
+ ERR  Cannot store all Huffman codewords in 32-bit representation
+ ERR  Huffman codeword representation requires at least 33 bits (longest codeword: 25 bits)
+  !!  switch to fallback codec 
+  !!  online allocate fallback (8-byte) codec 
+ ERR  Cannot store all Huffman codewords in 32-bit representation
+ ERR  Huffman codeword representation requires at least 33 bits (longest codeword: 25 bits)
+  !!  switch to fallback codec 
+  !!  online allocate fallback (8-byte) codec 
+ ERR  Cannot store all Huffman codewords in 32-bit representation
+ ERR  Huffman codeword representation requires at least 33 bits (longest codeword: 25 bits)
+  !!  switch to fallback codec 
+  !!  online allocate fallback (8-byte) codec 
+ ERR  Cannot store all Huffman codewords in 32-bit representation
+ ERR  Huffman codeword representation requires at least 33 bits (longest codeword: 25 bits)
+  !!  switch to fallback codec 
+  !!  online allocate fallback (8-byte) codec 
+ ERR  Cannot store all Huffman codewords in 32-bit representation
+ ERR  Huffman codeword representation requires at least 33 bits (longest codeword: 25 bits)
+  !!  switch to fallback codec 
+  !!  online allocate fallback (8-byte) codec 
+[2m[0m
+(c) COMPRESSION REPORT
+  compression ratio    16.09
+
+  [1m[31mkernel           time, ms      GiB/s[0m
+  predict          0.418816     222.37
+  histogram        0.212992     437.26
+  huff-enc         1.088992      85.52
+  outlier          0.205952     452.20
+  (subtotal)       1.926752      48.34
+  book            21.968897       4.24
+  (total)         23.895649       3.90
+
+[2m[0m
+(c) COMPRESSION REPORT
+  compression ratio    16.09
+
+  [1m[31mkernel           time, ms      GiB/s[0m
+  predict          0.419840     221.83
+  histogram        0.210944     441.50
+  huff-enc         1.245056      74.80
+  outlier          1.317152      70.71
+  (subtotal)       3.192992      29.17
+  book             5.202944      17.90
+  (total)          8.395936      11.09
+
+[2m[0m
+(c) COMPRESSION REPORT
+  compression ratio    16.09
+
+  [1m[31mkernel           time, ms      GiB/s[0m
+  predict          0.421888     220.75
+  histogram        0.214016     435.16
+  huff-enc         1.304032      71.42
+  outlier          0.979040      95.13
+  (subtotal)       2.918976      31.91
+  book            14.871552       6.26
+  (total)         17.790529       5.23
+
+[2m[0m
+(c) COMPRESSION REPORT
+  compression ratio    16.09
+
+  [1m[31mkernel           time, ms      GiB/s[0m
+  predict          0.421888     220.75
+  histogram        0.216064     431.04
+  huff-enc         1.279232      72.80
+  outlier          0.410080     227.11
+  (subtotal)       2.327264      40.02
+  book            22.710272       4.10
+  (total)         25.037537       3.72
+
+[2m[0m
+(c) COMPRESSION REPORT
+  compression ratio    16.09
+
+  [1m[31mkernel           time, ms      GiB/s[0m
+  predict          0.424960     219.16
+  histogram        0.211968     439.37
+  huff-enc         1.354720      68.75
+  outlier          0.504032     184.77
+  (subtotal)       2.495680      37.32
+  book             3.655680      25.48
+  (total)          6.151360      15.14
+
+[2m[0m
+(c) COMPRESSION REPORT
+  compression ratio    16.09
+
+  [1m[31mkernel           time, ms      GiB/s[0m
+  predict          0.429056     217.06
+  histogram        0.217088     429.01
+  huff-enc         4.113920      22.64
+  outlier          0.412384     225.84
+  (subtotal)       5.172448      18.01
+  book            34.539520       2.70
+  (total)         39.711967       2.35
+
+[2m[0m
+(c) COMPRESSION REPORT
+  compression ratio    16.09
+
+  [1m[31mkernel           time, ms      GiB/s[0m
+  predict          0.443392     210.04
+  histogram        0.228352     407.85
+  huff-enc         2.667136      34.92
+  outlier          0.246624     377.63
+  (subtotal)       3.585504      25.97
+  book            21.651457       4.30
+  (total)         25.236961       3.69
+
+[2m[0m
+(c) COMPRESSION REPORT
+  compression ratio    16.09
+
+  [1m[31mkernel           time, ms      GiB/s[0m
+  predict          0.429056     217.06
+  histogram        0.212992     437.26
+  huff-enc         1.236384      75.33
+  outlier          0.760160     122.52
+  (subtotal)       2.638592      35.30
+  book            22.062080       4.22
+  (total)         24.700672       3.77
+
+[2m[0m
+(c) COMPRESSION REPORT
+  compression ratio    16.09
+
+  [1m[31mkernel           time, ms      GiB/s[0m
+  predict          0.446464     208.60
+  histogram        0.225280     413.41
+  huff-enc         2.519264      36.97
+  outlier          0.255744     364.16
+  (subtotal)       3.446752      27.02
+  book             7.678976      12.13
+  (total)         11.125728       8.37
+
+[2m[0m
+(c) COMPRESSION REPORT
+  compression ratio    16.09
+
+  [1m[31mkernel           time, ms      GiB/s[0m
+  predict          0.433152     215.01
+  histogram        0.215040     433.09
+  huff-enc         1.518848      61.32
+  outlier          0.453120     205.54
+  (subtotal)       2.620160      35.54
+  book            14.635008       6.36
+  (total)         17.255167       5.40
+
+[2m[0m
+(c) COMPRESSION REPORT
+  compression ratio    16.09
+
+  [1m[31mkernel           time, ms      GiB/s[0m
+  predict          0.449536     207.17
+  histogram        0.227328     409.68
+  huff-enc         5.642400      16.51
+  outlier          0.613696     151.76
+  (subtotal)       6.932960      13.43
+  book            18.862080       4.94
+  (total)         25.795040       3.61
+
+[2m[0m
+(c) COMPRESSION REPORT
+  compression ratio    16.09
+
+  [1m[31mkernel           time, ms      GiB/s[0m
+  predict          0.433152     215.01
+  histogram        0.211968     439.37
+  huff-enc         1.901728      48.97
+  outlier          0.227904     408.65
+  (subtotal)       2.774752      33.56
+  book            17.088512       5.45
+  (total)         19.863264       4.69
+
+[2m[0m
+(c) COMPRESSION REPORT
+  compression ratio    16.09
+
+  [1m[31mkernel           time, ms      GiB/s[0m
+  predict          0.442368     210.53
+  histogram        0.211968     439.37
+  huff-enc         4.546432      20.48
+  outlier          0.415616     224.08
+  (subtotal)       5.616384      16.58
+  book            20.200447       4.61
+  (total)         25.816832       3.61
+
+[2m[0m
+(c) COMPRESSION REPORT
+  compression ratio    16.09
+
+  [1m[31mkernel           time, ms      GiB/s[0m
+  predict          0.431104     216.03
+  histogram        0.210944     441.50
+  huff-enc         4.529472      20.56
+  outlier          0.410624     226.81
+  (subtotal)       5.582144      16.68
+  book            11.277312       8.26
+  (total)         16.859457       5.52
+
+[2m[0m
+(c) COMPRESSION REPORT
+  compression ratio    16.09
+
+  [1m[31mkernel           time, ms      GiB/s[0m
+  predict          0.437248     213.00
+  histogram        0.217088     429.01
+  huff-enc         2.565952      36.30
+  outlier          0.831840     111.96
+  (subtotal)       4.052128      22.98
+  book            17.497087       5.32
+  (total)         21.549215       4.32
+
+[2m[0m
+(c) COMPRESSION REPORT
+  compression ratio    16.09
+
+  [1m[31mkernel           time, ms      GiB/s[0m
+  predict          0.435200     214.00
+  histogram        0.215040     433.09
+  huff-enc         4.764992      19.55
+  outlier          0.399520     233.11
+  (subtotal)       5.814752      16.02
+  book            19.137535       4.87
+  (total)         24.952288       3.73
+
+[2m[0m
+(c) COMPRESSION REPORT
+  compression ratio    16.09
+
+  [1m[31mkernel           time, ms      GiB/s[0m
+  predict          0.448512     207.65
+  histogram        0.221184     421.06
+  huff-enc         5.201920      17.90
+  outlier          0.244256     381.29
+  (subtotal)       6.115872      15.23
+  book            19.270657       4.83
+  (total)         25.386528       3.67
+
+[2m[0m
+(c) COMPRESSION REPORT
+  compression ratio    16.09
+
+  [1m[31mkernel           time, ms      GiB/s[0m
+  predict          0.436224     213.50
+  histogram        0.212992     437.26
+  huff-enc         4.322432      21.55
+  outlier          0.245664     379.10
+  (subtotal)       5.217312      17.85
+  book            15.535104       5.99
+  (total)         20.752417       4.49
+
+[2m[0m
+(c) COMPRESSION REPORT
+  compression ratio    16.09
+
+  [1m[31mkernel           time, ms      GiB/s[0m
+  predict          0.434176     214.50
+  histogram        0.212992     437.26
+  huff-enc         3.937920      23.65
+  outlier          0.268384     347.01
+  (subtotal)       4.853472      19.19
+  book            16.252928       5.73
+  (total)         21.106400       4.41
+
+[2m[0m
+(c) COMPRESSION REPORT
+  compression ratio    16.09
+
+  [1m[31mkernel           time, ms      GiB/s[0m
+  predict          0.436224     213.50
+  histogram        0.209920     443.66
+  huff-enc         1.953920      47.66
+  outlier          0.210208     443.05
+  (subtotal)       2.810272      33.14
+  book            11.287552       8.25
+  (total)         14.097824       6.61
+
+[2m[0m
+(c) COMPRESSION REPORT
+  compression ratio    16.09
+
+  [1m[31mkernel           time, ms      GiB/s[0m
+  predict          0.437248     213.00
+  histogram        0.212992     437.26
+  huff-enc         3.218528      28.94
+  outlier          0.395904     235.24
+  (subtotal)       4.264672      21.84
+  book            15.917056       5.85
+  (total)         20.181728       4.61
+
+[2m[0m
+(c) COMPRESSION REPORT
+  compression ratio    16.09
+
+  [1m[31mkernel           time, ms      GiB/s[0m
+  predict          0.439296     212.00
+  histogram        0.211968     439.37
+  huff-enc         3.404160      27.36
+  outlier          0.215488     432.19
+  (subtotal)       4.270912      21.81
+  book            15.908864       5.85
+  (total)         20.179775       4.62
+
