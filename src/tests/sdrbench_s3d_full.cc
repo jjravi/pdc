@@ -94,7 +94,7 @@ int main(int argc, char **argv)
   PDCprop_set_obj_app_name(obj_prop_subrr, (char *)std::string("ISABEL").c_str());
   PDCprop_set_obj_tags(obj_prop_subrr, (char *)std::string("tag0=1").c_str());
 
-  for(int ts_id = 0; ts_id < 11; ts_id++)
+  for(int ts_id = 7; ts_id < 11; ts_id++)
   {
     if(rank == 0) printf("ts_id=%d\n", ts_id);
     double (&ts0)[500][500][500] = *reinterpret_cast<double(*)[500][500][500]>(&full[ts_id]);
@@ -117,8 +117,8 @@ int main(int argc, char **argv)
     pdcid_t region_xx   = PDCregion_create(ndim, offset_remote, mysize);
 
     // PDC_API_CALL( PDCbuf_map_transform_register("pdc_cusz_compress:libpdc_transform_cusz.so", &ts0[0], region_x, obj_xx, region_xx, 0, INCR_STATE, DATA_OUT) );
-    PDC_API_CALL( PDCbuf_map_transform_register("pdc_sz_compress:libpdc_transform_sz.so", &ts0[0], region_x, obj_xx, region_xx, 0, INCR_STATE, DATA_OUT) );
-    // PDC_API_CALL( PDCbuf_map_transform_register("pdc_entropy:libanalyze_entropy.so", &ts0[0], region_x, obj_xx, region_xx, 0, INCR_STATE, DATA_OUT) );
+    // PDC_API_CALL( PDCbuf_map_transform_register("pdc_sz_compress:libpdc_transform_sz.so", &ts0[0], region_x, obj_xx, region_xx, 0, INCR_STATE, DATA_OUT) );
+    PDC_API_CALL( PDCbuf_map_transform_register("pdc_entropy:libanalyze_entropy.so", &ts0[0], region_x, obj_xx, region_xx, 0, INCR_STATE, DATA_OUT) );
 
     PDC_API_CALL( PDCbuf_obj_map(&ts0[0], PDC_DOUBLE, region_x, obj_xx, region_xx) );
     PDC_API_CALL( PDCreg_obtain_lock(obj_xx, region_xx, PDC_WRITE, PDC_NOBLOCK) );

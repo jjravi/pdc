@@ -107,6 +107,20 @@ struct freq_calc
   }
 };
 
+struct freq_calc_d
+{
+  const size_t n;
+  freq_calc_d(size_t n) : n(n) {}
+
+  __host__ __device__ double operator()(const int &x) const
+  {
+    double dx = (double)x;
+    double dn = (double)n;
+    double prob = dx / dn;
+    return (-(prob * log2(prob)));
+  }
+};
+
 // calculate shannon's entropy
 // - Σ i=1 to n     P(x_i) * log P(x_i)
 void shannon_entropy(float *buf, size_t nitems)
@@ -184,7 +198,7 @@ void shannon_entropy_d(double *buf, size_t nitems)
   int values_size = thrust::distance(iter1, new_end.second);
 
   double t60 = gettime_ms();
-  double entropy = thrust::transform_reduce(thrust::device, d_values.begin(), new_end.second, freq_calc(nitems), 0.0f, thrust::plus<double>());
+  double entropy = thrust::transform_reduce(thrust::device, d_values.begin(), new_end.second, freq_calc_d(nitems), 0.0f, thrust::plus<double>());
   double t61 = gettime_ms();
   // printf("transform_reduce time: %lf ms\n", t61 - t60);
 

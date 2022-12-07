@@ -175,8 +175,8 @@ int main(int argc, char **argv)
     pdcid_t region_xx   = PDCregion_create(ndim, offset_remote, mysize);
 
     // PDC_API_CALL( PDCbuf_map_transform_register("pdc_cusz_compress:libpdc_transform_cusz.so", &sub_region[0], region_x, obj_xx, region_xx, 0, INCR_STATE, DATA_OUT) );
-    PDC_API_CALL( PDCbuf_map_transform_register("pdc_sz_compress:libpdc_transform_sz.so", &sub_region[0], region_x, obj_xx, region_xx, 0, INCR_STATE, DATA_OUT) );
-    // PDC_API_CALL( PDCbuf_map_transform_register("pdc_entropy:libanalyze_entropy.so", &sub_region[0], region_x, obj_xx, region_xx, 0, INCR_STATE, DATA_OUT) );
+    // PDC_API_CALL( PDCbuf_map_transform_register("pdc_sz_compress:libpdc_transform_sz.so", &sub_region[0], region_x, obj_xx, region_xx, 0, INCR_STATE, DATA_OUT) );
+    PDC_API_CALL( PDCbuf_map_transform_register("pdc_entropy:libanalyze_entropy.so", &sub_region[0], region_x, obj_xx, region_xx, 0, INCR_STATE, DATA_OUT) );
 
     MPI_Barrier(MPI_COMM_WORLD);
     PDC_API_CALL( PDCbuf_obj_map(&sub_region[0], PDC_DOUBLE, region_x, obj_xx, region_xx) );
