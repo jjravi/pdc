@@ -1,0 +1,56 @@
+  ::  allocated 4-byte codec 
+  ::  allocated 4-byte codec 
+  ::  allocated 4-byte codec 
+  ::  allocated 4-byte codec 
+[2m[0m
+(c) COMPRESSION REPORT
+  compression ratio    454.42
+
+  [1m[31mkernel           time, ms      GiB/s[0m
+  predict          0.252896     368.26
+  histogram        0.137024     679.68
+  huff-enc         0.801376     116.22
+  outlier          0.144352     645.17
+  (subtotal)       1.335648      69.73
+  book            21.409248       4.35
+  (total)         22.744896       4.09
+
+[2m[0m
+(c) COMPRESSION REPORT
+  compression ratio    454.42
+
+  [1m[31mkernel           time, ms      GiB/s[0m
+  predict          0.255328     364.76
+  histogram        0.146432     636.01
+  huff-enc         0.719808     129.38
+  outlier          0.534464     174.25
+  (subtotal)       1.656032      56.24
+  book            19.119713       4.87
+  (total)         20.775745       4.48
+
+[2m[0m
+(c) COMPRESSION REPORT
+  compression ratio    454.42
+
+  [1m[31mkernel           time, ms      GiB/s[0m
+  predict          0.235712     395.11
+  histogram        0.136512     682.23
+  huff-enc         0.579584     160.69
+  outlier          0.144288     645.46
+  (subtotal)       1.096096      84.97
+  book            22.049088       4.22
+  (total)         23.145184       4.02
+
+[2m[0m
+(c) COMPRESSION REPORT
+  compression ratio    454.42
+
+  [1m[31mkernel           time, ms      GiB/s[0m
+  predict          0.236832     393.24
+  histogram        0.136512     682.23
+  huff-enc         0.576352     161.59
+  outlier          0.172224     540.76
+  (subtotal)       1.121920      83.01
+  book            20.314495       4.58
+  (total)         21.436415       4.34
+
