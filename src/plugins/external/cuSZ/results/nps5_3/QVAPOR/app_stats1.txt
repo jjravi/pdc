@@ -1,0 +1,14 @@
+  ::  allocated 4-byte codec 
+[2m[0m
+(c) COMPRESSION REPORT
+  compression ratio    2.04
+
+  [1m[31mkernel           time, ms      GiB/s[0m
+  predict          0.542720     171.60
+  histogram        0.263168     353.89
+  huff-enc         1.967936      47.32
+  outlier          0.476768     195.34
+  (subtotal)       3.250592      28.65
+  book            30.839808       3.02
+  (total)         34.090401       2.73
+

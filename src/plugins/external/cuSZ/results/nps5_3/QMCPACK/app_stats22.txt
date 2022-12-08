@@ -1,0 +1,308 @@
+  ::  allocated 4-byte codec 
+  ::  allocated 4-byte codec 
+  ::  allocated 4-byte codec 
+  ::  allocated 4-byte codec 
+[2m[0m
+(c) COMPRESSION REPORT
+  compression ratio    5128.78
+
+  [1m[31mkernel           time, ms      GiB/s[0m
+  predict          0.021504   27316.77
+  histogram        0.019456   30192.22
+  huff-enc         7.582144      77.47
+  outlier         42.967838      13.67
+  (subtotal)      50.590942      11.61
+  book           102.047745       5.76
+  (total)        152.638687       3.85
+
+  ::  allocated 4-byte codec 
+  ::  allocated 4-byte codec 
+  ::  allocated 4-byte codec 
+  ::  allocated 4-byte codec 
+  ::  allocated 4-byte codec 
+  ::  allocated 4-byte codec 
+[2m[0m
+(c) COMPRESSION REPORT
+  compression ratio    5128.78
+
+  [1m[31mkernel           time, ms      GiB/s[0m
+  predict          0.081920    7170.65
+  histogram        0.025600   22946.09
+  huff-enc         0.081760    7184.69
+  outlier          0.197760    2970.37
+  (subtotal)       0.387040    1517.72
+  book            38.063103      15.43
+  (total)         38.450142      15.28
+
+[2m[0m
+(c) COMPRESSION REPORT
+  compression ratio    5128.78
+
+  [1m[31mkernel           time, ms      GiB/s[0m
+  predict          0.117760    4988.28
+  histogram        0.040960   14341.31
+  huff-enc         0.154592    3799.81
+  outlier          0.125568    4678.10
+  (subtotal)       0.438880    1338.45
+  book            52.784126      11.13
+  (total)         53.223007      11.04
+
+  ::  allocated 4-byte codec 
+[2m[0m
+(c) COMPRESSION REPORT
+  compression ratio    5128.78
+
+  [1m[31mkernel           time, ms      GiB/s[0m
+  predict          0.084992    6911.47
+  histogram        0.040960   14341.31
+  huff-enc         0.104704    5610.29
+  outlier          0.063584    9238.49
+  (subtotal)       0.294240    1996.40
+  book            63.442944       9.26
+  (total)         63.737183       9.22
+
+  ::  allocated 4-byte codec 
+  ::  allocated 4-byte codec 
+  ::  allocated 4-byte codec 
+  ::  allocated 4-byte codec 
+  ::  allocated 4-byte codec 
+  ::  allocated 4-byte codec 
+  ::  allocated 4-byte codec 
+  ::  allocated 4-byte codec 
+  ::  allocated 4-byte codec 
+  ::  allocated 4-byte codec 
+  ::  allocated 4-byte codec 
+[2m[0m
+(c) COMPRESSION REPORT
+  compression ratio    5128.78
+
+  [1m[31mkernel           time, ms      GiB/s[0m
+  predict          0.071680    8195.03
+  histogram        0.027648   21246.38
+  huff-enc         0.229120    2563.81
+  outlier          0.349056    1682.88
+  (subtotal)       0.677504     867.04
+  book            44.371967      13.24
+  (total)         45.049473      13.04
+
+[2m[0m
+(c) COMPRESSION REPORT
+  compression ratio    5128.78
+
+  [1m[31mkernel           time, ms      GiB/s[0m
+  predict          0.019456   30192.22
+  histogram        0.018432   31869.57
+  huff-enc         0.842944     696.87
+  outlier          1.631488     360.05
+  (subtotal)       2.512320     233.82
+  book            43.373569      13.54
+  (total)         45.885891      12.80
+
+[2m[0m
+(c) COMPRESSION REPORT
+  compression ratio    5128.78
+
+  [1m[31mkernel           time, ms      GiB/s[0m
+  predict          0.029696   19781.11
+  histogram        0.030720   19121.74
+  huff-enc         0.386944    1518.10
+  outlier          0.418016    1405.26
+  (subtotal)       0.865376     678.80
+  book            39.006207      15.06
+  (total)         39.871582      14.73
+
+[2m[0m
+(c) COMPRESSION REPORT
+  compression ratio    5128.78
+
+  [1m[31mkernel           time, ms      GiB/s[0m
+  predict          0.030720   19121.74
+  histogram        0.045056   13037.55
+  huff-enc         0.131040    4482.75
+  outlier          0.422240    1391.20
+  (subtotal)       0.629056     933.81
+  book            44.976128      13.06
+  (total)         45.605183      12.88
+
+[2m[0m
+(c) COMPRESSION REPORT
+  compression ratio    5128.78
+
+  [1m[31mkernel           time, ms      GiB/s[0m
+  predict          0.019456   30192.22
+  histogram        0.018432   31869.57
+  huff-enc         0.106944    5492.78
+  outlier          0.286368    2051.28
+  (subtotal)       0.431200    1362.29
+  book            41.091072      14.30
+  (total)         41.522270      14.15
+
+[2m[0m
+(c) COMPRESSION REPORT
+  compression ratio    5128.78
+
+  [1m[31mkernel           time, ms      GiB/s[0m
+  predict          0.020480   28682.61
+  histogram        0.018432   31869.57
+  huff-enc         0.367424    1598.75
+  outlier          0.274592    2139.25
+  (subtotal)       0.680928     862.68
+  book            79.800323       7.36
+  (total)         80.481255       7.30
+
+[2m[0m
+(c) COMPRESSION REPORT
+  compression ratio    5128.78
+
+  [1m[31mkernel           time, ms      GiB/s[0m
+  predict          0.028672   20487.58
+  histogram        0.019456   30192.22
+  huff-enc         1.391104     422.27
+  outlier          0.095072    6178.68
+  (subtotal)       1.534304     382.86
+  book            45.513729      12.91
+  (total)         47.048035      12.49
+
+[2m[0m
+(c) COMPRESSION REPORT
+  compression ratio    5128.78
+
+  [1m[31mkernel           time, ms      GiB/s[0m
+  predict          0.028672   20487.58
+  histogram        0.023552   24941.40
+  huff-enc         0.638592     919.87
+  outlier          0.690688     850.49
+  (subtotal)       1.381504     425.20
+  book            54.787071      10.72
+  (total)         56.168575      10.46
+
+[2m[0m
+(c) COMPRESSION REPORT
+  compression ratio    5128.78
+
+  [1m[31mkernel           time, ms      GiB/s[0m
+  predict          0.027648   21246.38
+  histogram        0.024576   23902.17
+  huff-enc         0.503936    1165.66
+  outlier          0.289376    2029.95
+  (subtotal)       0.845536     694.73
+  book            52.365311      11.22
+  (total)         53.210846      11.04
+
+[2m[0m
+(c) COMPRESSION REPORT
+  compression ratio    5128.78
+
+  [1m[31mkernel           time, ms      GiB/s[0m
+  predict          0.028672   20487.58
+  histogram        0.026624   22063.55
+  huff-enc         0.489568    1199.87
+  outlier          0.109760    5351.86
+  (subtotal)       0.654624     897.34
+  book            37.304321      15.75
+  (total)         37.958946      15.48
+
+[2m[0m
+(c) COMPRESSION REPORT
+  compression ratio    5128.78
+
+  [1m[31mkernel           time, ms      GiB/s[0m
+  predict          0.021504   27316.77
+  histogram        0.019456   30192.22
+  huff-enc         0.232544    2526.06
+  outlier          0.051840   11331.40
+  (subtotal)       0.325344    1805.53
+  book            53.151745      11.05
+  (total)         53.477089      10.98
+
+[2m[0m
+(c) COMPRESSION REPORT
+  compression ratio    5128.78
+
+  [1m[31mkernel           time, ms      GiB/s[0m
+  predict          0.019456   30192.22
+  histogram        0.018432   31869.57
+  huff-enc         1.468160     400.11
+  outlier          0.086144    6819.05
+  (subtotal)       1.592192     368.94
+  book            46.035969      12.76
+  (total)         47.628162      12.33
+
+[2m[0m
+(c) COMPRESSION REPORT
+  compression ratio    5128.78
+
+  [1m[31mkernel           time, ms      GiB/s[0m
+  predict          0.021504   27316.77
+  histogram        0.018432   31869.57
+  huff-enc         0.204512    2872.30
+  outlier          0.049600   11843.14
+  (subtotal)       0.294048    1997.70
+  book            62.150658       9.45
+  (total)         62.444706       9.41
+
+[2m[0m
+(c) COMPRESSION REPORT
+  compression ratio    5128.78
+
+  [1m[31mkernel           time, ms      GiB/s[0m
+  predict          0.028672   20487.58
+  histogram        1.208320     486.15
+  huff-enc         1.020416     575.67
+  outlier          0.103936    5651.75
+  (subtotal)       2.361344     248.77
+  book            42.635265      13.78
+  (total)         44.996609      13.05
+
+[2m[0m
+(c) COMPRESSION REPORT
+  compression ratio    5128.78
+
+  [1m[31mkernel           time, ms      GiB/s[0m
+  predict          0.028672   20487.58
+  histogram        0.020480   28682.61
+  huff-enc         0.700512     838.56
+  outlier          0.150848    3894.12
+  (subtotal)       0.900512     652.32
+  book            41.483265      14.16
+  (total)         42.383778      13.86
+
+[2m[0m
+(c) COMPRESSION REPORT
+  compression ratio    5128.78
+
+  [1m[31mkernel           time, ms      GiB/s[0m
+  predict          0.020480   28682.61
+  histogram        0.018432   31869.57
+  huff-enc         1.544448     380.34
+  outlier          0.135584    4332.52
+  (subtotal)       1.718944     341.73
+  book            41.444351      14.17
+  (total)         43.163296      13.61
+
+[2m[0m
+(c) COMPRESSION REPORT
+  compression ratio    5128.78
+
+  [1m[31mkernel           time, ms      GiB/s[0m
+  predict          0.023552   24941.40
+  histogram        0.021504   27316.77
+  huff-enc         1.994944     294.45
+  outlier          0.093824    6260.87
+  (subtotal)       2.133824     275.29
+  book            57.234432      10.26
+  (total)         59.368256       9.89
+
+[2m[0m
+(c) COMPRESSION REPORT
+  compression ratio    5128.78
+
+  [1m[31mkernel           time, ms      GiB/s[0m
+  predict          0.019456   30192.22
+  histogram        0.019456   30192.22
+  huff-enc         0.513824    1143.23
+  outlier          0.118112    4973.41
+  (subtotal)       0.670848     875.64
+  book            52.493313      11.19
+  (total)         53.164162      11.05
+

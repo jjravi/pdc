@@ -1,0 +1,36 @@
+  ::  allocated 4-byte codec 
+  ::  allocated 4-byte codec 
+ ERR  Cannot store all Huffman codewords in 32-bit representation
+ ERR  Huffman codeword representation requires at least 33 bits (longest codeword: 25 bits)
+  !!  switch to fallback codec 
+  !!  online allocate fallback (8-byte) codec 
+ ERR  Cannot store all Huffman codewords in 32-bit representation
+ ERR  Huffman codeword representation requires at least 33 bits (longest codeword: 25 bits)
+  !!  switch to fallback codec 
+  !!  online allocate fallback (8-byte) codec 
+[2m[0m
+(c) COMPRESSION REPORT
+  compression ratio    16.09
+
+  [1m[31mkernel           time, ms      GiB/s[0m
+  predict          0.433152     215.01
+  histogram        0.224256     415.29
+  huff-enc         1.850336      50.33
+  outlier          0.480320     193.90
+  (subtotal)       2.988064      31.17
+  book             2.592768      35.92
+  (total)          5.580832      16.69
+
+[2m[0m
+(c) COMPRESSION REPORT
+  compression ratio    16.09
+
+  [1m[31mkernel           time, ms      GiB/s[0m
+  predict          0.443392     210.04
+  histogram        0.226304     411.54
+  huff-enc         1.276640      72.95
+  outlier          0.227712     408.99
+  (subtotal)       2.174048      42.84
+  book             2.536448      36.72
+  (total)          4.710496      19.77
+
