@@ -128,8 +128,11 @@ set(PDC_BUILD_INCLUDE_DEPENDENCIES
   ${LOCAL_INCLUDE_DIR}
 )
 
+find_package(Threads REQUIRED)
+
 add_library(pdc ${PDC_SRCS})
 target_link_libraries(pdc m) # -lm (links math lib)
+target_link_libraries(pdc Threads::Threads)
 target_link_libraries(pdc "-Wl,--no-undefined")
 
 target_include_directories(pdc
