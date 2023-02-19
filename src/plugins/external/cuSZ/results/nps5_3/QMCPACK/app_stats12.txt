@@ -34,7 +34,7 @@
   outlier          0.607808     966.46
   (subtotal)       0.737408     796.60
   book           129.444870       4.54
-  (total)        130.182281       4.51
+  (total)        160.182281       4.51
 
 [2m[0m
 (c) COMPRESSION REPORT
@@ -47,7 +47,7 @@
   outlier          0.314272    1869.14
   (subtotal)       0.574464    1022.55
   book            35.481602      16.56
-  (total)         36.056065      16.29
+  (total)         156.056065      16.29
 
 [2m[0m
 (c) COMPRESSION REPORT

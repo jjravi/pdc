@@ -14,8 +14,8 @@
   huff-enc         1.940672      47.99
   outlier          0.631584     147.46
   (subtotal)       3.221472      28.91
-  book            60.084225       1.55
-  (total)         63.305698       1.47
+  book            30.084225       1.55
+  (total)         33.305698       1.47
 
 [2m[0m
 (c) COMPRESSION REPORT

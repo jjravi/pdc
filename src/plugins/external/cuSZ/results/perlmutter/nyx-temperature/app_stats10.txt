@@ -96,8 +96,8 @@
   huff-enc         4.354816     114.82
   outlier          0.839488     595.60
   (subtotal)       7.039680      71.03
-  book           112.628159       4.44
-  (total)        119.667839       4.18
+  book            39.628159       4.44
+  (total)         46.667839       4.18
 
 [2m[0m
 (c) COMPRESSION REPORT
@@ -109,8 +109,8 @@
   huff-enc         3.878592     128.91
   outlier          0.988192     505.97
   (subtotal)       6.694144      74.69
-  book           112.523582       4.44
-  (total)        119.217728       4.19
+  book            39.523582       4.44
+  (total)         46.217728       4.19
 
 [2m[0m
 (c) COMPRESSION REPORT
@@ -122,8 +122,8 @@
   huff-enc         2.587648     193.23
   outlier          0.482272    1036.76
   (subtotal)       5.263776      94.99
-  book           115.487999       4.33
-  (total)        120.751778       4.14
+  book            42.487999       4.33
+  (total)         47.751778       4.14
 
 [2m[0m
 (c) COMPRESSION REPORT
@@ -135,6 +135,6 @@
   huff-enc         2.736096     182.74
   outlier          0.476512    1049.29
   (subtotal)       5.034208      99.32
-  book           115.498367       4.33
-  (total)        120.532578       4.15
+  book            42.498367       4.33
+  (total)         47.532578       4.15
 
